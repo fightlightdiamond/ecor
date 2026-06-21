@@ -1,0 +1,92 @@
+---
+description: Rule bắt buộc đa ngôn ngữ vi/en — URL, nội dung DB, SEO, UI strings. Áp dụng cho mọi tính năng.
+alwaysApply: true
+---
+
+# Rule: Multi-Language (vi / en)
+
+## Stack i18n
+- `@nuxtjs/i18n` v9 + Vue I18n v10 (Nuxt 3 native)
+- Locale mặc định: **Tiếng Việt (`vi`)**
+- Locale thứ hai: **English (`en`)**
+
+## Chiến lược URL
+```
+/           → Tiếng Việt (mặc định, không prefix)
+/dich-vu    → /en/services
+/lien-he    → /en/contact
+```
+Config: `strategy: 'prefix_except_default'`
+
+## Nuxt Config chuẩn
+```ts
+// nuxt.config.ts
+i18n: {
+  defaultLocale: 'vi',
+  strategy: 'prefix_except_default',
+  locales: [
+    { code: 'vi', language: 'vi-VN', name: 'Tiếng Việt', file: 'vi.json' },
+    { code: 'en', language: 'en-US', name: 'English',    file: 'en.json' }
+  ],
+  detectBrowserLanguage: {
+    useCookie: true,
+    cookieKey: 'i18n_locale',
+    cookieMaxAge: 2592000, // 30 ngày
+    fallbackLocale: 'vi'
+  }
+}
+```
+
+## DB: Nội dung động — cột translations (JSONB)
+Mọi entity có text hiển thị cho user PHẢI có cột `translations`:
+```json
+{
+  "vi": { "name": "Cắt tóc cơ bản", "description": "Dịch vụ..." },
+  "en": { "name": "Basic Haircut",  "description": "Service..." }
+}
+```
+- Tiếng Việt (`vi`): **bắt buộc**
+- Tiếng Anh (`en`): tùy chọn, **fallback về `vi`** nếu trống
+- API trả về theo `?lang=vi` hoặc `Accept-Language` header
+
+## UI Strings cố định — file locale
+```
+apps/web/locales/vi.json   # "Đặt lịch", "Dịch vụ", "Liên hệ"...
+apps/web/locales/en.json   # "Book Now", "Services", "Contact"...
+```
+Không bao giờ hardcode text UI trong template Vue.
+
+## Vue Component — sử dụng $t()
+```vue
+<!-- ✅ ĐÚNG -->
+<button>{{ $t('booking.submit') }}</button>
+<NuxtLink :to="localePath('/dich-vu')">{{ $t('nav.services') }}</NuxtLink>
+
+<!-- ❌ SAI: hardcode text -->
+<button>Đặt lịch ngay</button>
+```
+
+## SEO i18n — bắt buộc mọi trang
+```vue
+<script setup>
+const { locale, locales } = useI18n()
+const route = useRoute()
+
+useSeoMeta({
+  ogLocale: locale.value === 'vi' ? 'vi_VN' : 'en_US',
+})
+
+useHead({
+  link: [
+    { rel: 'alternate', hreflang: 'vi', href: `https://domain.vn${route.path}` },
+    { rel: 'alternate', hreflang: 'en', href: `https://domain.vn/en${route.path}` },
+    { rel: 'alternate', hreflang: 'x-default', href: `https://domain.vn${route.path}` }
+  ]
+})
+</script>
+```
+
+## Admin Panel — nhập nội dung song ngữ
+- Form nhập có 2 tab: **"Tiếng Việt"** | **"English"**
+- Validate: tab Tiếng Việt required, tab English optional
+- Preview: nút toggle để xem trang theo từng ngôn ngữ

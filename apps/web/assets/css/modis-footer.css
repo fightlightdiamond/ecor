@@ -1,0 +1,81 @@
+/* Modis footer — trích từ theme san-pham-list, dùng chung toàn site */
+
+.modis-site-footer {
+  background: #111;
+  color: #ccc;
+  padding: 60px 0 0;
+  clear: both;
+  position: relative;
+}
+
+.modis-site-footer h3 {
+  color: #fff;
+  text-transform: uppercase;
+  padding-bottom: 20px;
+  font-size: 16px;
+  font-weight: bold;
+  margin: 0 0 10px;
+}
+
+.modis-site-footer a {
+  color: #ccc;
+  text-decoration: none;
+}
+
+.modis-site-footer a:hover {
+  color: #eceff3;
+}
+
+.modis-site-footer .widget {
+  margin-bottom: 40px;
+}
+
+.modis-site-footer .widget ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.modis-site-footer .widget_recent_post li {
+  padding-left: 16px;
+  border-bottom: solid 1px #222;
+  padding-bottom: 7px;
+  margin-bottom: 5px;
+  position: relative;
+}
+
+.modis-site-footer .widget_recent_post li::before {
+  content: "›";
+  position: absolute;
+  left: 0;
+  color: #c9a86c;
+}
+
+.modis-site-footer .widget-address address span {
+  display: block;
+  margin-bottom: 8px;
+  line-height: 1.6;
+}
+
+.modis-site-footer .list-border-bottom li {
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, .08);
+}
+
+.modis-site-footer .box-border.double {
+  border: solid 1px rgba(255, 255, 255, .1);
+  padding: 16px;
+}
+
+.modis-site-footer .id-color {
+  color: #c9a86c;
+}
+
+.modis-site-footer .subfooter {
+  background: #151515;
+  padding: 30px 0 20px;
+  margin-top: 30px;
+  text-align: center;
+  color: #999;
+  font-size: 13px;
+}

@@ -1,0 +1,145 @@
+{
+  "site": {
+    "name": "Thăng Long Chè Việt",
+    "tagline": "Nghệ thuật làm đẹp truyền thống"
+  },
+  "nav": {
+    "home": "Trang chủ",
+    "products": "Sản phẩm",
+    "craftVillage": "Làng nghề",
+    "services": "Dịch vụ",
+    "gallery": "Bộ sưu tập",
+    "team": "Đội ngũ",
+    "blog": "Tin tức",
+    "contact": "Liên hệ",
+    "bookNow": "Đặt lịch ngay"
+  },
+  "hero": {
+    "cta": "Đặt lịch ngay",
+    "learnMore": "Khám phá thêm",
+    "openingTimes": "Giờ mở cửa",
+    "ourLocation": "Địa chỉ"
+  },
+  "services": {
+    "title": "Dịch vụ của chúng tôi",
+    "subtitle": "Trải nghiệm dịch vụ làm đẹp đẳng cấp với đội ngũ chuyên gia hàng đầu",
+    "fullServices": "Dịch vụ toàn diện",
+    "viewAll": "Xem tất cả dịch vụ",
+    "from": "Từ",
+    "duration": "Thời gian",
+    "minutes": "phút",
+    "bookService": "Đặt lịch dịch vụ này"
+  },
+  "team": {
+    "title": "Đội ngũ chuyên gia",
+    "subtitle": "Những nghệ nhân tài năng với nhiều năm kinh nghiệm trong ngành làm đẹp",
+    "viewAll": "Xem toàn bộ đội ngũ",
+    "specialist": "Chuyên gia"
+  },
+  "craftVillage": {
+    "eyebrow": "Làng nghề",
+    "title": "Tinh hoa làng nghề trà Việt",
+    "subtitle": "Gìn giữ và phát huy nghề trà truyền thống Thăng Long",
+    "intro": "Thăng Long Chè Việt gắn bó với những làng nghề trà lâu đời — nơi từng búp trà được chăm chút bằng đôi tay nghệ nhân và tình yêu quê hương.",
+    "body": "Chúng tôi hợp tác trực tiếp với các hộ dân và xưởng trà tại vùng nguyên liệu, bảo tồn quy trình sao sấy thủ công, ướp hương sen và đóng gói theo chuẩn vệ sinh an toàn thực phẩm. Mỗi sản phẩm là câu chuyện về đất, nước và người — mang hồn Việt đến từng ấm trà.",
+    "values": {
+      "heritage": "Bảo tồn kỹ thuật truyền thống",
+      "craft": "Chế biến thủ công tỉ mỉ",
+      "origin": "Nguồn gốc minh bạch",
+      "community": "Gắn kết cộng đồng làng nghề"
+    }
+  },
+  "promo": {
+    "badge": "Ưu đãi đặc biệt",
+    "badgeLabel": "Khuyến mãi đặc biệt",
+    "cta": "Nhận ưu đãi ngay",
+    "terms": "Áp dụng đến hết tháng này"
+  },
+  "contact": {
+    "title": "Liên hệ & Đặt lịch",
+    "subtitle": "Chúng tôi luôn sẵn sàng phục vụ bạn",
+    "address": "Địa chỉ",
+    "phone": "Điện thoại",
+    "email": "Email",
+    "hours": "Giờ mở cửa",
+    "form": {
+      "name": "Họ và tên",
+      "namePlaceholder": "Nguyễn Văn A",
+      "phone": "Số điện thoại",
+      "phonePlaceholder": "0901 234 567",
+      "email": "Email",
+      "emailPlaceholder": "email{'@'}example.com",
+      "service": "Dịch vụ quan tâm",
+      "servicePlaceholder": "Chọn dịch vụ",
+      "message": "Ghi chú",
+      "messagePlaceholder": "Yêu cầu đặc biệt hoặc câu hỏi...",
+      "submit": "Gửi yêu cầu",
+      "submitting": "Đang gửi...",
+      "success": "Cảm ơn! Chúng tôi sẽ liên hệ với bạn sớm.",
+      "error": "Có lỗi xảy ra. Vui lòng thử lại hoặc gọi trực tiếp."
+    }
+  },
+  "products": {
+    "label": "Sản phẩm",
+    "title": "Danh sách sản phẩm",
+    "subtitle": "Bộ sưu tập chè Việt — tinh hoa hương vị truyền thống",
+    "buy": "Liên hệ đặt mua",
+    "backToList": "Quay lại danh sách",
+    "descTitle": "Mô tả sản phẩm",
+    "featuresTitle": "Đặc điểm nổi bật",
+    "related": "Sản phẩm liên quan",
+    "notFound": "Không tìm thấy sản phẩm"
+  },
+  "connect": {
+    "open": "Kết nối",
+    "title": "Kết nối với chúng tôi",
+    "subtitle": "Chọn kênh liên hệ hoặc để lại thông tin",
+    "leaveInfo": "Để lại thông tin",
+    "back": "Kênh liên hệ"
+  },
+  "footer": {
+    "followUs": "Theo dõi chúng tôi",
+    "latestNews": "Tin mới nhất",
+    "phone": "Điện thoại",
+    "hotline": "Hotline",
+    "email": "Email",
+    "web": "Web",
+    "copyright": "© {year} Thăng Long Chè Việt. Bảo lưu mọi quyền.",
+    "privacy": "Chính sách bảo mật",
+    "terms": "Điều khoản sử dụng"
+  },
+  "common": {
+    "loading": "Đang tải...",
+    "error": "Có lỗi xảy ra",
+    "viewMore": "Xem thêm",
+    "close": "Đóng",
+    "back": "Quay lại",
+    "currency": "VNĐ"
+  },
+  "skills": {
+    "eyebrow": "Chuyên môn",
+    "title": "Kỹ năng của chúng tôi"
+  },
+  "testimonials": {
+    "title": "Khách hàng nói gì"
+  },
+  "discover": {
+    "eyebrow": "Khám phá",
+    "title": "Dịch vụ của chúng tôi",
+    "subtitle": "Chúng tôi cung cấp"
+  },
+  "blog": {
+    "eyebrow": "Tin tức",
+    "title": "Bài viết mới nhất",
+    "featured": "Tin nổi bật",
+    "subtitle": "Mẹo làm đẹp, xu hướng và tin tức từ Thăng Long Chè Việt",
+    "viewAll": "Xem tất cả bài viết",
+    "comingSoon": "Nội dung đầy đủ sẽ được cập nhật trong Phase 2."
+  },
+  "gallery": {
+    "eyebrow": "Tác phẩm của chúng tôi",
+    "title": "Bộ sưu tập",
+    "subtitle": "Không gian salon và tác phẩm từ đội ngũ chuyên gia",
+    "comingSoon": "Nhiều hình ảnh hơn sẽ được cập nhật trong Phase 2."
+  }
+}

@@ -1,0 +1,145 @@
+{
+  "site": {
+    "name": "Thăng Long Chè Việt",
+    "tagline": "The Art of Traditional Beauty"
+  },
+  "nav": {
+    "home": "Home",
+    "products": "Products",
+    "craftVillage": "Craft Village",
+    "services": "Services",
+    "gallery": "Gallery",
+    "team": "Our Team",
+    "blog": "News",
+    "contact": "Contact",
+    "bookNow": "Book Now"
+  },
+  "hero": {
+    "cta": "Book Now",
+    "learnMore": "Explore More",
+    "openingTimes": "Opening Times",
+    "ourLocation": "Our Location"
+  },
+  "services": {
+    "title": "Our Services",
+    "subtitle": "Experience premium beauty services with our team of leading experts",
+    "fullServices": "Full Services",
+    "viewAll": "View All Services",
+    "from": "From",
+    "duration": "Duration",
+    "minutes": "min",
+    "bookService": "Book This Service"
+  },
+  "team": {
+    "title": "Meet Our Experts",
+    "subtitle": "Talented artisans with years of experience in the beauty industry",
+    "viewAll": "View Full Team",
+    "specialist": "Specialist"
+  },
+  "craftVillage": {
+    "eyebrow": "Craft Village",
+    "title": "The Soul of Vietnamese Tea Heritage",
+    "subtitle": "Preserving and celebrating Thang Long's traditional tea craft",
+    "intro": "Thang Long Che Viet is rooted in time-honored tea villages — where every bud is tended by skilled artisans with deep love for their homeland.",
+    "body": "We work directly with farming families and workshops in source regions, preserving hand-firing, lotus scenting and hygienic packaging standards. Each product tells a story of land, water and people — bringing the Vietnamese spirit to every cup.",
+    "values": {
+      "heritage": "Traditional techniques preserved",
+      "craft": "Meticulous hand processing",
+      "origin": "Transparent sourcing",
+      "community": "Supporting craft communities"
+    }
+  },
+  "promo": {
+    "badge": "Special Offer",
+    "badgeLabel": "Special Promo",
+    "cta": "Claim Offer Now",
+    "terms": "Valid until end of this month"
+  },
+  "contact": {
+    "title": "Contact & Booking",
+    "subtitle": "We are always ready to serve you",
+    "address": "Address",
+    "phone": "Phone",
+    "email": "Email",
+    "hours": "Opening Hours",
+    "form": {
+      "name": "Full Name",
+      "namePlaceholder": "John Smith",
+      "phone": "Phone Number",
+      "phonePlaceholder": "+84 901 234 567",
+      "email": "Email",
+      "emailPlaceholder": "email{'@'}example.com",
+      "service": "Service of Interest",
+      "servicePlaceholder": "Select a service",
+      "message": "Notes",
+      "messagePlaceholder": "Special requests or questions...",
+      "submit": "Send Request",
+      "submitting": "Sending...",
+      "success": "Thank you! We will contact you shortly.",
+      "error": "An error occurred. Please try again or call us directly."
+    }
+  },
+  "products": {
+    "label": "Products",
+    "title": "Our Products",
+    "subtitle": "The Vietnamese tea collection — the essence of traditional flavor",
+    "buy": "Contact to order",
+    "backToList": "Back to list",
+    "descTitle": "Product description",
+    "featuresTitle": "Highlights",
+    "related": "Related products",
+    "notFound": "Product not found"
+  },
+  "connect": {
+    "open": "Connect",
+    "title": "Connect with us",
+    "subtitle": "Pick a channel or leave your info",
+    "leaveInfo": "Leave your info",
+    "back": "Channels"
+  },
+  "footer": {
+    "followUs": "Follow Us",
+    "latestNews": "Latest news",
+    "phone": "Phone",
+    "hotline": "Hotline",
+    "email": "Email",
+    "web": "Web",
+    "copyright": "© {year} Thang Long Che Viet. All rights reserved.",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Use"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "viewMore": "View More",
+    "close": "Close",
+    "back": "Back",
+    "currency": "VND"
+  },
+  "skills": {
+    "eyebrow": "Expertise",
+    "title": "Our Skills"
+  },
+  "testimonials": {
+    "title": "What They Say"
+  },
+  "discover": {
+    "eyebrow": "Discover",
+    "title": "Our Services",
+    "subtitle": "We do"
+  },
+  "blog": {
+    "eyebrow": "News",
+    "title": "Latest Articles",
+    "featured": "Featured",
+    "subtitle": "Beauty tips, trends and news from Thăng Long Chè Việt",
+    "viewAll": "View All Articles",
+    "comingSoon": "Full article content will be added in Phase 2."
+  },
+  "gallery": {
+    "eyebrow": "Our Works",
+    "title": "Gallery",
+    "subtitle": "Salon space and works from our expert team",
+    "comingSoon": "More photos will be added in Phase 2."
+  }
+}

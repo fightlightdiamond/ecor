@@ -1,0 +1,27 @@
+{
+  "name": "thang-long-che-viet",
+  "private": true,
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@parcel/watcher",
+      "esbuild",
+      "sharp"
+    ]
+  },
+  "scripts": {
+    "dev": "pnpm --filter web dev",
+    "build": "pnpm --filter web build",
+    "preview": "pnpm --filter web preview",
+    "lint": "pnpm --filter web lint",
+    "typecheck": "pnpm --filter web typecheck"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "dependencies": {
+    "@oxc-minify/binding-win32-x64-msvc": "0.132.0",
+    "@oxc-parser/binding-win32-x64-msvc": "0.132.0",
+    "@oxc-transform/binding-win32-x64-msvc": "^0.132.0"
+  }
+}

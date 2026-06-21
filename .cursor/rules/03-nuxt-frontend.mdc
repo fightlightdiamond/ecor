@@ -1,0 +1,105 @@
+---
+description: Conventions cho Nuxt 3 / Vue 3 frontend — component patterns, composables, SEO, performance.
+globs: apps/web/**/*.{vue,ts}
+alwaysApply: false
+---
+
+# Nuxt 3 / Vue 3 Frontend Conventions
+
+## Component Structure
+```vue
+<script setup lang="ts">
+// 1. Imports
+// 2. Props/Emits
+// 3. Composables (useI18n, useSeoMeta, useRoute...)
+// 4. Reactive state
+// 5. Computed
+// 6. Methods
+// 7. Lifecycle (onMounted nếu cần)
+</script>
+
+<template>
+  <!-- Single root element hoặc Fragment -->
+</template>
+```
+
+## File Naming
+```
+components/
+  AppHeader.vue         # PascalCase, prefix App cho global
+  ThemeProvider.vue
+  sections/
+    HeroSlider.vue      # PascalCase
+    ServiceGrid.vue
+composables/
+  useTheme.ts           # camelCase với prefix use
+  useBookingForm.ts
+```
+
+## SEO — mọi page phải có
+```vue
+<script setup>
+useSeoMeta({
+  title: computed(() => pageData.value?.title ?? 'Thăng Long Chè Việt'),
+  description: computed(() => pageData.value?.description),
+  ogTitle: ...,
+  ogImage: ...,
+})
+</script>
+```
+
+## Performance — bắt buộc
+```vue
+<!-- Lazy load component nặng -->
+const HeavyChart = defineAsyncComponent(() => import('~/components/HeavyChart.vue'))
+
+<!-- Image: luôn dùng NuxtImg, không dùng <img> raw cho content images -->
+<NuxtImg src="..." sizes="100vw sm:50vw lg:400px" loading="lazy" format="webp" />
+
+<!-- Prefetch trang quan trọng -->
+<NuxtLink prefetch href="/dich-vu">Dịch vụ</NuxtLink>
+```
+
+## Theme Engine — inject CSS variables
+```ts
+// composables/useTheme.ts
+export function useTheme() {
+  const applyTheme = (config: ThemeConfig) => {
+    const root = document.documentElement
+    root.style.setProperty('--color-primary', config.colors.primary)
+    root.style.setProperty('--font-heading', config.typography.heading)
+  }
+  return { applyTheme }
+}
+```
+
+## Page Template Registry
+```ts
+// utils/templateRegistry.ts
+export const templateRegistry: Record<string, Component> = {
+  'home-hero-slider': defineAsyncComponent(() => import('~/templates/HomeHeroSlider.vue')),
+  'home-video-bg':    defineAsyncComponent(() => import('~/templates/HomeVideoBg.vue')),
+  'services-grid':    defineAsyncComponent(() => import('~/templates/ServicesGrid.vue')),
+  // Thêm template mới tại đây
+}
+```
+
+## API Calls — luôn dùng useFetch / useAsyncData
+```ts
+// ✅ ĐÚNG: SSR-compatible, cache tự động
+const { data: page } = await useAsyncData(
+  `page-${slug}`,
+  () => $fetch(`/api/pages/${slug}?lang=${locale.value}`)
+)
+
+// ❌ SAI: chỉ chạy client-side
+onMounted(() => { fetch('/api/pages/...') })
+```
+
+## Error Handling
+```vue
+<script setup>
+const { data, error } = await useAsyncData(...)
+if (error.value) throw createError({ statusCode: 404 })
+</script>
+```

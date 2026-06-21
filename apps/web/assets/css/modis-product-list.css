@@ -1,0 +1,171 @@
+/* Modis product list page — bổ sung / override cho section-services-tab & info boxes */
+
+.modis-product-page .id-color {
+  color: #c9a86c;
+}
+
+.modis-product-page .info-box {
+  position: relative;
+  min-height: 48px;
+}
+
+.modis-product-page .info-box .info-icon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 48px;
+  height: 48px;
+  color: #c9a86c;
+}
+
+.modis-product-page .info-box .info-box_text {
+  padding-left: 60px;
+}
+
+.modis-product-page .info-box .info-box_title {
+  font-weight: 700;
+  text-transform: uppercase;
+  line-height: 16px;
+  color: #fff;
+  margin-top: 8px;
+}
+
+.modis-product-page .info-box .info-box_subtite {
+  color: rgba(255, 255, 255, .75);
+  margin-top: 4px;
+}
+
+.modis-product-page .overlay10 {
+  background: rgba(255, 255, 255, .1);
+}
+
+/* Giới hạn ảnh tab — ảnh gốc quá lớn làm vỡ layout */
+.modis-product-page.de_light .de_tab.tab_style_2 .de_nav li img,
+.modis-product-page.de_light .de_tab.tab_style_2 .de_nav li.active img {
+  width: auto;
+  max-width: 72px;
+  max-height: 72px;
+  height: auto;
+  object-fit: cover;
+  display: block;
+  margin: 0 auto 6px;
+  border-radius: 4px;
+}
+
+.modis-product-page .de_tab.tab_style_2 .de_nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.modis-product-page .de_tab.tab_style_2 .de_nav li {
+  float: none;
+  display: inline-block;
+  background: none;
+  margin: 0 5px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.modis-product-page.de_light .de_tab.tab_style_2 .de_nav li img {
+  filter: grayscale(100%);
+  opacity: .7;
+}
+
+.modis-product-page.de_light .de_tab.tab_style_2 .de_nav li.active img {
+  filter: grayscale(0%);
+  opacity: 1;
+}
+
+.modis-product-page.de_light .de_tab.tab_style_2 .de_nav li span {
+  background: none;
+  display: block;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  padding: 0 8px 8px;
+  color: #555;
+}
+
+.modis-product-page.de_light .de_tab.tab_style_2 .de_nav li.active span {
+  border-bottom: solid 6px #bbb;
+  color: #333;
+}
+
+.modis-product-page .de_tab_content {
+  border-top: 1px solid #ddd;
+  padding-top: 24px;
+  margin-top: 8px;
+}
+
+.modis-product-page .sub-item-service {
+  display: table;
+  font-size: 14px;
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.modis-product-page .sub-item-service .c1,
+.modis-product-page .sub-item-service .c2,
+.modis-product-page .sub-item-service .c3 {
+  display: table-cell;
+  vertical-align: middle;
+}
+
+.modis-product-page .sub-item-service .c1 {
+  color: #222;
+}
+
+.modis-product-page .sub-item-service .c2 {
+  width: 100%;
+  border-bottom: 1px dotted #ccc;
+  padding: 0 8px 4px;
+}
+
+.modis-product-page .sub-item-service .c3 {
+  font-weight: bold;
+  text-align: right;
+  color: #333;
+  white-space: nowrap;
+}
+
+.modis-product-page .sub-item-service .c1 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.modis-product-page .sub-item-service .c1 a:hover {
+  color: #c9a86c;
+}
+
+.modis-product-page .box-icon .text h4 {
+  color: #222;
+  margin: 0 0 10px;
+}
+
+.modis-product-page .box-icon .text p {
+  color: #555;
+  line-height: 1.7;
+  margin: 0;
+}
+
+.modis-product-page .box-icon .box-icon-fa {
+  display: block;
+  width: 50px;
+  height: 50px;
+  line-height: 50px;
+  text-align: center;
+  border-radius: 60px;
+  position: absolute;
+  font-size: 22px;
+  color: #fff;
+  background: #c9a86c;
+}
+
+.modis-product-page .box-icon .text {
+  margin-left: 80px;
+}
