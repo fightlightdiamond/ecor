@@ -24,11 +24,7 @@ const navLinks = computed(() => [
     role="banner"
   >
     <div class="site-header-inner container-page">
-      <NuxtLink :to="localePath('/')" class="site-header-logo flex-shrink-0">
-        <span class="font-heading text-lg md:text-xl font-semibold tracking-wide leading-none">
-          Thăng Long <span class="text-[#e8d5a8]">Chè Việt</span>
-        </span>
-      </NuxtLink>
+      <LayoutSiteLogo variant="header" class="site-header-logo" />
 
       <nav class="hidden lg:flex items-center gap-0 flex-1 justify-center min-w-0" aria-label="Main navigation">
         <NuxtLink
@@ -118,12 +114,7 @@ const navLinks = computed(() => [
 }
 
 .site-header-logo {
-  color: #f5f0e6;
   text-decoration: none;
-}
-
-.site-header-logo:hover {
-  color: #fff;
 }
 
 .site-nav-link {

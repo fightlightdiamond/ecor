@@ -140,6 +140,8 @@ async function submit() {
   bottom: 20px;
   z-index: 1000;
   font-family: 'Inter', system-ui, sans-serif;
+  /* border: 1px solid #eee; */
+  /* border-radius: 50%; */
 }
 
 /* ── FAB: chỉ icon, tròn ── */
@@ -153,11 +155,12 @@ async function submit() {
   padding: 0;
   border: 0;
   border-radius: 50%;
-  background: #c9a86c;
-  color: #1a1a1a;
+  background: #a01f25;
+  color: #898484;
   cursor: pointer;
   box-shadow: 0 8px 22px rgba(0, 0, 0, .35), 0 0 0 1px rgba(255, 255, 255, .08) inset;
   transition: transform .3s cubic-bezier(.22, .61, .36, 1), background .3s ease, box-shadow .3s ease;
+  border: 1px solid #eee;
 }
 
 .fab:hover {

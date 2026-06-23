@@ -136,6 +136,16 @@
     "viewAll": "Xem tất cả bài viết",
     "comingSoon": "Nội dung đầy đủ sẽ được cập nhật trong Phase 2."
   },
+  "home": {
+    "pillars": {
+      "aria": "Khám phá Thăng Long Chè Việt",
+      "tradition": "Văn hóa truyền thống",
+      "vietTea": "Nếp chè việt",
+      "vietIdentity": "Căn tính việt",
+      "teaProducts": "Sản phẩm chè",
+      "brand": "Thăng long chè việt"
+    }
+  },
   "gallery": {
     "eyebrow": "Tác phẩm của chúng tôi",
     "title": "Bộ sưu tập",

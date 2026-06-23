@@ -34,7 +34,7 @@ function choose(code: string) {
       @click="open = !open"
     >
       <span class="code">{{ current?.code?.toUpperCase() }}</span>
-      <span class="caret" aria-hidden="true">▾</span>
+      <span class="caret" aria-hidden="true"></span>
     </button>
 
     <!-- Danh sách ngôn ngữ -->
@@ -61,7 +61,7 @@ function choose(code: string) {
 <style scoped>
 .lang {
   position: fixed;
-  top: 18px;
+  top: calc(var(--site-marquee-h, 0px) + 18px);
   right: 18px;
   z-index: 1000;
   font-family: 'Roboto Condensed', system-ui, sans-serif;

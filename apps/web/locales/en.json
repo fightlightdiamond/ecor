@@ -136,6 +136,16 @@
     "viewAll": "View All Articles",
     "comingSoon": "Full article content will be added in Phase 2."
   },
+  "home": {
+    "pillars": {
+      "aria": "Explore Thang Long Che Viet",
+      "tradition": "Traditional culture",
+      "vietTea": "Vietnamese tea heritage",
+      "vietIdentity": "Vietnamese identity",
+      "teaProducts": "Tea products",
+      "brand": "Thang Long Che Viet"
+    }
+  },
   "gallery": {
     "eyebrow": "Our Works",
     "title": "Gallery",

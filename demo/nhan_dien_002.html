@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thăng Long Chè Việt – Tinh hoa trà Việt</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome (miễn phí) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* ===== RESET & CƠ BẢN ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #FDFBF7;
+            color: #2c2c2c;
+            line-height: 1.6;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* ===== MÀU SẮC ===== */
+        :root {
+            --xanh-reu: #2E5A27;
+            --xanh-la-nhat: #7BA05B;
+            --vang-dat: #C28A4A;
+            --nau-am: #8B5A2B;
+            --trang-nga: #FDFBF7;
+            --hong-sen: #E8A2A2;
+            --xam-nhe: #f0ede7;
+        }
+
+        /* ===== TYPOGRAPHY ===== */
+        h1, h2, h3, h4, h5 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 0.5rem;
+            color: var(--xanh-reu);
+            position: relative;
+        }
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 3px;
+            background: var(--vang-dat);
+            margin: 12px auto 0;
+        }
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 3rem;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        /* ===== BUTTON ===== */
+        .btn {
+            display: inline-block;
+            padding: 14px 36px;
+            border-radius: 50px;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+        }
+        .btn-primary {
+            background: var(--xanh-reu);
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background: var(--nau-am);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(46, 90, 39, 0.3);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--xanh-reu);
+            color: var(--xanh-reu);
+        }
+        .btn-outline:hover {
+            background: var(--xanh-reu);
+            color: #fff;
+        }
+
+        /* ===== HEADER ===== */
+        header {
+            background: var(--trang-nga);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 12px 0;
+        }
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--xanh-reu);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo i {
+            color: var(--vang-dat);
+            font-size: 2rem;
+        }
+        .logo span {
+            font-weight: 300;
+            color: var(--nau-am);
+            font-size: 1rem;
+            margin-left: 5px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+            align-items: center;
+        }
+        nav ul li a {
+            font-weight: 500;
+            color: #333;
+            transition: color 0.3s;
+            position: relative;
+        }
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--vang-dat);
+            transition: width 0.3s;
+        }
+        nav ul li a:hover {
+            color: var(--xanh-reu);
+        }
+        nav ul li a:hover::after {
+            width: 100%;
+        }
+        .nav-cta {
+            background: var(--xanh-reu);
+            color: #fff !important;
+            padding: 8px 20px;
+            border-radius: 50px;
+            transition: background 0.3s;
+        }
+        .nav-cta:hover {
+            background: var(--nau-am) !important;
+        }
+        .nav-cta::after {
+            display: none !important;
+        }
+
+        /* Hamburger cho mobile */
+        .menu-toggle {
+            display: none;
+            font-size: 1.8rem;
+            color: var(--xanh-reu);
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            background: linear-gradient(135deg, rgba(46, 90, 39, 0.85) 0%, rgba(123, 160, 91, 0.7) 100%), url('https://images.unsplash.com/photo-1556881286-fc6915169721?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80') center/cover no-repeat;
+            color: #fff;
+            padding: 100px 0 120px;
+            text-align: center;
+            position: relative;
+        }
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        .hero h1 i {
+            color: var(--hong-sen);
+            font-size: 3.2rem;
+            margin-right: 10px;
+        }
+        .hero p {
+            font-size: 1.3rem;
+            font-weight: 300;
+            margin-bottom: 40px;
+            opacity: 0.95;
+            line-height: 1.8;
+        }
+        .hero .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .hero .btn-primary {
+            background: #fff;
+            color: var(--xanh-reu);
+        }
+        .hero .btn-primary:hover {
+            background: var(--vang-dat);
+            color: #fff;
+        }
+        .hero .btn-outline {
+            border-color: #fff;
+            color: #fff;
+        }
+        .hero .btn-outline:hover {
+            background: #fff;
+            color: var(--xanh-reu);
+        }
+
+        /* ===== GIỚI THIỆU ===== */
+        .intro {
+            padding: 80px 0;
+        }
+        .intro-grid {
+            display: flex;
+            align-items: center;
+            gap: 60px;
+            flex-wrap: wrap;
+        }
+        .intro-text {
+            flex: 1;
+            min-width: 300px;
+        }
+        .intro-text h2 {
+            font-size: 2.5rem;
+            color: var(--xanh-reu);
+            margin-bottom: 20px;
+        }
+        .intro-text p {
+            font-size: 1.1rem;
+            color: #555;
+            margin-bottom: 20px;
+        }
+        .intro-text blockquote {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-size: 1.4rem;
+            color: var(--nau-am);
+            border-left: 5px solid var(--vang-dat);
+            padding-left: 25px;
+            margin: 30px 0;
+        }
+        .intro-image {
+            flex: 1;
+            min-width: 280px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+        }
+        .intro-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: transform 0.5s;
+        }
+        .intro-image:hover img {
+            transform: scale(1.02);
+        }
+
+        /* ===== SẢN PHẨM ===== */
+        .products {
+            background: var(--xam-nhe);
+            padding: 80px 0;
+        }
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 40px;
+        }
+        .product-card {
+            background: #fff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+            transition: all 0.4s ease;
+            text-align: center;
+        }
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(46, 90, 39, 0.12);
+        }
+        .product-card img {
+            width: 100%;
+            height: 240px;
+            object-fit: cover;
+            display: block;
+        }
+        .product-info {
+            padding: 25px 20px 30px;
+        }
+        .product-info h3 {
+            font-size: 1.4rem;
+            color: var(--xanh-reu);
+            margin-bottom: 8px;
+        }
+        .product-info .desc {
+            font-size: 0.95rem;
+            color: #777;
+            margin-bottom: 12px;
+        }
+        .product-info .price {
+            font-weight: 700;
+            color: var(--nau-am);
+            font-size: 1.2rem;
+            margin-bottom: 18px;
+        }
+        .product-info .btn {
+            padding: 10px 28px;
+            font-size: 0.9rem;
+        }
+
+        /* ===== CÂU CHUYỆN / BLOG ===== */
+        .story {
+            padding: 80px 0;
+        }
+        .story-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+        .story-item {
+            background: #fff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.04);
+            transition: 0.3s;
+        }
+        .story-item:hover {
+            box-shadow: 0 12px 35px rgba(0,0,0,0.08);
+        }
+        .story-item img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        .story-content {
+            padding: 25px;
+        }
+        .story-content h4 {
+            font-size: 1.3rem;
+            color: var(--xanh-reu);
+            margin-bottom: 8px;
+        }
+        .story-content .meta {
+            font-size: 0.85rem;
+            color: #aaa;
+            margin-bottom: 12px;
+        }
+        .story-content p {
+            color: #555;
+            margin-bottom: 15px;
+        }
+        .story-content a {
+            color: var(--vang-dat);
+            font-weight: 500;
+        }
+        .story-content a i {
+            margin-left: 5px;
+            transition: 0.3s;
+        }
+        .story-content a:hover i {
+            transform: translateX(5px);
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            background: var(--xanh-reu);
+            color: rgba(255,255,255,0.85);
+            padding: 50px 0 20px;
+        }
+        footer .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 40px;
+        }
+        footer .col {
+            flex: 1;
+            min-width: 180px;
+        }
+        footer h4 {
+            color: #fff;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        footer p, footer a {
+            font-size: 0.95rem;
+            line-height: 2;
+        }
+        footer a:hover {
+            color: var(--vang-dat);
+        }
+        footer .social i {
+            font-size: 1.5rem;
+            margin-right: 15px;
+            color: #fff;
+            transition: 0.3s;
+        }
+        footer .social i:hover {
+            color: var(--vang-dat);
+            transform: translateY(-3px);
+        }
+        footer .copyright {
+            text-align: center;
+            padding-top: 30px;
+            margin-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.15);
+            width: 100%;
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.6);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: block;
+            }
+            nav ul {
+                display: none;
+                flex-direction: column;
+                width: 100%;
+                padding: 20px 0;
+                gap: 15px;
+                background: var(--trang-nga);
+            }
+            nav ul.active {
+                display: flex;
+            }
+            nav ul li a {
+                display: block;
+                padding: 8px 0;
+            }
+            .hero h1 {
+                font-size: 2.6rem;
+            }
+            .hero p {
+                font-size: 1rem;
+            }
+            .section-title {
+                font-size: 2rem;
+            }
+            .intro-grid {
+                flex-direction: column;
+                gap: 30px;
+            }
+            .intro-text h2 {
+                font-size: 2rem;
+            }
+            footer .container {
+                flex-direction: column;
+                gap: 30px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero {
+                padding: 60px 0 80px;
+            }
+            .hero h1 {
+                font-size: 2rem;
+            }
+            .hero .btn-group {
+                flex-direction: column;
+                align-items: center;
+            }
+            .btn {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ========== HEADER ========== -->
+<header>
+    <div class="container">
+        <div class="logo">
+            <i class="fas fa-leaf"></i>
+            Thăng Long Chè Việt
+            <span>| tinh hoa trà Việt</span>
+        </div>
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+            <i class="fas fa-bars"></i>
+        </button>
+        <nav>
+            <ul id="navMenu">
+                <li><a href="#gioi-thieu">Giới thiệu</a></li>
+                <li><a href="#san-pham">Sản phẩm</a></li>
+                <li><a href="#cau-chuyen">Câu chuyện</a></li>
+                <li><a href="#lien-he">Liên hệ</a></li>
+                <li><a href="#" class="nav-cta">Khám phá</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<!-- ========== HERO ========== -->
+<section class="hero">
+    <div class="container hero-content">
+        <h1><i class="fas fa-mug-hot"></i> Thăng Long Chè Việt</h1>
+        <p>Tinh hoa trà Việt giữa lòng Thủ đô – Hành trình mang hương vị xanh và câu chuyện văn hóa trà đến gần hơn với bạn.</p>
+        <div class="btn-group">
+            <a href="#" class="btn btn-primary">Xem bộ sưu tập</a>
+            <a href="#cau-chuyen" class="btn btn-outline">Câu chuyện của chúng tôi</a>
+        </div>
+    </div>
+</section>
+
+<!-- ========== GIỚI THIỆU ========== -->
+<section class="intro" id="gioi-thieu">
+    <div class="container intro-grid">
+        <div class="intro-text">
+            <h2>Gìn giữ hương vị truyền thống</h2>
+            <p>Thăng Long Chè Việt ra đời từ tình yêu sâu sắc với những đồi chè xanh mướt và khao khát lan tỏa văn hóa trà Việt. Mỗi sản phẩm là một câu chuyện, là sự kết nối giữa đất, trời và bàn tay người nghệ nhân.</p>
+            <blockquote>
+                “Chạm vào hương sen bằng đôi tay mình, bằng ký ức, bằng sự biết ơn”
+            </blockquote>
+            <p><strong>CEO Đặng Thị Nhung</strong> – người sáng lập, luôn trăn trở để mang hương vị xanh đậm đà đến với những tâm hồn yêu trà.</p>
+        </div>
+        <div class="intro-image">
+            <img src="https://images.unsplash.com/photo-1594631252845-29fc4cc8cde9?ixlib=rb-4.0.3&auto=format&fit=crop&w=700&q=80" alt="Nghệ nhân trà Thăng Long">
+        </div>
+    </div>
+</section>
+
+<!-- ========== SẢN PHẨM NỔI BẬT ========== -->
+<section class="products" id="san-pham">
+    <div class="container">
+        <h2 class="section-title">Sản phẩm nổi bật</h2>
+        <p class="section-subtitle">Tuyển chọn những dòng trà đặc sắc từ Thăng Long Chè Việt</p>
+        <div class="product-grid">
+            <!-- Sản phẩm 1 -->
+            <div class="product-card">
+                <img src="https://images.unsplash.com/photo-1556881286-fc6915169721?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Trà Sen Thăng Long">
+                <div class="product-info">
+                    <h3>Trà ướp hoa Sen</h3>
+                    <p class="desc">Hương sen tinh khiết quyện cùng trà xanh thơm ngát, đặc sản của đất Thăng Long.</p>
+                    <p class="price">390.000 ₫ / 100g</p>
+                    <a href="#" class="btn btn-primary">Xem chi tiết</a>
+                </div>
+            </div>
+            <!-- Sản phẩm 2 -->
+            <div class="product-card">
+                <img src="https://images.unsplash.com/photo-1597484662317-713bd5f0a3b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Shan Tuyết cổ thụ">
+                <div class="product-info">
+                    <h3>Shan Tuyết cổ thụ</h3>
+                    <p class="desc">Từ những cây chè trăm tuổi trên núi cao, vị chát dịu, hậu ngọt sâu lắng.</p>
+                    <p class="price">520.000 ₫ / 100g</p>
+                    <a href="#" class="btn btn-primary">Xem chi tiết</a>
+                </div>
+            </div>
+            <!-- Sản phẩm 3 -->
+            <div class="product-card">
+                <img src="https://images.unsplash.com/photo-1597484662317-713bd5f0a3b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Trà Ô Long">
+                <div class="product-info">
+                    <h3>Trà Ô Long Đà Lạt</h3>
+                    <p class="desc">Ô Long bánh lên men nhẹ, hương hoa quả tự nhiên, thanh mát tinh tế.</p>
+                    <p class="price">350.000 ₫ / 100g</p>
+                    <a href="#" class="btn btn-primary">Xem chi tiết</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========== CÂU CHUYỆN VĂN HÓA TRÀ ========== -->
+<section class="story" id="cau-chuyen">
+    <div class="container">
+        <h2 class="section-title">Câu chuyện văn hóa trà</h2>
+        <p class="section-subtitle">Những bài viết về hương vị và triết lý trà Việt</p>
+        <div class="story-grid">
+            <!-- Bài 1 -->
+            <div class="story-item">
+                <img src="https://images.unsplash.com/photo-1564890369478-d89ca6d9a2c9?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Văn hóa trà Thăng Long">
+                <div class="story-content">
+                    <h4>Trà sen – Tinh túy của đất Thăng Long</h4>
+                    <div class="meta"><i class="far fa-calendar-alt"></i> 15/06/2026</div>
+                    <p>Nghệ thuật ướp trà sen đã có từ hàng trăm năm, là niềm tự hào của người Hà Nội. Hãy cùng khám phá bí quyết tạo nên hương vị độc đáo này.</p>
+                    <a href="#">Đọc tiếp <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+            <!-- Bài 2 -->
+            <div class="story-item">
+                <img src="https://images.unsplash.com/photo-1564890369478-d89ca6d9a2c9?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Thưởng trà">
+                <div class="story-content">
+                    <h4>Thưởng trà – Nghệ thuật sống chậm</h4>
+                    <div class="meta"><i class="far fa-calendar-alt"></i> 08/06/2026</div>
+                    <p>Trong nhịp sống hiện đại, một tách trà nóng là khoảnh khắc để lắng đọng, để kết nối với bản thân và với những giá trị văn hóa Việt.</p>
+                    <a href="#">Đọc tiếp <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+            <!-- Bài 3 -->
+            <div class="story-item">
+                <img src="https://images.unsplash.com/photo-1564890369478-d89ca6d9a2c9?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Lễ hội xanh">
+                <div class="story-content">
+                    <h4>Thăng Long Chè Việt tại Lễ hội Sản phẩm Xanh</h4>
+                    <div class="meta"><i class="far fa-calendar-alt"></i> 02/06/2026</div>
+                    <p>Chúng tôi đã có mặt tại Lễ hội Sản phẩm Xanh để giới thiệu những dòng trà cao cấp và lan tỏa thông điệp sống xanh đến cộng đồng.</p>
+                    <a href="#">Đọc tiếp <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ========== FOOTER ========== -->
+<footer id="lien-he">
+    <div class="container">
+        <div class="col">
+            <h4><i class="fas fa-leaf" style="color: var(--vang-dat);"></i> Thăng Long Chè Việt</h4>
+            <p>Gìn giữ tinh hoa trà Việt<br>Kết nối văn hóa và hương vị xanh.</p>
+            <div class="social">
+                <a href="https://www.facebook.com/thanglongcheviet/" target="_blank"><i class="fab fa-facebook"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-youtube"></i></a>
+            </div>
+        </div>
+        <div class="col">
+            <h4>Liên hệ</h4>
+            <p><i class="fas fa-phone-alt" style="color: var(--vang-dat);"></i> 0356 456 556</p>
+            <p><i class="fas fa-envelope" style="color: var(--vang-dat);"></i> info@thanglongcheviet.com</p>
+            <p><i class="fas fa-map-marker-alt" style="color: var(--vang-dat);"></i> Hà Nội, Việt Nam</p>
+        </div>
+        <div class="col">
+            <h4>Về chúng tôi</h4>
+            <a href="#">Giới thiệu</a><br>
+            <a href="#">Sản phẩm</a><br>
+            <a href="#">Tin tức & Sự kiện</a><br>
+            <a href="#">Chính sách bảo mật</a>
+        </div>
+        <div class="copyright">
+            &copy; 2026 Thăng Long Chè Việt. All rights reserved.
+        </div>
+    </div>
+</footer>
+
+<!-- ========== JAVASCRIPT (menu mobile) ========== -->
+<script>
+    document.getElementById('menuToggle').addEventListener('click', function() {
+        document.getElementById('navMenu').classList.toggle('active');
+    });
+</script>
+
+</body>
+</html>
