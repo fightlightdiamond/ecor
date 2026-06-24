@@ -11,6 +11,49 @@ useHead({
     { innerHTML: `html,body{min-height:100%;margin:0;background:#333;}` },
   ],
 })
+
+// Tablet/mobile: banner + marquee là cụm cố định ở đỉnh. Khi cuộn tới footer,
+// đẩy cả cụm lên để đáy cụm luôn nằm TRÊN đỉnh footer (không đè vào footer).
+// Fixed element không tự biết vị trí footer nên cần theo dõi scroll bằng JS.
+onMounted(() => {
+  const mq = window.matchMedia('(max-width: 1023px)')
+  const sel = (s: string) => document.querySelector<HTMLElement>(s)
+  let banner = sel('.home-mobile-banner')
+  let marquee = sel('.home-marquee')
+  let footer = sel('.home-footer-wrap')
+
+  const update = () => {
+    banner ||= sel('.home-mobile-banner')
+    marquee ||= sel('.home-marquee')
+    footer ||= sel('.home-footer-wrap')
+    if (!banner || !marquee || !footer) return
+
+    // Desktop: banner ẩn, không cần dịch chuyển.
+    if (!mq.matches) {
+      banner.style.transform = ''
+      marquee.style.transform = ''
+      return
+    }
+
+    const clusterBottom = banner.offsetHeight + marquee.offsetHeight
+    const footerTop = footer.getBoundingClientRect().top
+    const offset = Math.min(0, footerTop - clusterBottom)
+    const tf = offset < 0 ? `translateY(${offset}px)` : ''
+    banner.style.transform = tf
+    marquee.style.transform = tf
+  }
+
+  update()
+  window.addEventListener('scroll', update, { passive: true })
+  window.addEventListener('resize', update)
+  mq.addEventListener('change', update)
+
+  onUnmounted(() => {
+    window.removeEventListener('scroll', update)
+    window.removeEventListener('resize', update)
+    mq.removeEventListener('change', update)
+  })
+})
 </script>
 
 <template>
@@ -39,6 +82,10 @@ useHead({
 <style scoped>
 .home-page {
   --site-marquee-h: 0px;
+  /* Chiều cao marquee (khớp --marquee-h trong HomeNewsMarquee) */
+  --home-marquee-h: 34px;
+  /* Chiều cao banner mobile/tablet (desktop banner ẩn nên = 0) */
+  --home-banner-h: 0px;
   min-height: 100vh;
   min-height: 100dvh;
   display: flex;
@@ -61,9 +108,30 @@ useHead({
 }
 
 @media (max-width: 1023px) {
+  .home-page {
+    /* Khớp chiều cao thực của HomeMobileTopBanner: prop 7vh + min 126 / max 210 */
+    --home-banner-h: clamp(126px, 7vh, 210px);
+  }
+
+  /* Tablet & mobile: banner lên sát đỉnh, marquee nằm DƯỚI chân banner */
+  .home-page :deep(.home-mobile-banner) {
+    top: 0;
+  }
+
+  .home-page :deep(.home-marquee) {
+    top: var(--home-banner-h);
+  }
+
   .home-main {
-    /* Chừa chỗ cho marquee + banner fixed (mobile & tablet) */
-    padding-top: calc(var(--site-marquee-h) + clamp(150px, 18vh, 320px));
+    /* Chừa chỗ cho banner + marquee fixed (mobile & tablet) */
+    padding-top: calc(var(--home-banner-h) + var(--home-marquee-h) + 16px);
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .home-page {
+    /* Tablet: khớp chiều cao thực HomeMobileTopBanner (prop 7vh + min 140 / max 224) */
+    --home-banner-h: clamp(140px, 7vh, 224px);
   }
 }
 
@@ -110,6 +178,8 @@ useHead({
 @media (max-width: 639px) {
   .home-page {
     --site-marquee-h: 31px;
+    /* Khớp --marquee-h của HomeNewsMarquee ở breakpoint này */
+    --home-marquee-h: 32px;
   }
 }
 </style>

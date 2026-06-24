@@ -12,21 +12,9 @@ withDefaults(defineProps<{
 </script>
 
 <template>
-  <NuxtLink
-    :to="localePath('/')"
-    class="site-logo"
-    :class="`site-logo--${variant}`"
-    :aria-label="t('site.name')"
-  >
-    <img
-      :src="logoUrl"
-      :alt="t('site.name')"
-      class="site-logo__img"
-      width="120"
-      height="120"
-      decoding="async"
-      fetchpriority="high"
-    >
+  <NuxtLink :to="localePath('/')" class="site-logo" :class="`site-logo--${variant}`" :aria-label="t('site.name')">
+    <img :src="logoUrl" :alt="t('site.name')" class="site-logo__img" width="120" height="120" decoding="async"
+      fetchpriority="high">
   </NuxtLink>
 </template>
 
@@ -37,6 +25,9 @@ withDefaults(defineProps<{
   flex-shrink: 0;
   text-decoration: none;
   line-height: 0;
+  background-color: #fff;
+  border-radius: 5px;
+  padding: 3px;
 }
 
 .site-logo__img {

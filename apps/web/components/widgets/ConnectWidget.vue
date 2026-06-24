@@ -139,7 +139,6 @@ async function submit() {
   left: 20px;
   bottom: 20px;
   z-index: 1000;
-  font-family: 'Inter', system-ui, sans-serif;
   /* border: 1px solid #eee; */
   /* border-radius: 50%; */
 }

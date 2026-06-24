@@ -21,7 +21,7 @@ const props = withDefaults(defineProps<{
   leftImage: undefined,
   leftBlur: 0,
   fallbackColor: '#333',
-  heightVh: 18,
+  heightVh: 7,
 })
 
 const resolvedBaseImage = computed(() => props.baseImage ?? defaultBaseImage)
@@ -74,7 +74,7 @@ const mediaStyle = (image: string, blur: number) => ({
     --home-bg-ratio-left: 1;
     --home-bg-ratio-right: 1.618;
     --home-bg-left-w: calc(100% * var(--home-bg-ratio-left) / (var(--home-bg-ratio-left) + var(--home-bg-ratio-right)));
-    --banner-h: 18vh;
+    --banner-h: 12.6vh;
     display: block;
     position: fixed;
     top: var(--site-marquee-h, 0px);
@@ -83,8 +83,8 @@ const mediaStyle = (image: string, blur: number) => ({
     z-index: 5;
     width: 100%;
     height: var(--banner-h);
-    min-height: 180px;
-    max-height: 300px;
+    min-height: 126px;
+    max-height: 210px;
     margin: 0;
     padding: 0;
     overflow: hidden;
@@ -132,7 +132,7 @@ const mediaStyle = (image: string, blur: number) => ({
     inset: -8px;
     background-repeat: no-repeat;
     background-position: top center;
-    background-size: 100% auto;
+    background-size: contain;
     transform: scale(1.02);
     transform-origin: center;
   }
@@ -150,9 +150,9 @@ const mediaStyle = (image: string, blur: number) => ({
 
 @media (min-width: 768px) and (max-width: 1023px) {
   .home-mobile-banner {
-    --banner-h: 22vh;
-    min-height: 200px;
-    max-height: 320px;
+    --banner-h: 15.4vh;
+    min-height: 140px;
+    max-height: 224px;
   }
 }
 

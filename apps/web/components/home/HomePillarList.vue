@@ -41,9 +41,6 @@ const pillars = computed(() => [
   --pillar-red: #a10c25;
   --pillar-red-bright: #c41e3a;
   --pillar-red-glow: rgba(161, 12, 37, .72);
-  --pillar-blue: #1e56a8;
-  --pillar-blue-bright: #2b7de9;
-  --pillar-blue-glow: rgba(30, 86, 168, .48);
   --pillar-green: #4d7c3a;
   --pillar-green-glow: rgba(77, 124, 58, .55);
   margin-top: 4px;
@@ -134,6 +131,7 @@ const pillars = computed(() => [
               box-shadow .45s cubic-bezier(.22, .61, .36, 1);
   will-change: transform;
   text-decoration: none;
+  box-shadow: 1px 1px 6px 1px #666666;
 }
 
 .preview-link:not(:hover) {
@@ -217,7 +215,7 @@ const pillars = computed(() => [
     0 0 0 2px var(--pillar-red),
     0 0 14px var(--pillar-red-glow),
     0 0 28px rgba(196, 30, 58, .42),
-    0 0 40px var(--pillar-blue-glow),
+    0 0 40px var(--pillar-green-glow),
     0 14px 32px rgba(0, 0, 0, .4),
     inset 0 56px 64px -20px var(--pillar-green-glow);
 }
@@ -237,8 +235,8 @@ const pillars = computed(() => [
   background: linear-gradient(
     to top,
     rgba(161, 12, 37, .94) 0%,
-    rgba(30, 86, 168, .62) 46%,
-    rgba(30, 86, 168, 0) 100%
+    rgba(30, 168, 53, 0.62) 46%,
+    rgba(1, 97, 14, 0) 100%
   );
 }
 
@@ -248,14 +246,14 @@ const pillars = computed(() => [
       0 0 0 2px var(--pillar-red),
       0 0 10px rgba(161, 12, 37, .85),
       0 0 22px rgba(196, 30, 58, .5),
-      0 0 34px rgba(43, 125, 233, .28);
+      0 0 34px rgba(1, 85, 22, 0.28);
   }
   50% {
     box-shadow:
       0 0 0 2px var(--pillar-red-bright),
       0 0 18px rgba(196, 30, 58, 1),
       0 0 32px rgba(161, 12, 37, .72),
-      0 0 48px rgba(43, 125, 233, .45);
+      0 0 48px rgba(1, 95, 32, 0.45);
   }
 }
 
@@ -284,7 +282,7 @@ const pillars = computed(() => [
     box-shadow:
       0 0 0 2px var(--pillar-red),
       0 0 16px var(--pillar-red-glow),
-      0 0 28px var(--pillar-blue-glow),
+      0 0 28px var(--pillar-green-glow),
       0 10px 24px rgba(0, 0, 0, .35),
       inset 0 48px 56px -20px var(--pillar-green-glow);
   }
@@ -296,7 +294,7 @@ const pillars = computed(() => [
     box-shadow:
       0 0 0 2px var(--pillar-red-bright),
       0 0 14px rgba(196, 30, 58, .9),
-      0 0 26px rgba(43, 125, 233, .38);
+      0 0 26px rgba(0, 88, 34, 0.38);
   }
 }
 </style>

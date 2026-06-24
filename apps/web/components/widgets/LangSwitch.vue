@@ -64,7 +64,6 @@ function choose(code: string) {
   top: calc(var(--site-marquee-h, 0px) + 18px);
   right: 18px;
   z-index: 1000;
-  font-family: 'Roboto Condensed', system-ui, sans-serif;
 }
 
 /* Nút hiện ngôn ngữ hiện tại */
@@ -128,7 +127,7 @@ function choose(code: string) {
   letter-spacing: .1em;
   min-width: 22px;
 }
-.ci-name { font-size: 13px; font-family: 'Inter', system-ui, sans-serif; }
+.ci-name { font-size: 13px; }
 
 /* Transition */
 .lpop-enter-active, .lpop-leave-active {

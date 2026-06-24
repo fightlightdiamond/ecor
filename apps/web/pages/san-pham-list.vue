@@ -117,10 +117,6 @@ const addressText = computed(() =>
   contact.value.address?.[locale.value as 'vi' | 'en'] ?? contact.value.address?.vi ?? '',
 )
 
-const hoursSummary = computed(() =>
-  hours.value.map(h => `${h.days}: ${h.time}`).join(' · '),
-)
-
 useHead({
   link: [
     { rel: 'stylesheet', href: '/san-pham-list/assets/style.css' },
@@ -171,7 +167,9 @@ useSeoMeta({
                     </svg>
                     <div class="info-box_text">
                       <div class="info-box_title">{{ t('contact.hours') }}</div>
-                      <div class="info-box_subtite">{{ hoursSummary }}</div>
+                      <div class="info-box_subtite">
+                        <div v-for="h in hours" :key="h.days">{{ h.days }}: {{ h.time }}</div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -390,10 +388,12 @@ useSeoMeta({
 <style scoped>
 .tlcv-hero {
   position: relative;
-  height: 600px;
+  height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   background: #1a1a1a;
-  margin-top: 0;
+  /* Kéo lên dưới header (bù pt-[72px] của layout) để header trong suốt nổi trên slider */
+  margin-top: -72px;
 }
 .tlcv-hero-bg .s {
   position: absolute;
@@ -458,7 +458,6 @@ useSeoMeta({
   .tlcv-hero-bg .s1 { opacity: 1; }
 }
 @media (max-width: 768px) {
-  .tlcv-hero { height: 420px; }
   .tlcv-hero-caption h2 { font-size: 30px; }
 }
 </style>

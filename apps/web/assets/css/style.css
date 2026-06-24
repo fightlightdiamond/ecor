@@ -2,13 +2,12 @@
 /* created by designesia
 /* -------------------------------------------------- */
 
-@import url(https://fonts.googleapis.com/css?family=Dosis:400,200,300,500,600,700,800);
+/* Đã gỡ: đồng bộ toàn site về một font duy nhất (Inter). Dosis không còn dùng. */
 
 /* -------------------------------------------------- */
 /* body */
 /* -------------------------------------------------- */
 body {
-font-family: 'Montserrat',Arial, Helvetica, sans-serif;
 background-size:cover;
 color:#fff;
 font-size:12px;

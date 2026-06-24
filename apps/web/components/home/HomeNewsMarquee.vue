@@ -192,16 +192,7 @@ const duration = computed(() => `${Math.max(items.value.length * 8, 32)}s`)
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .home-marquee-track {
-    animation: none;
-  }
-
-  .home-marquee-viewport {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .home-marquee-list[aria-hidden="true"] {
+   .home-marquee-list[aria-hidden="true"] {
     display: none;
   }
 }

@@ -7,6 +7,11 @@ const isMenuOpen = ref(false)
 
 watch(() => route.path, () => { isMenuOpen.value = false })
 
+// Header trong suốt khi ở đỉnh trang; đổ nền sau khi cuộn > 50px
+// (hoặc khi menu mobile đang mở để giữ chữ dễ đọc).
+const { y: scrollY } = useWindowScroll()
+const isSolid = computed(() => scrollY.value > 50 || isMenuOpen.value)
+
 const navLinks = computed(() => [
   { key: 'nav.home', path: '/' },
   { key: 'nav.products', path: '/san-pham-list' },
@@ -21,12 +26,13 @@ const navLinks = computed(() => [
   <!-- role="banner" thay vì <header> để tránh xung đột CSS Modis (header { position:absolute }) -->
   <div
     class="site-header"
+    :class="{ 'is-solid': isSolid }"
     role="banner"
   >
     <div class="site-header-inner container-page">
       <LayoutSiteLogo variant="header" class="site-header-logo" />
 
-      <nav class="hidden lg:flex items-center gap-0 flex-1 justify-center min-w-0" aria-label="Main navigation">
+      <nav class="max-lg:hidden lg:flex items-center gap-0 flex-1 justify-center min-w-0" aria-label="Main navigation">
         <NuxtLink
           v-for="link in navLinks"
           :key="link.key"
@@ -38,7 +44,7 @@ const navLinks = computed(() => [
         </NuxtLink>
       </nav>
 
-      <div class="hidden lg:flex items-center">
+      <div class="max-lg:hidden lg:flex items-center">
         <NuxtLink :to="localePath('/lien-he')" class="site-header-cta">
           {{ t('nav.bookNow') }}
         </NuxtLink>
@@ -100,8 +106,15 @@ const navLinks = computed(() => [
   left: 0;
   right: 0;
   z-index: 950;
-  background: linear-gradient(180deg, #1a3d2e 0%, #163528 100%);
-  border-bottom: 1px solid rgba(201, 168, 108, .35);
+  background: transparent;
+  border-bottom: 1px solid transparent;
+  box-shadow: none;
+  transition: background .3s ease, border-color .3s ease, box-shadow .3s ease;
+}
+
+.site-header.is-solid {
+  background: linear-gradient(180deg, #4a4a4a 0%, #333333 100%);
+  border-bottom-color: rgba(201, 108, 108, 0.35);
   box-shadow: 0 4px 20px rgba(0, 0, 0, .22);
 }
 
@@ -118,7 +131,6 @@ const navLinks = computed(() => [
 }
 
 .site-nav-link {
-  font-family: 'Roboto Condensed', Arial, sans-serif;
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: .12em;
@@ -151,9 +163,8 @@ const navLinks = computed(() => [
   justify-content: center;
   min-height: 44px;
   padding: .6rem 1.25rem;
-  background: #c9a86c;
-  color: #1a3d2e;
-  font-family: 'Roboto Condensed', Arial, sans-serif;
+  background: #64231e;
+  color: #d5b176;
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
@@ -163,8 +174,8 @@ const navLinks = computed(() => [
 }
 
 .site-header-cta:hover {
-  background: #e8d5a8;
-  color: #143222;
+  background: #752b26;
+  color: #d5b176;
 }
 
 .site-header-mobile {

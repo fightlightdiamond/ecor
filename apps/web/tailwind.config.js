@@ -32,9 +32,13 @@ export default {
         },
       },
       fontFamily: {
-        heading: ['"Playfair Display"', 'Georgia', 'serif'],
+        // Đồng bộ toàn hệ thống về một font duy nhất: Inter.
+        // Giữ nguyên các token (heading/body/condensed) để mọi class hiện có
+        // (font-heading/font-condensed/...) vẫn hoạt động nhưng đều trỏ về Inter.
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        heading: ['Inter', 'system-ui', 'sans-serif'],
         body: ['Inter', 'system-ui', 'sans-serif'],
-        condensed: ['"Roboto Condensed"', 'Arial', 'sans-serif'],
+        condensed: ['Inter', 'system-ui', 'sans-serif'],
       },
       screens: {
         xs: '375px',

@@ -27,6 +27,15 @@
   ::-webkit-scrollbar-thumb:hover { background: #c9a86c88; }
 }
 
+/* ── Đồng bộ font: ép Inter cho toàn site ──────────
+   Rule unlayered + specificity (html body) để đè font mặc định của
+   Bootstrap (body { font-family: Helvetica Neue... }) vốn nạp sau main.css. */
+html body,
+html body h1, html body h2, html body h3,
+html body h4, html body h5, html body h6 {
+  font-family: theme('fontFamily.body');
+}
+
 /* ── Lenis smooth scrolling (global, áp dụng mọi trang) ── */
 html.lenis,
 html.lenis body {
