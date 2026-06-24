@@ -21,7 +21,7 @@ const pillars = computed(() => [
   { key: 'home.pillars.experiences', path: '/trai-nghiem', img: 'tlcv_can_tinh_viet_001.jpg' },
   { key: 'home.pillars.library', path: '/thu-vien-van-hoa', img: 'tlcv_san_pham.jpg' },
   { key: 'home.pillars.projects', path: '/du-an-doi-tac', img: 'kp_thang_long_che_viet.jpg' },
-  { key: 'home.pillars.promotions', path: '/uu-dai', img: 'tlcv_nep_che_viet.jpg' },
+  // { key: 'home.pillars.promotions', path: '/uu-dai', img: 'tlcv_nep_che_viet.jpg' },
 ])
 
 // Pillar "Giờ mở cửa + Liên hệ & Đặt lịch": các dòng liên hệ tự cuộn dưới->trên.
@@ -57,6 +57,11 @@ const directionsUrl = computed(() => {
         </div>
         <div v-if="i % 2 === 1" class="clearfix" />
       </template>
+
+      <!-- Pillar ưu đãi trong tháng: danh sách sản phẩm scroll từ dưới lên -->
+      <div class="col-md-6 mb30 col-sm-12 col-sm-offset-0">
+        <HomePromotionsList />
+      </div>
 
       <!-- Pillar thông tin: Giờ mở cửa + Liên hệ & Đặt lịch, tự cuộn dưới -> trên -->
       <div class="col-md-6 mb30 col-sm-12 col-sm-offset-0">
