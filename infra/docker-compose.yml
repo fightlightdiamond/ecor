@@ -7,7 +7,7 @@ services:
     ports:
       - "3210:3000"
     volumes:
-      - /tmp_DEV/www/htmls/thanglogoncheviet/apps/web:/home/app
+      - /tmp_DEV/www/htmls/thanglongcheviet/apps/web:/home/app
     command: "npm install && npm run dev"
     
   # nginx:
