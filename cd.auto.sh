@@ -94,7 +94,7 @@ while true; do
     # Check if code has changed (if there are new commits)
     if [ -n "$(git log HEAD@{1}..HEAD)" ]; then
       echo "🔄 Code đã thay đổi, chạy build..."
-      ./start.dev.sh
+      # ./start.dev.sh
       echo "✅ Build thành công"
     else
       echo "ℹ️  Code không thay đổi, không cần build."
