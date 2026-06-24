@@ -62,6 +62,8 @@
     "phone": "Phone",
     "email": "Email",
     "hours": "Opening Hours",
+    "map": "Find Our Company",
+    "directions": "Get Directions",
     "form": {
       "name": "Full Name",
       "namePlaceholder": "John Smith",

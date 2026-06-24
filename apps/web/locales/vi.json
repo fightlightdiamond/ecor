@@ -62,6 +62,8 @@
     "phone": "Điện thoại",
     "email": "Email",
     "hours": "Giờ mở cửa",
+    "map": "Bản đồ tới công ty",
+    "directions": "Chỉ đường",
     "form": {
       "name": "Họ và tên",
       "namePlaceholder": "Nguyễn Văn A",
