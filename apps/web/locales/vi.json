@@ -141,11 +141,17 @@
   "home": {
     "pillars": {
       "aria": "Khám phá Thăng Long Chè Việt",
-      "tradition": "Văn hóa truyền thống",
-      "vietTea": "Nếp chè việt",
-      "vietIdentity": "Căn tính việt",
-      "teaProducts": "Sản phẩm chè",
-      "brand": "Thăng long chè việt"
+      "vietTea": "Nếp trà Việt",
+      "tradition": "Văn hóa Việt & Làng nghề truyền thống",
+      "teaProducts": "Thăng Long Chè Việt (sản phẩm)",
+      "teaHeritage": "Di sản trà cụ Việt",
+      "corporateGifts": "Quà tặng doanh nghiệp",
+      "anQuangGarden": "Vườn Ân Quang",
+      "anQuangCaffe": "Ân Quang Caffe",
+      "experiences": "Trải nghiệm (Workshop & Sự kiện)",
+      "library": "Thư viện văn hóa Việt",
+      "projects": "Dự án & Đối tác",
+      "promotions": "Ưu đãi trong tháng"
     }
   },
   "gallery": {

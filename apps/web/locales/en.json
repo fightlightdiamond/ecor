@@ -141,11 +141,17 @@
   "home": {
     "pillars": {
       "aria": "Explore Thang Long Che Viet",
-      "tradition": "Traditional culture",
-      "vietTea": "Vietnamese tea heritage",
-      "vietIdentity": "Vietnamese identity",
-      "teaProducts": "Tea products",
-      "brand": "Thang Long Che Viet"
+      "vietTea": "Vietnamese Tea Culture",
+      "tradition": "Vietnamese Culture & Traditional Craft Villages",
+      "teaProducts": "Thang Long Che Viet (Products)",
+      "teaHeritage": "Vietnamese Tea Heritage",
+      "corporateGifts": "Corporate Gifts",
+      "anQuangGarden": "An Quang Garden",
+      "anQuangCaffe": "An Quang Caffe",
+      "experiences": "Experiences (Workshops & Events)",
+      "library": "Vietnamese Cultural Library",
+      "projects": "Projects & Partners",
+      "promotions": "Monthly Promotions"
     }
   },
   "gallery": {

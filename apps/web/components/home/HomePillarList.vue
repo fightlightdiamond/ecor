@@ -11,11 +11,17 @@ const imgUrl = (name: string) =>
   Object.entries(imgModules).find(([k]) => k.endsWith(`/${name}`))?.[1] ?? ''
 
 const pillars = computed(() => [
-  { key: 'home.pillars.tradition', path: '/san-pham-list', img: 'tlcv_van_hoa_truyen_thong_001.jpg' },
-  { key: 'home.pillars.vietTea', path: '/san-pham-list', img: 'tlcv_nep_che_viet.jpg' },
-  { key: 'home.pillars.vietIdentity', path: '/san-pham-list', img: 'tlcv_can_tinh_viet_001.jpg' },
+  { key: 'home.pillars.vietTea', path: '/nep-tra-viet', img: 'tlcv_nep_che_viet.jpg' },
+  { key: 'home.pillars.tradition', path: '/van-hoa-viet', img: 'tlcv_van_hoa_truyen_thong_001.jpg' },
   { key: 'home.pillars.teaProducts', path: '/san-pham-list', img: 'tlcv_san_pham.jpg' },
-  { key: 'home.pillars.brand', path: '/san-pham-list', img: 'kp_thang_long_che_viet.jpg' },
+  { key: 'home.pillars.teaHeritage', path: '/di-san-tra-cu', img: 'tlcv_can_tinh_viet_001.jpg' },
+  { key: 'home.pillars.corporateGifts', path: '/qua-tang-doanh-nghiep', img: 'kp_thang_long_che_viet.jpg' },
+  { key: 'home.pillars.anQuangGarden', path: '/vuon-an-quang', img: 'tlcv_van_hoa_truyen_thong_001.jpg' },
+  { key: 'home.pillars.anQuangCaffe', path: '/an-quang-caffe', img: 'tlcv_nep_che_viet.jpg' },
+  { key: 'home.pillars.experiences', path: '/trai-nghiem', img: 'tlcv_can_tinh_viet_001.jpg' },
+  { key: 'home.pillars.library', path: '/thu-vien-van-hoa', img: 'tlcv_san_pham.jpg' },
+  { key: 'home.pillars.projects', path: '/du-an-doi-tac', img: 'kp_thang_long_che_viet.jpg' },
+  { key: 'home.pillars.promotions', path: '/uu-dai', img: 'tlcv_nep_che_viet.jpg' },
 ])
 
 // Pillar "Giờ mở cửa + Liên hệ & Đặt lịch": các dòng liên hệ tự cuộn dưới->trên.
@@ -493,9 +499,10 @@ a.info-val:hover {
   z-index: 2;
   background: linear-gradient(
     to bottom,
-    rgba(161, 12, 37, .48) 0%,
-    rgba(30, 86, 168, .36) 40%,
-    transparent 74%
+    rgba(161, 12, 37, .42) 0%,
+    rgba(77, 124, 58, .38) 45%,
+    rgba(30, 95, 14, .25) 70%,
+    transparent 85%
   );
   opacity: 0;
   transition: opacity .45s ease;

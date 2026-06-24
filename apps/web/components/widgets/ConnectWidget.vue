@@ -155,16 +155,89 @@ async function submit() {
   border: 0;
   border-radius: 50%;
   background: #a01f25;
-  color: #898484;
+  color: #fff;
   cursor: pointer;
-  box-shadow: 0 8px 22px rgba(0, 0, 0, .35), 0 0 0 1px rgba(255, 255, 255, .08) inset;
+  box-shadow: 
+    0 8px 22px rgba(0, 0, 0, .35), 
+    0 0 0 1px rgba(255, 255, 255, .08) inset,
+    0 0 0 0 rgba(196, 30, 58, 0),
+    0 0 0 0 rgba(77, 124, 58, 0);
   transition: transform .3s cubic-bezier(.22, .61, .36, 1), background .3s ease, box-shadow .3s ease;
-  border: 1px solid #eee;
+  border: 1px solid rgba(255, 255, 255, .15);
+  animation: fab-heartbeat 0.9s cubic-bezier(.45, .05, .55, .95) infinite;
+}
+
+/* Animation giống nhịp tim + điện thoại reo - chu kỳ 0.9s */
+@keyframes fab-heartbeat {
+  0% {
+    transform: rotate(0deg) scale(1);
+    box-shadow: 
+      0 8px 22px rgba(0, 0, 0, .35),
+      0 0 0 1px rgba(255, 255, 255, .08) inset,
+      0 0 0 0 rgba(196, 30, 58, 0),
+      0 0 0 0 rgba(77, 124, 58, 0);
+  }
+  
+  /* Nhịp 1: lắc mạnh */
+  8% {
+    transform: rotate(-10deg) scale(1.04);
+  }
+  12% {
+    transform: rotate(10deg) scale(1.06);
+    box-shadow: 
+      0 10px 26px rgba(0, 0, 0, .42),
+      0 0 0 1px rgba(255, 255, 255, .15) inset,
+      0 0 22px 4px rgba(196, 30, 58, .75),
+      0 0 32px 6px rgba(77, 124, 58, .55);
+  }
+  16% {
+    transform: rotate(-8deg) scale(1.05);
+  }
+  
+  /* Nhịp 2: lắc nhẹ hơn */
+  20% {
+    transform: rotate(6deg) scale(1.03);
+  }
+  24% {
+    transform: rotate(-4deg) scale(1.02);
+  }
+  28% {
+    transform: rotate(0deg) scale(1.01);
+    box-shadow: 
+      0 12px 28px rgba(0, 0, 0, .45),
+      0 0 0 1px rgba(255, 255, 255, .18) inset,
+      0 0 26px 5px rgba(196, 30, 58, .85),
+      0 0 38px 8px rgba(77, 124, 58, .65);
+  }
+  
+  /* Fade out ánh sáng */
+  35% {
+    transform: rotate(0deg) scale(1);
+    box-shadow: 
+      0 10px 24px rgba(0, 0, 0, .38),
+      0 0 0 1px rgba(255, 255, 255, .1) inset,
+      0 0 14px 2px rgba(196, 30, 58, .4),
+      0 0 20px 3px rgba(77, 124, 58, .3);
+  }
+  
+  45%, 100% {
+    transform: rotate(0deg) scale(1);
+    box-shadow: 
+      0 8px 22px rgba(0, 0, 0, .35),
+      0 0 0 1px rgba(255, 255, 255, .08) inset,
+      0 0 0 0 rgba(196, 30, 58, 0),
+      0 0 0 0 rgba(77, 124, 58, 0);
+  }
 }
 
 .fab:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, .45);
+  animation-play-state: paused;
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 
+    0 12px 28px rgba(0, 0, 0, .45),
+    0 0 0 1px rgba(255, 255, 255, .15) inset,
+    0 0 20px 4px rgba(196, 30, 58, .7),
+    0 0 32px 6px rgba(77, 124, 58, .5);
 }
 
 .fab.on {

@@ -22,8 +22,8 @@
     "phoneDisplay": "(024) 3456 7890",
     "mobile": "+84 901 234 567",
     "email": "hello@thanglongcheviet.vn",
-    "mapEmbed": "https://maps.google.com/maps?q=Ba+Dinh,+Hanoi&output=embed",
-    "coordinates": { "lat": 21.045, "lng": 105.844 }
+    "mapEmbed": "https://maps.google.com/maps?q=1A+L%C3%A1ng+H%E1%BA%A1%2C+H%C3%A0+N%E1%BB%99i&output=embed",
+    "coordinates": { "lat": 21.0285, "lng": 105.8342 }
   },
   "hours": [
     { "days": { "vi": "Thứ Hai – Thứ Sáu", "en": "Monday – Friday" }, "time": "09:00 – 21:00" },
