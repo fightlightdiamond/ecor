@@ -73,9 +73,9 @@ onMounted(() => {
       </div>
     </div>
     <WidgetsConnectWidget />
-    <div class="home-footer-wrap">
+    <!-- <div class="home-footer-wrap">
       <LayoutAppFooter />
-    </div>
+    </div> -->
   </div>
 </template>
 

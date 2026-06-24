@@ -1,6 +1,7 @@
 <script setup lang="ts">
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const localePath = useLocalePath()
+const { hours, contact } = useSettings()
 
 const imgModules = import.meta.glob('~/assets/images/*.jpg', {
   eager: true,
@@ -16,6 +17,16 @@ const pillars = computed(() => [
   { key: 'home.pillars.teaProducts', path: '/san-pham-list', img: 'tlcv_san_pham.jpg' },
   { key: 'home.pillars.brand', path: '/san-pham-list', img: 'kp_thang_long_che_viet.jpg' },
 ])
+
+// Pillar "Giờ mở cửa + Liên hệ & Đặt lịch": các dòng liên hệ tự cuộn dưới->trên.
+const contactRows = computed(() => {
+  const address = (contact.value.address as Record<string, string>)
+  return [
+    { key: 'address', label: t('contact.address'), value: address[locale.value] ?? address.vi, href: '' },
+    { key: 'phone', label: t('contact.phone'), value: contact.value.phoneDisplay, href: `tel:${contact.value.phone.replace(/\s+/g, '')}` },
+    { key: 'email', label: t('contact.email'), value: contact.value.email, href: `mailto:${contact.value.email}` },
+  ]
+})
 </script>
 
 <template>
@@ -32,6 +43,38 @@ const pillars = computed(() => [
         </div>
         <div v-if="i % 2 === 1" class="clearfix" />
       </template>
+
+      <!-- Pillar thông tin: Giờ mở cửa + Liên hệ & Đặt lịch, tự cuộn dưới -> trên -->
+      <div class="col-md-6 mb30 col-sm-12 col-sm-offset-0">
+        <div class="info-card" role="group" :aria-label="`${t('contact.hours')} · ${t('contact.title')}`">
+          <div class="info-viewport">
+            <!-- Hai bản giống nhau xếp chồng để vòng lặp liền mạch (CSS-only) -->
+            <div class="info-track">
+              <div v-for="n in 2" :key="n" class="info-set" :aria-hidden="n === 2 ? 'true' : undefined">
+                <section class="info-block">
+                  <h3 class="info-heading"><span class="info-ic" aria-hidden="true">🕒</span>{{ t('contact.hours') }}</h3>
+                  <ul class="info-rows">
+                    <li v-for="h in hours" :key="h.days" class="info-row">
+                      <span class="info-day">{{ h.days }}</span>
+                      <span class="info-time">{{ h.time }}</span>
+                    </li>
+                  </ul>
+                </section>
+
+                <section class="info-block">
+                  <h3 class="info-heading"><span class="info-ic" aria-hidden="true">📞</span>{{ t('contact.title') }}</h3>
+                  <ul class="info-rows">
+                    <li v-for="r in contactRows" :key="r.key" class="info-row info-row--stack">
+                      <span class="info-label">{{ r.label }}</span>
+                      <component :is="r.href ? 'a' : 'span'" :href="r.href || undefined" class="info-val">{{ r.value }}</component>
+                    </li>
+                  </ul>
+                </section>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -64,6 +107,148 @@ const pillars = computed(() => [
 @media (min-width: 640px) and (max-width: 1023px) {
   .home-pillars {
     --pillar-gutter: 24px;
+  }
+}
+
+/* ── Pillar thông tin (Giờ mở cửa + Liên hệ & Đặt lịch) ── */
+/* Khớp hình học với .preview-link để xếp cùng lưới pillar */
+.info-card {
+  position: relative;
+  display: block;
+  width: calc(100% - var(--pillar-gutter, 0px) * 2);
+  margin-left: auto;
+  margin-right: auto;
+  max-width: none;
+  aspect-ratio: 346 / 197;
+  overflow: hidden;
+  border-radius: 6px;
+  background:
+    radial-gradient(120% 90% at 18% 0%, rgba(77, 124, 58, .22), transparent 60%),
+    linear-gradient(160deg, #20281c 0%, #161d12 100%);
+  box-shadow: 1px 1px 6px 1px #666666;
+}
+
+@media (min-width: 1024px) {
+  .info-card {
+    max-width: 346px;
+  }
+}
+
+.info-viewport {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 6px;
+  /* Làm mờ mép trên/dưới để dòng chữ trôi vào/ra êm */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 13%, #000 87%, transparent 100%);
+          mask-image: linear-gradient(to bottom, transparent 0, #000 13%, #000 87%, transparent 100%);
+}
+
+/* Track = 2 bản .info-set xếp chồng; dịch -50% là tròn đúng 1 bản -> lặp liền mạch */
+.info-track {
+  display: flex;
+  flex-direction: column;
+  animation: info-scroll 22s linear infinite;
+  will-change: transform;
+}
+
+.info-card:hover .info-track,
+.info-card:focus-within .info-track {
+  animation-play-state: paused;
+}
+
+@keyframes info-scroll {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-50%); }
+}
+
+/* Mỗi bản tự chứa khoảng cách dẫn (padding-top + gap) đồng đều -> điểm nối phẳng */
+.info-set {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px 18px 0;
+}
+
+.info-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: #e7d8b4;
+}
+
+.info-ic {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.info-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.info-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, .9);
+}
+
+.info-row--stack {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+}
+
+.info-day {
+  color: rgba(255, 255, 255, .72);
+}
+
+.info-time {
+  flex-shrink: 0;
+  font-weight: 600;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+
+.info-label {
+  font-size: 10.5px;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: rgba(231, 216, 180, .68);
+}
+
+.info-val {
+  color: #fff;
+  text-decoration: none;
+  word-break: break-word;
+}
+
+a.info-val:hover {
+  color: var(--pillar-red-bright);
+  text-decoration: underline;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .info-track {
+    animation: none;
+  }
+
+  /* Không có chuyển động: cho phép cuộn tay để xem đủ nội dung */
+  .info-viewport {
+    overflow-y: auto;
   }
 }
 
