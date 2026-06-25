@@ -92,6 +92,27 @@
     "related": "Related products",
     "notFound": "Product not found"
   },
+  "cart": {
+    "title": "Cart",
+    "eyebrow": "Order",
+    "add": "Add to cart",
+    "added": "Added to cart",
+    "view": "View cart",
+    "empty": "Your cart is empty.",
+    "continueShopping": "Continue shopping",
+    "quantity": "Quantity",
+    "remove": "Remove",
+    "total": "Total",
+    "checkoutTitle": "Shipping information",
+    "address": "Shipping address",
+    "submit": "Place order",
+    "submitting": "Processing...",
+    "formRequired": "Please fill in all shipping details.",
+    "orderSuccess": "Order placed successfully! Order ID: {number}",
+    "addError": "Could not add item to cart.",
+    "checkoutError": "Checkout failed. Please try again.",
+    "lookupError": "Order not found."
+  },
   "connect": {
     "open": "Connect",
     "title": "Connect with us",

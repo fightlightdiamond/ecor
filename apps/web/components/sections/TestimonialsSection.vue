@@ -1,21 +1,10 @@
 <script setup lang="ts">
 import { Swiper, SwiperSlide } from 'swiper/vue'
 import { Autoplay, Pagination } from 'swiper/modules'
-import testimonialsData from '~/content/testimonials.json'
 
-const { t, locale } = useI18n()
+const { testimonials } = useTestimonials()
 
-const localText = (field: Record<string, string> | undefined) =>
-  field?.[locale.value] ?? field?.vi ?? ''
-
-const testimonials = computed(() =>
-  testimonialsData.map(item => ({
-    id: item.id,
-    quote: localText(item.quote),
-    author: localText(item.author),
-    role: localText(item.role),
-  })),
-)
+const { t } = useI18n()
 
 const modules = [Autoplay, Pagination]
 </script>

@@ -1,27 +1,12 @@
 <script setup lang="ts">
-import servicesData from '~/content/services.json'
+const { categories } = useServices()
 
 const { t, locale } = useI18n()
 
-const localText = (field: Record<string, string> | undefined) =>
-  field?.[locale.value] ?? field?.vi ?? ''
-
-const categories = computed(() =>
-  servicesData.map(cat => ({
-    id: cat.id,
-    name: localText(cat.category),
-    icon: cat.icon,
-    items: cat.items.map(item => ({
-      id: item.id,
-      name: localText(item.name),
-      price: item.price,
-      duration: item.duration,
-      discount: item.featured ? (item.id === 'nail-gel' ? '5%' : item.id === 'hair-color' ? '10%' : null) : null,
-    })),
-  })),
-)
-
-const activeTab = ref(categories.value[0]?.id ?? '')
+const activeTab = ref('')
+watch(categories, (cats) => {
+  if (!activeTab.value && cats[0]) activeTab.value = cats[0].id
+}, { immediate: true })
 const activeCategory = computed(() =>
   categories.value.find(c => c.id === activeTab.value) ?? categories.value[0],
 )

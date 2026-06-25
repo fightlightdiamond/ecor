@@ -1,20 +1,7 @@
 <script setup lang="ts">
-import teamData from '~/content/team.json'
+const { team } = useTeam()
 
 const { t, locale } = useI18n()
-
-const localText = (field: Record<string, string> | undefined) =>
-  field?.[locale.value] ?? field?.vi ?? ''
-
-const team = computed(() =>
-  teamData.map(m => ({
-    ...m,
-    name: localText(m.name),
-    role: localText(m.role),
-    bio: localText(m.bio),
-    specialties: m.specialties.map(s => localText(s)),
-  })),
-)
 </script>
 
 <template>

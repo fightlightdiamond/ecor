@@ -1,53 +1,110 @@
-import productsData from '~/content/products.json'
+import type { ApiEnvelope, Product, ProductCategory, RawProduct } from '~/utils/storefront'
+import { categoryLabel, transformProduct } from '~/utils/storefront'
 
-// Ảnh sản phẩm nằm trong ~/assets/images -> resolve qua glob (Vite build URL).
-const imgModules = import.meta.glob('~/assets/images/*.jpg', {
-  eager: true,
-  import: 'default',
-}) as Record<string, string>
+export type { Product } from '~/utils/storefront'
 
-const resolveImg = (name: string) =>
-  Object.entries(imgModules).find(([k]) => k.endsWith(`/${name}`))?.[1] ?? ''
+async function fetchAllProducts(fetchApi: ReturnType<typeof useApi>['fetchApi']) {
+  const first = await fetchApi<ApiEnvelope<RawProduct[]>>('/products?per_page=100')
+  const all = [...(first.data ?? [])]
+  const lastPage = first.meta?.last_page ?? 1
 
-export interface Product {
-  id: string
-  slug: string
-  price: number
-  image: string
-  gallery: string[]
-  title: string
-  shortDesc: string
-  description: string
-  features: string[]
+  if (lastPage > 1) {
+    const pages = await Promise.all(
+      Array.from({ length: lastPage - 1 }, (_, i) =>
+        fetchApi<ApiEnvelope<RawProduct[]>>(`/products?per_page=100&page=${i + 2}`),
+      ),
+    )
+    for (const page of pages) {
+      all.push(...(page.data ?? []))
+    }
+  }
+
+  return { success: true, data: all, meta: first.meta }
 }
 
 export function useProducts() {
   const { locale } = useI18n()
+  const { fetchApi } = useApi()
 
-  const L = (f: Record<string, string> | undefined) =>
-    f?.[locale.value] ?? f?.vi ?? ''
-  const LA = (f: Record<string, string[]> | undefined) =>
-    f?.[locale.value] ?? f?.vi ?? []
-
-  const products = computed<Product[]>(() =>
-    productsData.items.map(p => ({
-      id: p.id,
-      slug: p.slug,
-      price: p.price,
-      image: resolveImg(p.image),
-      gallery: (p.gallery?.length ? p.gallery : [p.image]).map(resolveImg),
-      title: L(p.title),
-      shortDesc: L(p.shortDesc),
-      description: L(p.description),
-      features: LA(p.features),
-    })),
+  const { data: productsData, pending } = useAsyncData(
+    () => `products-${locale.value}`,
+    () => fetchAllProducts(fetchApi),
+    { default: () => ({ success: true, data: [] as RawProduct[] }) },
   )
 
-  const getBySlug = (slug: string) =>
-    products.value.find(p => p.slug === slug)
+  const products = computed<Product[]>(() => {
+    const raw = productsData.value?.data ?? []
+    return (Array.isArray(raw) ? raw : []).map(p => transformProduct(p, locale.value))
+  })
 
-  const related = (slug: string, count = 3) =>
-    products.value.filter(p => p.slug !== slug).slice(0, count)
+  const { data: featuredData } = useAsyncData(
+    () => `featured-products-${locale.value}`,
+    () => fetchApi<ApiEnvelope<RawProduct[]>>('/products/featured'),
+    { default: () => ({ success: true, data: [] as RawProduct[] }) },
+  )
 
-  return { products, getBySlug, related }
+  const featuredProducts = computed<Product[]>(() => {
+    const raw = featuredData.value?.data ?? []
+    return (Array.isArray(raw) ? raw : []).map(p => transformProduct(p, locale.value))
+  })
+
+  const { data: categoriesData } = useAsyncData(
+    'product-categories',
+    () => fetchApi<ApiEnvelope<ProductCategory[]>>('/categories'),
+    { default: () => ({ success: true, data: [] as ProductCategory[] }) },
+  )
+
+  const categories = computed(() => {
+    const raw = categoriesData.value?.data ?? []
+    return (Array.isArray(raw) ? raw : []).map(c => ({
+      id: c.id,
+      slug: c.slug,
+      label: categoryLabel(c.name, locale.value),
+    }))
+  })
+
+  const getBySlug = async (slug: string) => {
+    try {
+      const res = await fetchApi<ApiEnvelope<RawProduct> & { related?: RawProduct[] }>(`/products/${slug}`)
+      if (res.success && res.data) {
+        const product = transformProduct(res.data, locale.value)
+        const relatedFromApi = (res.related ?? []).map(p => transformProduct(p, locale.value))
+        return { product, relatedFromApi }
+      }
+    } catch (e) {
+      console.error(e)
+    }
+
+    const found = products.value.find(p => p.slug === slug)
+    if (found) {
+      return {
+        product: found,
+        relatedFromApi: related(found.slug, found.categoryId, 3),
+      }
+    }
+
+    return { product: null, relatedFromApi: [] as Product[] }
+  }
+
+  const related = (slug: string, categoryId: number | null, count = 3) => {
+    const pool = categoryId
+      ? products.value.filter(p => p.categoryId === categoryId && p.slug !== slug)
+      : products.value.filter(p => p.slug !== slug)
+    return pool.slice(0, count)
+  }
+
+  const byCategory = (categoryId: number | null) => {
+    if (!categoryId) return products.value
+    return products.value.filter(p => p.categoryId === categoryId)
+  }
+
+  return {
+    products,
+    featuredProducts,
+    categories,
+    pending,
+    getBySlug,
+    related,
+    byCategory,
+  }
 }

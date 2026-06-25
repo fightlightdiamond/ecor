@@ -2,21 +2,19 @@
 const { t, locale } = useI18n()
 const localePath = useLocalePath()
 const { contact, hours } = useSettings()
+const { latestPosts } = useBlog()
 const year = new Date().getFullYear()
-
-const localLabel = (vi: string, en: string) => (locale.value === 'en' ? en : vi)
 
 const addressText = computed(() =>
   contact.value.address?.[locale.value as 'vi' | 'en'] ?? contact.value.address?.vi ?? '',
 )
 
-const recentPosts = computed(() => [
-  localLabel('Nghệ thuật thưởng trà Việt', 'The art of Vietnamese tea'),
-  localLabel('5 loại trà tốt cho sức khỏe', '5 teas good for health'),
-  localLabel('Cách pha trà ngon đúng điệu', 'How to brew tea properly'),
-  localLabel('Trà sen Tây Hồ — tinh hoa Hà thành', 'West Lake lotus tea — Hanoi essence'),
-  localLabel('Bí quyết bảo quản trà đúng cách', 'How to store tea properly'),
-])
+const recentPosts = computed(() =>
+  latestPosts.value.map(post => ({
+    slug: post.slug,
+    title: post.title,
+  })),
+)
 
 const footerHours = computed(() => {
   if (hours.value.length >= 2) {
@@ -24,7 +22,7 @@ const footerHours = computed(() => {
       { days: hours.value[0]!.days, time: hours.value[0]!.time },
       { days: hours.value[1]!.days, time: hours.value[1]!.time },
       {
-        days: localLabel('Chủ nhật & Lễ', 'Sunday & holidays'),
+        days: locale.value === 'en' ? 'Sunday & holidays' : 'Chủ nhật & Lễ',
         time: hours.value[1]!.time,
       },
     ]
@@ -41,8 +39,8 @@ const footerHours = computed(() => {
           <div class="widget widget_recent_post">
             <h3>{{ t('footer.latestNews') }}</h3>
             <ul>
-              <li v-for="post in recentPosts" :key="post">
-                <NuxtLink :to="localePath('/tin-tuc')">{{ post }}</NuxtLink>
+              <li v-for="post in recentPosts" :key="post.slug">
+                <NuxtLink :to="localePath(`/tin-tuc/${post.slug}`)">{{ post.title }}</NuxtLink>
               </li>
             </ul>
           </div>

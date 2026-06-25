@@ -10,6 +10,14 @@ export default defineNuxtConfig({
     },
   },
 
+  nitro: {
+    routeRules: {
+      '/api/**': {
+        proxy: `${process.env.NUXT_API_PROXY_TARGET || 'http://127.0.0.1:8000'}/api/**`,
+      },
+    },
+  },
+
   modules: [
     '@nuxtjs/i18n',
     '@nuxt/image',
@@ -39,6 +47,7 @@ export default defineNuxtConfig({
       gallery: { en: '/gallery', vi: '/gallery' },
       'tin-tuc': { en: '/blog', vi: '/tin-tuc' },
       'tin-tuc-slug': { en: '/blog/[slug]', vi: '/tin-tuc/[slug]' },
+      'gio-hang': { en: '/cart', vi: '/gio-hang' },
       'lien-he': { en: '/contact', vi: '/lien-he' },
     },
     bundle: {
@@ -61,7 +70,7 @@ export default defineNuxtConfig({
   image: {
     quality: 85,
     formats: ['webp', 'avif'],
-    domains: ['images.unsplash.com'],
+    domains: ['images.unsplash.com', 'localhost', '127.0.0.1'],
     screens: {
       xs: 375,
       sm: 640,
@@ -74,6 +83,7 @@ export default defineNuxtConfig({
 
   // Runtime config
   runtimeConfig: {
+    apiProxyTarget: process.env.NUXT_API_PROXY_TARGET || 'http://127.0.0.1:8000',
     public: {
       siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'https://thanglongcheviet.vn',
       siteName: 'Thăng Long Chè Việt',

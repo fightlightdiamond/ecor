@@ -1,38 +1,29 @@
 <script setup lang="ts">
-import blogData from '~/content/blog.json'
-
 const { t, locale } = useI18n()
 const localePath = useLocalePath()
+const { posts: rawPosts, latestPosts } = useBlog()
 
-const imgModules = import.meta.glob('~/assets/images/*.jpg', {
-  eager: true,
-  import: 'default',
-}) as Record<string, string>
-const imgUrl = (name: string) =>
-  Object.entries(imgModules).find(([k]) => k.endsWith(`/${name}`))?.[1] ?? ''
+const sourcePosts = computed(() =>
+  latestPosts.value.length ? latestPosts.value : rawPosts.value,
+)
 
-const localText = (field: Record<string, string> | undefined) =>
-  field?.[locale.value] ?? field?.vi ?? ''
-
-type BlogPost = (typeof blogData)[number]
-
-const mapPost = (post: BlogPost) => {
-  const date = new Date(post.date)
+const mapPost = (post: { slug: string; image: string; date: string; title: string; excerpt: string }) => {
+  const date = new Date(post.date || Date.now())
   return {
-    id: post.id,
+    id: post.slug,
     slug: post.slug,
-    pinned: Boolean(post.pinned),
-    thumbnail: imgUrl(post.thumbnail) || post.thumbnail,
+    pinned: false, // Default unless backend provides
+    thumbnail: post.image,
     day: date.getDate().toString().padStart(2, '0'),
     month: date.toLocaleDateString(locale.value === 'vi' ? 'vi-VN' : 'en-US', { month: 'short' }).toUpperCase(),
     year: date.getFullYear().toString(),
-    category: localText(post.category as Record<string, string>),
-    title: localText(post.title),
-    excerpt: localText(post.excerpt),
+    category: 'Tin tức',
+    title: post.title,
+    excerpt: post.excerpt,
   }
 }
 
-const allPosts = computed(() => blogData.map(mapPost))
+const allPosts = computed(() => sourcePosts.value.map(mapPost))
 
 const featuredPost = computed(() =>
   allPosts.value.find(p => p.pinned) ?? allPosts.value[0],

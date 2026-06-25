@@ -92,6 +92,27 @@
     "related": "Sản phẩm liên quan",
     "notFound": "Không tìm thấy sản phẩm"
   },
+  "cart": {
+    "title": "Giỏ hàng",
+    "eyebrow": "Đặt hàng",
+    "add": "Thêm vào giỏ",
+    "added": "Đã thêm vào giỏ",
+    "view": "Xem giỏ hàng",
+    "empty": "Giỏ hàng của bạn đang trống.",
+    "continueShopping": "Tiếp tục mua sắm",
+    "quantity": "Số lượng",
+    "remove": "Xóa",
+    "total": "Tổng cộng",
+    "checkoutTitle": "Thông tin giao hàng",
+    "address": "Địa chỉ giao hàng",
+    "submit": "Đặt hàng",
+    "submitting": "Đang xử lý...",
+    "formRequired": "Vui lòng điền đầy đủ thông tin giao hàng.",
+    "orderSuccess": "Đặt hàng thành công! Mã đơn: {number}",
+    "addError": "Không thể thêm vào giỏ hàng.",
+    "checkoutError": "Thanh toán thất bại. Vui lòng thử lại.",
+    "lookupError": "Không tìm thấy đơn hàng."
+  },
   "connect": {
     "open": "Kết nối",
     "title": "Kết nối với chúng tôi",

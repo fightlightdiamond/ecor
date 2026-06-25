@@ -1,6 +1,8 @@
 <script setup lang="ts">
 const { t, locale } = useI18n()
 const { contact, hours } = useSettings()
+const { categories: productCategories } = useProducts()
+const { submitContact } = useContact()
 
 const form = reactive({
   name: '',
@@ -12,16 +14,35 @@ const form = reactive({
 
 const status = ref<'idle' | 'submitting' | 'success' | 'error'>('idle')
 
+const serviceOptions = computed(() => {
+  if (productCategories.value.length) {
+    return productCategories.value.map(c => ({ value: c.slug, label: c.label }))
+  }
+  return [
+    { value: 'hair', label: locale.value === 'vi' ? 'Tóc' : 'Hair' },
+    { value: 'nail', label: 'Nail' },
+    { value: 'spa', label: 'Spa & Massage' },
+  ]
+})
+
 async function handleSubmit() {
   if (!form.name || !form.phone) return
   status.value = 'submitting'
-  // Phase 1: simulated — Phase 4 sẽ kết nối API thật
-  await new Promise(resolve => setTimeout(resolve, 1200))
-  status.value = 'success'
-  setTimeout(() => {
-    status.value = 'idle'
-    form.name = form.phone = form.email = form.service = form.message = ''
-  }, 5000)
+  const res = await submitContact({
+    name: form.name,
+    phone: form.phone,
+    email: form.email,
+    service: form.service,
+    message: form.message,
+    source: 'contact-page',
+  })
+  status.value = res.success ? 'success' : 'error'
+  if (res.success) {
+    setTimeout(() => {
+      status.value = 'idle'
+      form.name = form.phone = form.email = form.service = form.message = ''
+    }, 5000)
+  }
 }
 
 const localText = (field: Record<string, string> | undefined) =>
@@ -117,9 +138,19 @@ const localText = (field: Record<string, string> | undefined) =>
             </div>
           </div>
 
-          <!-- Map placeholder -->
-          <div class="mt-6 h-48 bg-white/5 border border-white/10 flex items-center justify-center">
-            <p class="text-white/30 text-sm">📍 Google Maps</p>
+          <!-- Map -->
+          <div class="mt-6 h-48 bg-white/5 border border-white/10 overflow-hidden">
+            <iframe
+              v-if="contact.mapEmbed"
+              :src="contact.mapEmbed"
+              class="w-full h-full border-0"
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+              :title="t('contact.map')"
+            />
+            <div v-else class="h-full flex items-center justify-center">
+              <p class="text-white/30 text-sm">📍 Google Maps</p>
+            </div>
           </div>
         </div>
 
@@ -190,9 +221,9 @@ const localText = (field: Record<string, string> | undefined) =>
                        text-sm focus:outline-none focus:border-primary-500 transition-colors min-h-[44px]"
               >
                 <option value="">{{ t('contact.form.servicePlaceholder') }}</option>
-                <option value="hair">{{ locale === 'vi' ? 'Tóc' : 'Hair' }}</option>
-                <option value="nail">Nail</option>
-                <option value="spa">Spa & Massage</option>
+                <option v-for="opt in serviceOptions" :key="opt.value" :value="opt.value">
+                  {{ opt.label }}
+                </option>
               </select>
             </div>
 

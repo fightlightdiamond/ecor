@@ -1,26 +1,10 @@
 <script setup lang="ts">
-import servicesData from '~/content/services.json'
+const { featuredServices } = useServices()
 
-const { t, locale } = useI18n()
+const { t } = useI18n()
 const localePath = useLocalePath()
 
-const localText = (field: Record<string, string> | undefined) =>
-  field?.[locale.value] ?? field?.vi ?? ''
-
-// Only featured services for homepage
-const featuredServices = computed(() =>
-  servicesData.flatMap(cat =>
-    cat.items
-      .filter(item => item.featured)
-      .map(item => ({
-        ...item,
-        name: localText(item.name),
-        description: localText(item.description),
-        categoryName: localText(cat.category),
-        categoryIcon: cat.icon,
-      })),
-  ).slice(0, 6),
-)
+const featuredServicesList = computed(() => featuredServices.value.slice(0, 6))
 
 const formatPrice = (price: number) =>
   new Intl.NumberFormat('vi-VN').format(price) + ' ₫'
@@ -46,7 +30,7 @@ const formatPrice = (price: number) =>
       <!-- Services grid -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
         <article
-          v-for="service in featuredServices"
+          v-for="service in featuredServicesList"
           :key="service.id"
           class="group bg-white border border-gray-100 rounded-lg overflow-hidden
                  hover:shadow-xl transition-shadow duration-300 animate-on-scroll"

@@ -1,58 +1,100 @@
 version: '3.9'
 
 services:
+  # ==========================================
+  # Frontend (Nuxt)
+  # ==========================================
   web:
     image: node:20.19-alpine
-    container_name: tl_che_viet
+    container_name: tl_che_viet_web
     working_dir: /home/app
     ports:
-      - "3210:3000"
+      - "3000:3000"
     volumes:
       - ./apps/web:/home/app
       - node_modules:/home/app/node_modules
     environment:
       - NODE_ENV=development
       - NPM_CONFIG_LOGLEVEL=info
+      - NUXT_API_PROXY_TARGET=http://nginx:80
+      - NUXT_PUBLIC_SITE_URL=http://localhost:3000
     command: sh -c "npm install --prefer-offline --no-audit && npm run dev -- --host"
-    
-  # nginx:
-  #   image: nginx:1.25-alpine
-  #   ports:
-  #     - "80:80"
-  #     - "443:443"
-  #   volumes:
-  #     - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-  #     - ./nginx/sites:/etc/nginx/conf.d:ro
-  #     - ./certbot/conf:/etc/letsencrypt:ro
-  #     - ./certbot/www:/var/www/certbot:ro
-  #   depends_on:
-  #     - web
-  #   restart: unless-stopped
+    depends_on:
+      - nginx
+    networks:
+      - tl_che_viet_network
 
-  # web:
-  #   build:
-  #     context: ../apps/web
-  #     dockerfile: Dockerfile
-  #   expose:
-  #     - "3000"
-  #   environment:
-  #     - NODE_ENV=production
-  #     - NUXT_PUBLIC_SITE_URL=${NUXT_PUBLIC_SITE_URL}
-  #   restart: unless-stopped
-  #   healthcheck:
-  #     test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/health"]
-  #     interval: 30s
-  #     timeout: 10s
-  #     retries: 3
+  # ==========================================
+  # Backend App (Laravel PHP-FPM)
+  # ==========================================
+  app:
+    build:
+      context: ./be
+      dockerfile: docker/php/Dockerfile
+    container_name: tl_che_viet_app
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./be:/var/www
+      - ./be/docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - tl_che_viet_network
 
-  # certbot:
-  #   image: certbot/certbot:latest
-  #   volumes:
-  #     - ./certbot/conf:/etc/letsencrypt
-  #     - ./certbot/www:/var/www/certbot
-  #   command: certonly --webroot --webroot-path=/var/www/certbot --email ${SSL_EMAIL} --agree-tos --no-eff-email -d ${DOMAIN}
-  #   profiles:
-  #     - ssl
+  # ==========================================
+  # Backend Web Server (Nginx)
+  # ==========================================
+  nginx:
+    image: nginx:alpine
+    container_name: tl_che_viet_nginx
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ./be:/var/www
+      - ./be/docker/nginx/conf.d:/etc/nginx/conf.d
+    networks:
+      - tl_che_viet_network
+    depends_on:
+      - app
+
+  # ==========================================
+  # Database (MySQL)
+  # ==========================================
+  db:
+    image: mysql:8.0
+    container_name: tl_che_viet_db
+    restart: unless-stopped
+    ports: []
+    environment:
+      MYSQL_DATABASE: laravel
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - dbdata:/var/lib/mysql
+    networks:
+      - tl_che_viet_network
+
+  # ==========================================
+  # Cache (Redis)
+  # ==========================================
+  redis:
+    image: redis:alpine
+    container_name: tl_che_viet_redis
+    restart: unless-stopped
+    ports: []
+    volumes:
+      - redisdata:/data
+    networks:
+      - tl_che_viet_network
+
+networks:
+  tl_che_viet_network:
+    driver: bridge
 
 volumes:
   node_modules:
+  dbdata:
+    driver: local
+  redisdata:
+    driver: local

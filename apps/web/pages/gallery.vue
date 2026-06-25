@@ -4,17 +4,7 @@ const { salon } = useSettings()
 
 useScrollAnimation()
 
-const galleryImages = [
-  '/images/services/hair-cut.jpg',
-  '/images/services/hair-color.jpg',
-  '/images/services/hair-perm.jpg',
-  '/images/services/nail-basic.jpg',
-  '/images/services/nail-gel.jpg',
-  '/images/services/facial.jpg',
-  '/images/services/massage.jpg',
-  '/images/hero/hero-1.jpg',
-  '/images/hero/hero-2.jpg',
-]
+const { imageUrls: galleryImages } = useGallery()
 
 useSeoMeta({
   title: () => `${t('nav.gallery')} | ${salon.value.name}`,

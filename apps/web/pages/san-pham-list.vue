@@ -2,7 +2,8 @@
 const { t, locale } = useI18n()
 const localePath = useLocalePath()
 const { salon, contact, hours } = useSettings()
-const { products } = useProducts()
+const { products, categories, byCategory } = useProducts()
+const { latestPosts } = useBlog()
 
 useScrollAnimation()
 
@@ -18,54 +19,55 @@ const formatPrice = (price: number) =>
 
 const localLabel = (vi: string, en: string) => (locale.value === 'en' ? en : vi)
 
-const heroSlides = ['sp-001.jpg', 'sp-003.jpg', 'sp-005.jpg', 'sp-007.jpg']
+const heroSlides = computed(() => {
+  const fromApi = products.value.slice(0, 4).map(p => p.image).filter(Boolean)
+  return fromApi.length ? fromApi : ['sp-001.jpg', 'sp-003.jpg', 'sp-005.jpg', 'sp-007.jpg'].map(assetUrl)
+})
 
-const teaTabs = computed(() => [
-  {
-    id: 'green',
-    label: localLabel('Trà xanh', 'Green tea'),
-    image: 'sp-003.jpg',
-    productIds: ['sp-003'],
-  },
-  {
-    id: 'lotus',
-    label: localLabel('Trà sen', 'Lotus tea'),
-    image: 'sp-002.jpg',
-    productIds: ['sp-002'],
-  },
-  {
-    id: 'oolong',
-    label: localLabel('Trà ô long', 'Oolong tea'),
-    image: 'sp-005.jpg',
-    productIds: ['sp-005'],
-  },
-  {
-    id: 'herbal',
-    label: localLabel('Trà thảo mộc', 'Herbal tea'),
-    image: 'sp-006.jpg',
-    productIds: ['sp-006'],
-  },
-  {
-    id: 'gift',
-    label: localLabel('Quà tặng', 'Gift sets'),
-    image: 'sp-001.jpg',
-    productIds: ['sp-001', 'sp-004', 'sp-007'],
-  },
-  {
-    id: 'combo',
-    label: localLabel('Combo trà', 'Tea combos'),
-    image: 'sp-006.jpg',
-    productIds: ['sp-001', 'sp-002', 'sp-003', 'sp-004', 'sp-005', 'sp-006', 'sp-007'],
-  },
-])
+const teaTabs = computed(() => {
+  const allTab = {
+    id: 'all',
+    label: localLabel('Tất cả', 'All'),
+    image: products.value[0]?.image ?? assetUrl('sp-001.jpg'),
+    categoryId: null as number | null,
+  }
 
-const activeTab = ref(teaTabs.value[0]?.id ?? 'green')
+  const fromApi = categories.value.map(c => ({
+    id: String(c.id),
+    label: c.label,
+    image: byCategory(c.id)[0]?.image ?? assetUrl('sp-003.jpg'),
+    categoryId: c.id,
+  }))
+
+  return fromApi.length ? [allTab, ...fromApi] : [allTab]
+})
+
+const activeTab = ref('all')
+
+watch(teaTabs, (tabs) => {
+  if (!tabs.find(t => t.id === activeTab.value)) {
+    activeTab.value = tabs[0]?.id ?? 'all'
+  }
+}, { immediate: true })
 
 const activeTabProducts = computed(() => {
   const tab = teaTabs.value.find(t => t.id === activeTab.value)
-  if (!tab) return products.value
-  return products.value.filter(p => tab.productIds.includes(p.id))
+  if (!tab || tab.categoryId === null) return products.value
+  return byCategory(tab.categoryId)
 })
+
+const blogSnippets = computed(() =>
+  latestPosts.value.map((post) => {
+    const date = new Date(post.date || Date.now())
+    return {
+      slug: post.slug,
+      img: post.image,
+      day: date.getDate().toString().padStart(2, '0'),
+      month: date.toLocaleDateString(locale.value === 'vi' ? 'vi-VN' : 'en-US', { month: 'short' }).toUpperCase(),
+      title: post.title,
+    }
+  }),
+)
 
 const testimonials = computed(() => [
   {
@@ -84,21 +86,16 @@ const testimonials = computed(() => [
   },
 ])
 
-const blogSnippets = computed(() => [
-  { img: 'sp-001.jpg', day: '26', month: 'FEB', title: localLabel('Nghệ thuật thưởng trà Việt', 'The art of Vietnamese tea') },
-  { img: 'sp-003.jpg', day: '20', month: 'FEB', title: localLabel('5 loại trà tốt cho sức khỏe', '5 teas good for health') },
-  { img: 'sp-005.jpg', day: '16', month: 'FEB', title: localLabel('Cách pha trà ngon đúng điệu', 'How to brew tea properly') },
-  { img: 'sp-007.jpg', day: '08', month: 'FEB', title: localLabel('Trà sen Tây Hồ — tinh hoa Hà thành', 'West Lake lotus tea — Hanoi essence') },
-])
-
-const typedPhrases = computed(() => [
-  localLabel('Trà xanh Thái Nguyên', 'Thai Nguyen green tea'),
-  localLabel('Trà sen Tây Hồ', 'West Lake lotus tea'),
-  localLabel('Trà ô long', 'Oolong tea'),
-  localLabel('Trà thảo mộc', 'Herbal tea'),
-  localLabel('Quà Tết An Tâm', 'Tet An Tam gifts'),
-  localLabel('Combo trà', 'Tea combos'),
-])
+const typedPhrases = computed(() => {
+  const fromCategories = categories.value.map(c => c.label)
+  if (fromCategories.length) return fromCategories
+  return [
+    localLabel('Trà xanh Thái Nguyên', 'Thai Nguyen green tea'),
+    localLabel('Trà sen Tây Hồ', 'West Lake lotus tea'),
+    localLabel('Trà ô long', 'Oolong tea'),
+    localLabel('Trà thảo mộc', 'Herbal tea'),
+  ]
+})
 
 const typedIndex = ref(0)
 let typedTimer: ReturnType<typeof setInterval> | undefined
@@ -116,6 +113,9 @@ onUnmounted(() => {
 const addressText = computed(() =>
   contact.value.address?.[locale.value as 'vi' | 'en'] ?? contact.value.address?.vi ?? '',
 )
+
+const heroBg = (img: string) =>
+  img.startsWith('http') ? `url(${img})` : `url(${assetUrl(img)})`
 
 useHead({
   link: [
@@ -137,10 +137,10 @@ useSeoMeta({
       <div class="tlcv-hero-bg">
         <div
           v-for="(img, i) in heroSlides"
-          :key="img"
+          :key="`${img}-${i}`"
           class="s"
           :class="`s${i + 1}`"
-          :style="{ backgroundImage: `url(${assetUrl(img)})` }"
+          :style="{ backgroundImage: heroBg(img) }"
         />
       </div>
       <div class="tlcv-hero-overlay" />
@@ -227,12 +227,12 @@ useSeoMeta({
               </div>
             </div>
           </div>
-          <div class="col-md-4 text-middle text-light" :style="{ backgroundImage: `url(${assetUrl('sp-002.jpg')})`, backgroundSize: 'cover', backgroundPosition: 'center' }">
+          <div class="col-md-4 text-middle text-light" :style="{ backgroundImage: heroBg(products[0]?.image ?? 'sp-002.jpg'), backgroundSize: 'cover', backgroundPosition: 'center' }">
             <div class="padding40" style="background: rgba(0,0,0,.45);">
               <div class="box-icon" style="position: relative;">
                 <i class="fa fa-tags box-icon-fa" aria-hidden="true" />
                 <div class="text">
-                  <h4 style="color:#fff;">{{ localLabel('Giảm giá 50%', '50% off') }}</h4>
+                  <h4 style="color:#fff;">{{ localLabel('Sản phẩm nổi bật', 'Featured products') }}</h4>
                   <p style="color:rgba(255,255,255,.85);">{{ localLabel(
                     'Hương vị thanh khiết, an toàn cho sức khỏe — món quà ý nghĩa cho gia đình và người thân.',
                     'Pure flavor, safe for health — a meaningful gift for family and loved ones.',
@@ -243,7 +243,7 @@ useSeoMeta({
           </div>
           <div class="col-md-4 text-middle text-center" style="background-color: #50094d;">
             <div class="padding40">
-              <NuxtLink :to="localePath('/lien-he')" class="btn btn-line-white btn-big">
+              <NuxtLink :to="localePath('/gio-hang')" class="btn btn-line-white btn-big">
                 {{ localLabel('Đặt mua ngay', 'Order now') }}
               </NuxtLink>
             </div>
@@ -265,7 +265,7 @@ useSeoMeta({
                 :class="{ active: activeTab === tab.id }"
                 @click="activeTab = tab.id"
               >
-                <img :src="assetUrl(tab.image)" :alt="tab.label">
+                <img :src="tab.image.startsWith('http') ? tab.image : assetUrl(tab.image)" :alt="tab.label">
                 <span>{{ tab.label }}</span>
                 <div class="v-border" :style="{ opacity: activeTab === tab.id ? 1 : 0 }" />
               </li>
@@ -273,7 +273,10 @@ useSeoMeta({
 
             <div class="de_tab_content">
               <div class="tab_single_content">
-                <div class="row">
+                <div v-if="!activeTabProducts.length" class="text-center py-8 text-[#999]">
+                  {{ t('common.loading') }}
+                </div>
+                <div v-else class="row">
                   <div
                     v-for="p in activeTabProducts"
                     :key="p.id"
@@ -335,17 +338,17 @@ useSeoMeta({
     </section>
 
     <!-- Blog snippets -->
-    <section id="section-blog" class="no-top section-py">
+    <section v-if="blogSnippets.length" id="section-blog" class="no-top section-py">
       <div class="container">
         <div class="row">
           <div
             v-for="post in blogSnippets"
-            :key="post.title"
+            :key="post.slug"
             class="col-md-6 col-sm-6 mb-8"
           >
             <div class="post-content flex gap-4">
               <div class="post-image flex-shrink-0" style="width:120px;">
-                <img :src="assetUrl(post.img)" :alt="post.title" class="w-full h-auto rounded object-cover" style="max-height:90px;">
+                <img :src="post.img" :alt="post.title" class="w-full h-auto rounded object-cover" style="max-height:90px;">
               </div>
               <div class="post-text">
                 <div class="date-box text-xs text-[#999] mb-1">
@@ -353,7 +356,7 @@ useSeoMeta({
                   <span class="month ml-1">{{ post.month }}</span>
                 </div>
                 <h3 class="text-base font-semibold m-0">
-                  <NuxtLink :to="localePath('/tin-tuc')" class="text-[#333] hover:text-[#c9a86c]">
+                  <NuxtLink :to="localePath(`/tin-tuc/${post.slug}`)" class="text-[#333] hover:text-[#c9a86c]">
                     {{ post.title }}
                   </NuxtLink>
                 </h3>
@@ -375,7 +378,7 @@ useSeoMeta({
             </h3>
           </div>
           <div class="col-md-3 text-right">
-            <NuxtLink :to="localePath('/lien-he')" class="btn btn-line-white btn-big">
+            <NuxtLink :to="localePath('/gio-hang')" class="btn btn-line-white btn-big">
               {{ localLabel('Đặt mua ngay', 'Order now') }}
             </NuxtLink>
           </div>
@@ -392,7 +395,6 @@ useSeoMeta({
   height: 100dvh;
   overflow: hidden;
   background: #1a1a1a;
-  /* Kéo lên dưới header (bù pt-[72px] của layout) để header trong suốt nổi trên slider */
   margin-top: -72px;
 }
 .tlcv-hero-bg .s {

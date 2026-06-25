@@ -51,20 +51,30 @@ const icons: Record<string, string> = {
   form: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H7l-4 4V5zm4 3v2h10V8H7zm0 4v2h7v-2H7z"/></svg>',
 }
 
-// ── Form để lại thông tin (mô phỏng như ContactSection) ──
+const { submitContact } = useContact()
+
+// ── Form để lại thông tin ──
 const form = reactive({ name: '', phone: '', email: '', message: '' })
-const status = ref<'idle' | 'submitting' | 'success'>('idle')
+const status = ref<'idle' | 'submitting' | 'success' | 'error'>('idle')
 
 async function submit() {
   if (!form.name || !form.phone) return
   status.value = 'submitting'
-  await new Promise(r => setTimeout(r, 1000))
-  status.value = 'success'
-  setTimeout(() => {
-    status.value = 'idle'
-    form.name = form.phone = form.email = form.message = ''
-    showForm.value = false
-  }, 4000)
+  const res = await submitContact({
+    name: form.name,
+    phone: form.phone,
+    email: form.email,
+    message: form.message,
+    source: 'connect-widget',
+  })
+  status.value = res.success ? 'success' : 'error'
+  if (res.success) {
+    setTimeout(() => {
+      status.value = 'idle'
+      form.name = form.phone = form.email = form.message = ''
+      showForm.value = false
+    }, 4000)
+  }
 }
 </script>
 

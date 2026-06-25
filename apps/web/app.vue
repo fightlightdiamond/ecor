@@ -2,6 +2,8 @@
 const { t, locale } = useI18n()
 const { salon } = useSettings()
 
+useSeoHreflang()
+
 useSeoMeta({
   titleTemplate: (title) => title ? `${title} | ${salon.value.name}` : salon.value.name,
   ogSiteName: 'Thăng Long Chè Việt',

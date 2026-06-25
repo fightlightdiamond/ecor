@@ -1,43 +1,61 @@
 <script setup lang="ts">
 const { t } = useI18n()
 const { salon } = useSettings()
-const { getBySlug, related } = useProducts()
+const { getBySlug } = useProducts()
+const { addToCart, loading: cartLoading } = useCart()
 const localePath = useLocalePath()
 const route = useRoute()
 
 useScrollAnimation()
 
 const listUrl = computed(() => localePath('/san-pham-list'))
-
 const slug = computed(() => String(route.params.slug))
-const product = computed(() => getBySlug(slug.value))
+const added = ref(false)
 
-// 404 khi không tìm thấy sản phẩm
-if (!product.value) {
-  throw createError({ statusCode: 404, statusMessage: t('products.notFound'), fatal: true })
-}
+const { data: productData, pending } = useAsyncData(
+  () => `product-${slug.value}`,
+  () => getBySlug(slug.value),
+)
 
-const activeImage = ref(product.value.gallery[0] ?? product.value.image)
-watch(product, (p) => { if (p) activeImage.value = p.gallery[0] ?? p.image })
+const product = computed(() => productData.value?.product ?? null)
+const relatedItems = computed(() => productData.value?.relatedFromApi ?? [])
 
-const relatedItems = computed(() => related(slug.value, 3))
+watchEffect(() => {
+  if (!pending.value && !product.value) {
+    throw createError({ statusCode: 404, statusMessage: t('products.notFound'), fatal: true })
+  }
+})
+
+const activeImage = ref('')
+watchEffect(() => {
+  if (product.value) {
+    activeImage.value = product.value.gallery[0] ?? product.value.image
+  }
+})
+
 const priceText = computed(() =>
   `${product.value?.price.toLocaleString('vi-VN')} ${t('common.currency')}`,
 )
+
+const handleAddToCart = async () => {
+  if (!product.value) return
+  const res = await addToCart(product.value.id)
+  if (res.success) added.value = true
+}
 
 useSeoMeta({
   title: () => `${product.value?.title} | ${salon.value.name}`,
   description: () => product.value?.shortDesc,
   ogImage: () => product.value?.image,
 })
+
+useProductStructuredData(product)
 </script>
 
 <template>
   <div v-if="product" class="bg-dark text-white">
     <section class="section-py">
       <div class="container-page">
-
-        <!-- Breadcrumb -->
         <nav class="mb-8 text-xs uppercase tracking-[0.12em] text-white/50 d-none!" aria-label="Breadcrumb">
           <NuxtLink :to="localePath('/')" class="hover:text-primary-400">{{ t('nav.home') }}</NuxtLink>
           <span class="mx-2">/</span>
@@ -46,10 +64,7 @@ useSeoMeta({
           <span class="text-white/80">{{ product.title }}</span>
         </nav>
 
-        <!-- Top: gallery + info -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-14">
-
-          <!-- Gallery -->
           <div class="animate-on-scroll">
             <div class="relative aspect-[16/9] overflow-hidden rounded-lg bg-[#2a3326] shadow-2xl">
               <img :src="activeImage" :alt="product.title" class="w-full h-full object-cover">
@@ -68,14 +83,12 @@ useSeoMeta({
             </div>
           </div>
 
-          <!-- Info -->
           <div class="animate-on-scroll">
             <p class="modis-eyebrow mb-3">{{ t('products.label') }}</p>
             <h1 class="font-heading text-3xl md:text-4xl font-bold mb-3">{{ product.title }}</h1>
             <p class="text-2xl font-semibold text-primary-400 mb-5">{{ priceText }}</p>
             <p class="text-white/70 leading-relaxed mb-6">{{ product.shortDesc }}</p>
 
-            <!-- Features -->
             <ul v-if="product.features.length" class="space-y-2.5 mb-8">
               <li
                 v-for="(f, i) in product.features"
@@ -89,10 +102,17 @@ useSeoMeta({
               </li>
             </ul>
 
-            <!-- CTA -->
             <div class="flex flex-wrap gap-3">
-              <NuxtLink :to="localePath('/lien-he')" class="btn-primary">
-                {{ t('products.buy') }}
+              <button
+                type="button"
+                class="btn-primary min-h-[44px] disabled:opacity-60"
+                :disabled="cartLoading"
+                @click="handleAddToCart"
+              >
+                {{ added ? t('cart.added') : t('cart.add') }}
+              </button>
+              <NuxtLink :to="localePath('/gio-hang')" class="btn-ghost">
+                {{ t('cart.view') }}
               </NuxtLink>
               <NuxtLink :to="listUrl" class="btn-ghost">
                 {{ t('products.backToList') }}
@@ -101,16 +121,17 @@ useSeoMeta({
           </div>
         </div>
 
-        <!-- Description -->
         <div class="mt-16 max-w-3xl animate-on-scroll">
           <h2 class="section-heading text-2xl md:text-3xl mb-4">{{ t('products.descTitle') }}</h2>
           <div class="divider-gold !mx-0" />
-          <p class="text-white/70 leading-relaxed mt-5 whitespace-pre-line">{{ product.description }}</p>
+          <div
+            class="prose prose-invert max-w-none text-white/70 leading-relaxed mt-5"
+            v-html="product.description"
+          />
         </div>
       </div>
     </section>
 
-    <!-- Related -->
     <section v-if="relatedItems.length" class="section-py bg-dark-800" aria-label="Related products">
       <div class="container-page">
         <h2 class="section-heading text-2xl md:text-3xl text-center mb-3">{{ t('products.related') }}</h2>

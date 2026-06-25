@@ -1,10 +1,7 @@
 <script setup lang="ts">
-import galleryData from '~/content/gallery.json'
+const { items: galleryItems } = useGallery()
 
 const { t, locale } = useI18n()
-
-const localText = (field: Record<string, string> | undefined) =>
-  field?.[locale.value] ?? field?.vi ?? ''
 
 const filters = computed(() => [
   { id: 'all', label: locale.value === 'vi' ? 'Tất cả' : 'All Images' },
@@ -17,9 +14,8 @@ const filters = computed(() => [
 const activeFilter = ref('all')
 
 const items = computed(() =>
-  galleryData.map(item => ({
+  galleryItems.value.map(item => ({
     ...item,
-    label: localText(item.label),
     visible: activeFilter.value === 'all' || item.category === activeFilter.value,
   })),
 )

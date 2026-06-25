@@ -1,28 +1,33 @@
 <script setup lang="ts">
-import blogData from '~/content/blog.json'
-
-const { t, locale } = useI18n()
+const { t } = useI18n()
 const route = useRoute()
 const localePath = useLocalePath()
+const { getBySlug } = useBlog()
 
-const localText = (field: Record<string, string> | undefined) =>
-  field?.[locale.value] ?? field?.vi ?? ''
+const slug = computed(() => String(route.params.slug))
 
-const post = computed(() =>
-  blogData.find(p => p.slug === route.params.slug),
+const { data: post, pending } = useAsyncData(
+  `post-${slug.value}`,
+  () => getBySlug(slug.value),
 )
 
-if (!post.value) {
-  throw createError({ statusCode: 404, statusMessage: 'Post not found' })
-}
+watchEffect(() => {
+  if (!pending.value && !post.value) {
+    throw createError({ statusCode: 404, statusMessage: 'Post not found', fatal: true })
+  }
+})
 
-const title = computed(() => localText(post.value!.title))
-const excerpt = computed(() => localText(post.value!.excerpt))
+const title = computed(() => post.value?.title || '')
+const excerpt = computed(() => post.value?.excerpt || '')
+const content = computed(() => post.value?.content || '')
 
 useSeoMeta({
   title: () => `${title.value} | ${t('nav.blog')}`,
   description: () => excerpt.value,
+  ogImage: () => post.value?.image,
 })
+
+useArticleStructuredData(post)
 </script>
 
 <template>
@@ -34,12 +39,14 @@ useSeoMeta({
     <article class="section-py bg-dark-800 text-white">
       <div class="container-page max-w-3xl">
         <time class="text-primary-400 text-sm">{{ post!.date }}</time>
-        <p class="mt-6 text-white/70 leading-relaxed text-base md:text-lg">
+        <p v-if="excerpt" class="mt-6 text-white/70 leading-relaxed text-base md:text-lg">
           {{ excerpt }}
         </p>
-        <p class="mt-6 text-white/40 text-sm">
-          {{ t('blog.comingSoon') }}
-        </p>
+        <div
+          v-if="content"
+          class="prose prose-invert max-w-none mt-8 text-white/80 leading-relaxed"
+          v-html="content"
+        />
         <NuxtLink
           :to="localePath('/tin-tuc')"
           class="btn-ghost mt-10 inline-flex"

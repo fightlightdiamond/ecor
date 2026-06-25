@@ -1,18 +1,14 @@
 <script setup lang="ts">
-import blogData from '~/content/blog.json'
-
 const { t, locale } = useI18n()
 const localePath = useLocalePath()
-
-const localText = (field: Record<string, string> | undefined) =>
-  field?.[locale.value] ?? field?.vi ?? ''
+const { posts: rawPosts, latestPosts } = useBlog()
 
 const items = computed(() =>
-  blogData.map(post => ({
-    id: post.id,
+  (latestPosts.value.length ? latestPosts.value : rawPosts.value).map(post => ({
+    id: post.slug,
     slug: post.slug,
-    title: localText(post.title),
-    category: localText(post.category as Record<string, string>),
+    title: post.title,
+    category: 'Tin tức', // Fallback
   })),
 )
 

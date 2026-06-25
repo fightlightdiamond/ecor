@@ -7,10 +7,10 @@ const isMenuOpen = ref(false)
 
 watch(() => route.path, () => { isMenuOpen.value = false })
 
-// Header trong suốt khi ở đỉnh trang; đổ nền sau khi cuộn > 50px
-// (hoặc khi menu mobile đang mở để giữ chữ dễ đọc).
 const { y: scrollY } = useWindowScroll()
 const isSolid = computed(() => scrollY.value > 50 || isMenuOpen.value)
+
+const { totalItems } = useCart()
 
 const navLinks = computed(() => [
   { key: 'nav.home', path: '/' },
@@ -23,7 +23,6 @@ const navLinks = computed(() => [
 </script>
 
 <template>
-  <!-- role="banner" thay vì <header> để tránh xung đột CSS Modis (header { position:absolute }) -->
   <div
     class="site-header"
     :class="{ 'is-solid': isSolid }"
@@ -44,7 +43,20 @@ const navLinks = computed(() => [
         </NuxtLink>
       </nav>
 
-      <div class="max-lg:hidden lg:flex items-center">
+      <div class="max-lg:hidden lg:flex items-center gap-3">
+        <NuxtLink
+          :to="localePath('/gio-hang')"
+          class="site-cart-link"
+          :aria-label="t('cart.title')"
+        >
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+            <path d="M6 6h15l-1.5 9h-12z" stroke-linejoin="round" />
+            <path d="M6 6 5 3H2" stroke-linecap="round" stroke-linejoin="round" />
+            <circle cx="9" cy="20" r="1" />
+            <circle cx="18" cy="20" r="1" />
+          </svg>
+          <span v-if="totalItems > 0" class="site-cart-badge">{{ totalItems }}</span>
+        </NuxtLink>
         <NuxtLink :to="localePath('/lien-he')" class="site-header-cta">
           {{ t('nav.bookNow') }}
         </NuxtLink>
@@ -83,6 +95,14 @@ const navLinks = computed(() => [
             @click="isMenuOpen = false"
           >
             {{ t(link.key) }}
+          </NuxtLink>
+          <NuxtLink
+            :to="localePath('/gio-hang')"
+            class="site-mobile-link"
+            @click="isMenuOpen = false"
+          >
+            {{ t('cart.title') }}
+            <span v-if="totalItems > 0" class="ml-2 text-[#e8d5a8]">({{ totalItems }})</span>
           </NuxtLink>
           <div class="pt-4">
             <NuxtLink
@@ -155,6 +175,33 @@ const navLinks = computed(() => [
 
 .site-nav-active {
   color: #e8d5a8 !important;
+}
+
+.site-cart-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  color: rgba(245, 240, 230, .88);
+  text-decoration: none;
+}
+
+.site-cart-badge {
+  position: absolute;
+  top: 4px;
+  right: 2px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: #c41e3a;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
 }
 
 .site-header-cta {

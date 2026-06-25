@@ -1,24 +1,20 @@
 <script setup lang="ts">
-import blogData from '~/content/blog.json'
-
 const { t, locale } = useI18n()
 const localePath = useLocalePath()
-
-const localText = (field: Record<string, string> | undefined) =>
-  field?.[locale.value] ?? field?.vi ?? ''
+const { posts: rawPosts } = useBlog()
 
 const posts = computed(() =>
-  blogData.slice(0, 4).map((post) => {
-    const date = new Date(post.date)
+  rawPosts.value.slice(0, 4).map((post) => {
+    const date = new Date(post.date || Date.now())
     return {
-      id: post.id,
+      id: post.slug,
       slug: post.slug,
-      thumbnail: post.thumbnail ?? '',
-      category: localText(post.category as Record<string, string>),
+      thumbnail: post.image,
+      category: 'Tin tức', // post category not available in basic api yet
       day: date.getDate().toString().padStart(2, '0'),
       month: date.toLocaleDateString(locale.value === 'vi' ? 'vi-VN' : 'en-US', { month: 'short' }).toUpperCase(),
-      title: localText(post.title),
-      excerpt: localText(post.excerpt),
+      title: post.title,
+      excerpt: post.excerpt,
     }
   }),
 )

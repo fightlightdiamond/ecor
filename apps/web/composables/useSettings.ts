@@ -1,34 +1,31 @@
-import settingsData from '~/content/settings.json'
+import { localText } from '~/utils/storefront'
 
 export function useSettings() {
   const { locale } = useI18n()
+  const { settings: settingsData } = useSiteBundle()
 
-  const settings = computed(() => settingsData)
-
-  const localizedText = (field: Record<string, string> | undefined) => {
-    if (!field) return ''
-    return field[locale.value] ?? field['vi'] ?? ''
-  }
+  const localizedText = (field: Record<string, string> | undefined) =>
+    localText(field, locale.value)
 
   const salon = computed(() => ({
-    name: localizedText(settingsData.salon.name),
-    tagline: localizedText(settingsData.salon.tagline),
-    description: localizedText(settingsData.salon.description),
+    name: localizedText(settingsData.value.salon.name),
+    tagline: localizedText(settingsData.value.salon.tagline),
+    description: localizedText(settingsData.value.salon.description),
   }))
 
-  const contact = computed(() => settingsData.contact)
+  const contact = computed(() => settingsData.value.contact)
 
   const hours = computed(() =>
-    settingsData.hours.map(h => ({
+    settingsData.value.hours.map(h => ({
       days: localizedText(h.days),
       time: h.time,
     })),
   )
 
-  const social = computed(() => settingsData.social)
+  const social = computed(() => settingsData.value.social)
 
   const heroSlides = computed(() =>
-    settingsData.hero.slides.map(slide => ({
+    settingsData.value.hero.slides.map(slide => ({
       ...slide,
       imageAlt: localizedText(slide.imageAlt),
       heading: localizedText(slide.heading),
@@ -37,30 +34,30 @@ export function useSettings() {
   )
 
   const heroMeta = computed(() => ({
-    eyebrow: localizedText(settingsData.hero.eyebrow),
-    commitment: localizedText(settingsData.hero.commitment),
+    eyebrow: localizedText(settingsData.value.hero.eyebrow),
+    commitment: localizedText(settingsData.value.hero.commitment),
   }))
 
   const skills = computed(() =>
-    settingsData.skills.map(s => ({
+    settingsData.value.skills.map(s => ({
       ...s,
       label: localizedText(s.label),
     })),
   )
 
   const discoverServices = computed(() =>
-    settingsData.discoverServices.map(s => ({
+    settingsData.value.discoverServices.map(s => ({
       ...s,
       label: localizedText(s.label),
     })),
   )
 
   const promo = computed(() => ({
-    ...settingsData.promo,
-    badge: localizedText(settingsData.promo.badge),
-    heading: localizedText(settingsData.promo.heading),
-    subheading: localizedText(settingsData.promo.subheading),
+    ...settingsData.value.promo,
+    badge: localizedText(settingsData.value.promo.badge),
+    heading: localizedText(settingsData.value.promo.heading),
+    subheading: localizedText(settingsData.value.promo.subheading),
   }))
 
-  return { settings, salon, contact, hours, social, heroSlides, heroMeta, skills, discoverServices, promo }
+  return { settings: settingsData, salon, contact, hours, social, heroSlides, heroMeta, skills, discoverServices, promo }
 }
