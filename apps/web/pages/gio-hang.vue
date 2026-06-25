@@ -10,34 +10,81 @@ const {
   removeFromCart,
   checkout,
 } = useCart()
+const { applied, validateCoupon, clearCoupon } = useCoupon()
+const { customer, isLoggedIn, fetchProfile } = useCustomerAuth()
+const { methods: paymentMethods, fetchPaymentMethods } = usePayment()
 
 const form = reactive({
   name: '',
   phone: '',
+  email: '',
   address: '',
+  paymentMethod: 'cod',
 })
 
+onMounted(async () => {
+  await fetchPaymentMethods()
+  if (isLoggedIn.value && !customer.value) {
+    await fetchProfile()
+  }
+  if (customer.value) {
+    form.name = form.name || customer.value.name
+    form.phone = form.phone || customer.value.phone
+    form.email = form.email || customer.value.email || ''
+  }
+})
+
+const couponCode = ref('')
+const couponMessage = ref('')
 const message = ref('')
 const error = ref('')
+
+const discount = computed(() => applied.value?.discount ?? 0)
+const payableTotal = computed(() => Math.max(0, totalPrice.value - discount.value))
 
 const formatPrice = (price: number) =>
   `${price.toLocaleString('vi-VN')} ${t('common.currency')}`
 
+const handleApplyCoupon = async () => {
+  couponMessage.value = ''
+  if (!couponCode.value.trim()) return
+  const res = await validateCoupon(couponCode.value.trim(), totalPrice.value)
+  if (res.success && res.data?.valid) {
+    couponMessage.value = t('cart.couponApplied', { amount: formatPrice(res.data.discount ?? 0) })
+  } else {
+    clearCoupon()
+    couponMessage.value = res.data?.message || res.message || t('cart.couponInvalid')
+  }
+}
+
 const handleCheckout = async () => {
   error.value = ''
   message.value = ''
+  couponMessage.value = ''
   if (!form.name || !form.phone || !form.address) {
     error.value = t('cart.formRequired')
     return
   }
-  const res = await checkout({ ...form })
+  const res = await checkout({
+    ...form,
+    email: form.email.trim() || undefined,
+    payment_method: form.paymentMethod,
+    coupon_code: applied.value?.code ?? (couponCode.value.trim() || undefined),
+  })
   if (res.success) {
+    if (res.paymentUrl) {
+      window.location.href = res.paymentUrl
+      return
+    }
     message.value = res.orderNumber
       ? t('cart.orderSuccess', { number: res.orderNumber })
       : res.message
     form.name = ''
     form.phone = ''
+    form.email = ''
     form.address = ''
+    couponCode.value = ''
+    clearCoupon()
   } else {
     error.value = res.message
   }
@@ -110,10 +157,40 @@ useSeoMeta({
             </li>
           </ul>
 
-          <div class="flex justify-between items-center border-t border-white/10 pt-6 mb-10">
-            <span class="text-lg font-semibold">{{ t('cart.total') }}</span>
-            <span class="text-xl text-primary-400 font-bold">{{ formatPrice(totalPrice) }}</span>
+          <div class="border-t border-white/10 pt-6 mb-6 space-y-2 max-w-lg">
+            <div class="flex justify-between items-center text-white/70">
+              <span>{{ t('cart.subtotal') }}</span>
+              <span>{{ formatPrice(totalPrice) }}</span>
+            </div>
+            <div v-if="discount > 0" class="flex justify-between items-center text-green-400">
+              <span>{{ t('cart.discount') }}</span>
+              <span>-{{ formatPrice(discount) }}</span>
+            </div>
+            <div class="flex justify-between items-center pt-2">
+              <span class="text-lg font-semibold">{{ t('cart.total') }}</span>
+              <span class="text-xl text-primary-400 font-bold">{{ formatPrice(payableTotal) }}</span>
+            </div>
           </div>
+
+          <div class="flex flex-col sm:flex-row gap-3 mb-10 max-w-lg">
+            <input
+              v-model="couponCode"
+              type="text"
+              :placeholder="t('cart.couponPlaceholder')"
+              class="flex-1 px-4 py-3 rounded bg-dark border border-white/20 min-h-[44px] uppercase"
+            >
+            <button
+              type="button"
+              class="btn-ghost min-h-[44px] px-6"
+              :disabled="loading"
+              @click="handleApplyCoupon"
+            >
+              {{ t('cart.couponApply') }}
+            </button>
+          </div>
+          <p v-if="couponMessage" class="text-sm mb-6 -mt-6" :class="applied ? 'text-green-400' : 'text-red-400'">
+            {{ couponMessage }}
+          </p>
 
           <form class="space-y-4 max-w-lg" @submit.prevent="handleCheckout">
             <h2 class="text-xl font-semibold mb-2">{{ t('cart.checkoutTitle') }}</h2>
@@ -132,6 +209,14 @@ useSeoMeta({
               class="w-full px-4 py-3 rounded bg-dark border border-white/20 min-h-[44px]"
               required
             >
+            <input
+              v-model="form.email"
+              type="email"
+              inputmode="email"
+              autocomplete="email"
+              :placeholder="t('cart.emailOptional')"
+              class="w-full px-4 py-3 rounded bg-dark border border-white/20 min-h-[44px]"
+            >
             <textarea
               v-model="form.address"
               rows="3"
@@ -139,6 +224,22 @@ useSeoMeta({
               class="w-full px-4 py-3 rounded bg-dark border border-white/20"
               required
             />
+            <fieldset v-if="paymentMethods.length > 1" class="space-y-2">
+              <legend class="text-sm text-white/70 mb-2">{{ t('cart.paymentMethod') }}</legend>
+              <label
+                v-for="method in paymentMethods"
+                :key="method.id"
+                class="flex items-center gap-3 min-h-[44px] cursor-pointer"
+              >
+                <input
+                  v-model="form.paymentMethod"
+                  type="radio"
+                  :value="method.id"
+                  class="w-4 h-4"
+                >
+                <span class="text-sm">{{ method.label }}</span>
+              </label>
+            </fieldset>
             <p v-if="error" class="text-red-400 text-sm">{{ error }}</p>
             <p v-if="message" class="text-green-400 text-sm">{{ message }}</p>
             <button

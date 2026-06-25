@@ -78,8 +78,51 @@
       "submit": "Gửi yêu cầu",
       "submitting": "Đang gửi...",
       "success": "Cảm ơn! Chúng tôi sẽ liên hệ với bạn sớm.",
-      "error": "Có lỗi xảy ra. Vui lòng thử lại hoặc gọi trực tiếp."
+      "error": "Có lỗi xảy ra. Vui lòng thử lại hoặc gọi trực tiếp.",
+      "bookingHint": "Đăng ký tài khoản cùng SĐT tại trang Tài khoản để theo dõi lịch hẹn."
     }
+  },
+  "orderLookup": {
+    "title": "Tra cứu đơn hàng",
+    "eyebrow": "Đơn hàng",
+    "subtitle": "Nhập mã đơn và số điện thoại đặt hàng để xem trạng thái.",
+    "numberPlaceholder": "Mã đơn (VD: ORD-20260625-ABC123)",
+    "orderNumber": "Mã đơn",
+    "status": "Trạng thái",
+    "date": "Ngày đặt",
+    "paymentStatus": "Thanh toán",
+    "paymentMethod": "Phương thức",
+    "retryPayment": "Thanh toán lại VNPay",
+    "retrying": "Đang chuyển hướng...",
+    "retryError": "Không thể tạo lại link thanh toán.",
+    "submit": "Tra cứu",
+    "searching": "Đang tra cứu..."
+  },
+  "paymentResult": {
+    "title": "Kết quả thanh toán",
+    "eyebrow": "Thanh toán",
+    "success": "Thanh toán thành công!",
+    "failed": "Thanh toán không thành công",
+    "failedHint": "Đơn hàng có thể vẫn được tạo. Vui lòng tra cứu hoặc liên hệ salon.",
+    "orderNumber": "Mã đơn: {number}"
+  },
+  "orderStatus": {
+    "new": "Mới",
+    "processing": "Đang xử lý",
+    "shipped": "Đang giao",
+    "delivered": "Đã giao",
+    "cancelled": "Đã hủy"
+  },
+  "paymentStatus": {
+    "pending": "Chờ thanh toán",
+    "paid": "Đã thanh toán",
+    "failed": "Thanh toán thất bại"
+  },
+  "paymentMethod": {
+    "cod": "Thanh toán khi nhận hàng",
+    "vnpay": "VNPay",
+    "bank_transfer": "Chuyển khoản",
+    "credit_card": "Thẻ tín dụng"
   },
   "products": {
     "label": "Sản phẩm",
@@ -105,13 +148,58 @@
     "total": "Tổng cộng",
     "checkoutTitle": "Thông tin giao hàng",
     "address": "Địa chỉ giao hàng",
+    "emailOptional": "Email (nhận xác nhận đơn hàng)",
+    "paymentMethod": "Phương thức thanh toán",
     "submit": "Đặt hàng",
     "submitting": "Đang xử lý...",
     "formRequired": "Vui lòng điền đầy đủ thông tin giao hàng.",
     "orderSuccess": "Đặt hàng thành công! Mã đơn: {number}",
     "addError": "Không thể thêm vào giỏ hàng.",
     "checkoutError": "Thanh toán thất bại. Vui lòng thử lại.",
-    "lookupError": "Không tìm thấy đơn hàng."
+    "lookupError": "Không tìm thấy đơn hàng.",
+    "coupon": "Mã giảm giá",
+    "couponPlaceholder": "Nhập mã giảm giá",
+    "couponApply": "Áp dụng",
+    "couponApplied": "Đã giảm {amount}",
+    "couponInvalid": "Mã không hợp lệ",
+    "couponError": "Không thể kiểm tra mã giảm giá.",
+    "discount": "Giảm giá",
+    "subtotal": "Tạm tính"
+  },
+  "booking": {
+    "preferredDate": "Ngày hẹn",
+    "preferredTime": "Giờ hẹn",
+    "selectTime": "Chọn giờ",
+    "loadingSlots": "Đang tải khung giờ...",
+    "noSlots": "Không còn khung giờ trống trong ngày này.",
+    "success": "Đặt lịch thành công! Chúng tôi sẽ xác nhận sớm.",
+    "error": "Không thể gửi yêu cầu đặt lịch. Vui lòng gọi trực tiếp."
+  },
+  "account": {
+    "title": "Tài khoản",
+    "eyebrow": "Khách hàng",
+    "login": "Đăng nhập",
+    "register": "Đăng ký",
+    "logout": "Đăng xuất",
+    "password": "Mật khẩu",
+    "submitting": "Đang xử lý...",
+    "welcome": "Xin chào",
+    "appointments": "Lịch hẹn của tôi",
+    "noAppointments": "Chưa có lịch hẹn nào.",
+    "orders": "Đơn hàng của tôi",
+    "noOrders": "Chưa có đơn hàng nào.",
+    "generalBooking": "Đặt lịch dịch vụ",
+    "cancel": "Hủy lịch",
+    "cancelled": "Đã hủy lịch hẹn.",
+    "loginError": "Đăng nhập thất bại.",
+    "registerError": "Đăng ký thất bại.",
+    "cancelError": "Không thể hủy lịch hẹn.",
+    "status": {
+      "pending": "Chờ xác nhận",
+      "confirmed": "Đã xác nhận",
+      "completed": "Hoàn thành",
+      "cancelled": "Đã hủy"
+    }
   },
   "connect": {
     "open": "Kết nối",
@@ -157,7 +245,7 @@
     "featured": "Tin nổi bật",
     "subtitle": "Mẹo làm đẹp, xu hướng và tin tức từ Thăng Long Chè Việt",
     "viewAll": "Xem tất cả bài viết",
-    "comingSoon": "Nội dung đầy đủ sẽ được cập nhật trong Phase 2."
+    "comingSoon": "Nội dung đang được cập nhật."
   },
   "home": {
     "pillars": {
@@ -179,6 +267,6 @@
     "eyebrow": "Tác phẩm của chúng tôi",
     "title": "Bộ sưu tập",
     "subtitle": "Không gian salon và tác phẩm từ đội ngũ chuyên gia",
-    "comingSoon": "Nhiều hình ảnh hơn sẽ được cập nhật trong Phase 2."
+    "comingSoon": "Nhiều hình ảnh hơn sẽ được cập nhật sớm."
   }
 }

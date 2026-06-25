@@ -3,7 +3,7 @@ export default defineEventHandler(async (event) => {
   const baseUrl = String(config.public.siteUrl || 'https://thanglongcheviet.vn').replace(/\/$/, '')
   const apiBase = String(config.apiProxyTarget || 'http://127.0.0.1:8000').replace(/\/$/, '')
 
-  const staticPaths = ['/', '/san-pham-list', '/tin-tuc', '/lien-he', '/lang-nghe', '/doi-ngu', '/dich-vu', '/gallery', '/gio-hang']
+  const staticPaths = ['/', '/san-pham-list', '/tin-tuc', '/lien-he', '/lang-nghe', '/doi-ngu', '/dich-vu', '/gallery', '/gio-hang', '/tai-khoan', '/tra-cuu-don']
 
   let products: Array<{ slug: string; updated_at?: string }> = []
   let posts: Array<{ slug: string; updated_at?: string }> = []

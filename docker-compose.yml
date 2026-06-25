@@ -37,6 +37,78 @@ services:
     volumes:
       - ./be:/var/www
       - ./be/docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    environment:
+      MAIL_MAILER: smtp
+      MAIL_HOST: mailpit
+      MAIL_PORT: 1025
+      MAIL_FROM_ADDRESS: noreply@thanglongcheviet.vn
+      MAIL_FROM_NAME: "Thăng Long Chè Việt"
+      QUEUE_CONNECTION: database
+      STOREFRONT_ADMIN_EMAIL: admin@thanglongcheviet.vn
+      STOREFRONT_FRONTEND_URL: http://localhost:3000
+      VNPAY_ENABLED: "false"
+    depends_on:
+      - db
+      - redis
+      - mailpit
+    networks:
+      - tl_che_viet_network
+
+  queue:
+    build:
+      context: ./be
+      dockerfile: docker/php/Dockerfile
+    container_name: tl_che_viet_queue
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./be:/var/www
+      - ./be/docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    environment:
+      MAIL_MAILER: smtp
+      MAIL_HOST: mailpit
+      MAIL_PORT: 1025
+      MAIL_FROM_ADDRESS: noreply@thanglongcheviet.vn
+      MAIL_FROM_NAME: "Thăng Long Chè Việt"
+      QUEUE_CONNECTION: database
+      STOREFRONT_ADMIN_EMAIL: admin@thanglongcheviet.vn
+      STOREFRONT_FRONTEND_URL: http://localhost:3000
+      VNPAY_ENABLED: "false"
+    command: php artisan queue:work --sleep=3 --tries=3 --max-time=3600
+    depends_on:
+      - app
+      - db
+      - redis
+      - mailpit
+    networks:
+      - tl_che_viet_network
+
+  scheduler:
+    build:
+      context: ./be
+      dockerfile: docker/php/Dockerfile
+    container_name: tl_che_viet_scheduler
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./be:/var/www
+      - ./be/docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    environment:
+      QUEUE_CONNECTION: database
+    command: sh -c "while true; do php artisan schedule:run --verbose --no-interaction; sleep 60; done"
+    depends_on:
+      - app
+      - db
+    networks:
+      - tl_che_viet_network
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: tl_che_viet_mailpit
+    restart: unless-stopped
+    ports:
+      - "8025:8025"
+      - "1025:1025"
     networks:
       - tl_che_viet_network
 

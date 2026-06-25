@@ -49,6 +49,9 @@ export default defineNuxtConfig({
       'tin-tuc-slug': { en: '/blog/[slug]', vi: '/tin-tuc/[slug]' },
       'gio-hang': { en: '/cart', vi: '/gio-hang' },
       'lien-he': { en: '/contact', vi: '/lien-he' },
+      'tai-khoan': { en: '/account', vi: '/tai-khoan' },
+      'tra-cuu-don': { en: '/order-tracking', vi: '/tra-cuu-don' },
+      'thanh-toan-ket-qua': { en: '/payment/result', vi: '/thanh-toan/ket-qua' },
     },
     bundle: {
       optimizeTranslationDirective: false,

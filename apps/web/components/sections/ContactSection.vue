@@ -1,8 +1,10 @@
 <script setup lang="ts">
 const { t, locale } = useI18n()
+const localePath = useLocalePath()
 const { contact, hours } = useSettings()
 const { categories: productCategories } = useProducts()
 const { submitContact } = useContact()
+const { slots, slotsLoading, fetchAvailability, submitBooking } = useBooking()
 
 const form = reactive({
   name: '',
@@ -10,9 +12,12 @@ const form = reactive({
   email: '',
   service: '',
   message: '',
+  preferredDate: '',
+  preferredTime: '',
 })
 
 const status = ref<'idle' | 'submitting' | 'success' | 'error'>('idle')
+const lastWasBooking = ref(false)
 
 const serviceOptions = computed(() => {
   if (productCategories.value.length) {
@@ -25,22 +30,42 @@ const serviceOptions = computed(() => {
   ]
 })
 
+watch(() => form.preferredDate, async (date) => {
+  form.preferredTime = ''
+  if (date) await fetchAvailability(date)
+})
+
 async function handleSubmit() {
   if (!form.name || !form.phone) return
   status.value = 'submitting'
-  const res = await submitContact({
-    name: form.name,
-    phone: form.phone,
-    email: form.email,
-    service: form.service,
-    message: form.message,
-    source: 'contact-page',
-  })
+
+  const isBooking = Boolean(form.preferredDate)
+  lastWasBooking.value = isBooking
+  const res = isBooking
+    ? await submitBooking({
+        name: form.name,
+        phone: form.phone,
+        email: form.email || undefined,
+        service: form.service || undefined,
+        preferred_date: form.preferredDate,
+        preferred_time: form.preferredTime || undefined,
+        note: form.message || undefined,
+      })
+    : await submitContact({
+        name: form.name,
+        phone: form.phone,
+        email: form.email,
+        service: form.service,
+        message: form.message,
+        source: 'contact-page',
+      })
+
   status.value = res.success ? 'success' : 'error'
   if (res.success) {
     setTimeout(() => {
       status.value = 'idle'
       form.name = form.phone = form.email = form.service = form.message = ''
+      form.preferredDate = form.preferredTime = ''
     }, 5000)
   }
 }
@@ -227,6 +252,42 @@ const localText = (field: Record<string, string> | undefined) =>
               </select>
             </div>
 
+            <!-- Preferred date (booking) -->
+            <div>
+              <label for="contact-date" class="block text-xs uppercase tracking-widest text-primary-400 mb-1.5">
+                {{ t('booking.preferredDate') }}
+              </label>
+              <input
+                id="contact-date"
+                v-model="form.preferredDate"
+                type="date"
+                :min="new Date().toISOString().split('T')[0]"
+                class="w-full px-4 py-3 bg-white/5 border border-white/15 text-white
+                       text-sm focus:outline-none focus:border-primary-500 transition-colors min-h-[44px]"
+              >
+            </div>
+
+            <!-- Preferred time -->
+            <div v-if="form.preferredDate">
+              <label for="contact-time" class="block text-xs uppercase tracking-widest text-primary-400 mb-1.5">
+                {{ t('booking.preferredTime') }}
+              </label>
+              <p v-if="slotsLoading" class="text-sm text-white/50 mb-2">{{ t('booking.loadingSlots') }}</p>
+              <p v-else-if="!slots.length" class="text-sm text-amber-400/90 mb-2">{{ t('booking.noSlots') }}</p>
+              <select
+                v-else
+                id="contact-time"
+                v-model="form.preferredTime"
+                class="w-full px-4 py-3 bg-dark border border-white/15 text-white/70
+                       text-sm focus:outline-none focus:border-primary-500 transition-colors min-h-[44px]"
+              >
+                <option value="">{{ t('booking.selectTime') }}</option>
+                <option v-for="slot in slots" :key="slot.time" :value="slot.time">
+                  {{ slot.time }}
+                </option>
+              </select>
+            </div>
+
             <!-- Message -->
             <div>
               <label for="contact-message" class="block text-xs uppercase tracking-widest text-primary-400 mb-1.5">
@@ -260,9 +321,13 @@ const localText = (field: Record<string, string> | undefined) =>
             <Transition enter-active-class="transition-opacity duration-300" enter-from-class="opacity-0">
               <div
                 v-if="status === 'success'"
-                class="text-green-400 bg-green-500/10 border border-green-500/30 p-3 text-sm"
+                class="text-green-400 bg-green-500/10 border border-green-500/30 p-3 text-sm space-y-2"
               >
-                ✅ {{ t('contact.form.success') }}
+                <p>✅ {{ t('contact.form.success') }}</p>
+                <p v-if="lastWasBooking" class="text-green-300/90 text-xs">
+                  {{ t('contact.form.bookingHint') }}
+                  <NuxtLink :to="localePath('/tai-khoan')" class="underline">{{ t('account.title') }}</NuxtLink>
+                </p>
               </div>
               <div
                 v-else-if="status === 'error'"

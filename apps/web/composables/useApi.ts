@@ -17,11 +17,17 @@ export function useApi() {
     const separator = url.includes('?') ? '&' : '?'
     const apiUrl = `/api/storefront${url}${separator}lang=${locale.value}`
 
-    const headers = {
+    const customerToken = useCookie<string | null>('customer_token')
+
+    const headers: Record<string, string> = {
       ...(options.headers as Record<string, string> | undefined),
       'X-Session-ID': sessionId.value!,
-      'Accept': 'application/json',
+      Accept: 'application/json',
       'Accept-Language': locale.value,
+    }
+
+    if (customerToken.value) {
+      headers.Authorization = `Bearer ${customerToken.value}`
     }
 
     return $fetch<T>(apiUrl, {

@@ -24,6 +24,14 @@ class DatabaseSeeder extends Seeder
         $role = \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'super_admin', 'guard_name' => 'web']);
         $admin->syncRoles([$role]);
 
+        \App\Models\Coupon::firstOrCreate(['code' => 'WELCOME10'], [
+            'type' => 'percent',
+            'value' => 10,
+            'starts_at' => now()->subDay(),
+            'expires_at' => now()->addYear(),
+            'is_active' => true,
+        ]);
+
         $category = \TomatoPHP\FilamentCms\Models\Category::firstOrCreate([
             'slug' => 'tra-xanh',
         ], [

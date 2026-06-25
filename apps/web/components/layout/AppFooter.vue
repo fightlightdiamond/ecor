@@ -90,6 +90,12 @@ const footerHours = computed(() => {
 
     <div class="subfooter">
       <div class="container text-center">
+        <NuxtLink :to="localePath('/tai-khoan')" class="text-white/50 hover:text-primary-400 text-sm mr-4">
+          {{ t('account.title') }}
+        </NuxtLink>
+        <NuxtLink :to="localePath('/tra-cuu-don')" class="text-white/50 hover:text-primary-400 text-sm mr-4">
+          {{ t('orderLookup.title') }}
+        </NuxtLink>
         {{ t('footer.copyright', { year }) }}
       </div>
     </div>

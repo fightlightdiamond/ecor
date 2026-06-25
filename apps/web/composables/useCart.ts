@@ -100,20 +100,40 @@ export function useCart() {
     }
   }
 
-  const checkout = async (data: { name: string; phone: string; address: string }) => {
+  const checkout = async (data: {
+    name: string
+    phone: string
+    address: string
+    email?: string
+    coupon_code?: string
+    payment_method?: string
+  }) => {
     loading.value = true
     try {
-      const res = await fetchApi<ApiEnvelope<{ order_number: string }> & { message: string }>('/checkout', {
+      const res = await fetchApi<ApiEnvelope<{
+        order_number: string
+        subtotal?: number
+        discount?: number
+        total_price?: number
+        payment_method?: string
+        payment_url?: string
+      }> & { message: string }>('/checkout', {
         method: 'POST',
         body: data,
       })
       if (res.success) {
-        cart.value = null
-        items.value = []
+        if (!res.data?.payment_url) {
+          cart.value = null
+          items.value = []
+        }
         return {
           success: true,
           message: res.message,
           orderNumber: res.data?.order_number ?? null,
+          subtotal: res.data?.subtotal,
+          discount: res.data?.discount,
+          totalPrice: res.data?.total_price,
+          paymentUrl: res.data?.payment_url ?? null,
         }
       }
     } catch (err) {
@@ -122,11 +142,12 @@ export function useCart() {
         success: false,
         message: parseApiError(err, t('cart.checkoutError')),
         orderNumber: null,
+        paymentUrl: null,
       }
     } finally {
       loading.value = false
     }
-    return { success: false, message: t('cart.checkoutError'), orderNumber: null }
+    return { success: false, message: t('cart.checkoutError'), orderNumber: null, paymentUrl: null }
   }
 
   const totalItems = computed(() => items.value.reduce((sum, item) => sum + item.quantity, 0))

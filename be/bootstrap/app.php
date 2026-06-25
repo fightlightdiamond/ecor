@@ -15,10 +15,15 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'storefront.cache' => \App\Http\Middleware\CacheStorefrontApi::class,
+            'customer' => \App\Http\Middleware\AuthenticateCustomer::class,
+            'sanctum.optional' => \App\Http\Middleware\OptionalSanctumAuth::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*'),
         );
+    })
+    ->withSchedule(function (\Illuminate\Console\Scheduling\Schedule $schedule): void {
+        $schedule->command('orders:expire-unpaid-vnpay')->everyFiveMinutes();
     })->create();

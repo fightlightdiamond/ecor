@@ -78,8 +78,51 @@
       "submit": "Send Request",
       "submitting": "Sending...",
       "success": "Thank you! We will contact you shortly.",
-      "error": "An error occurred. Please try again or call us directly."
+      "error": "An error occurred. Please try again or call us directly.",
+      "bookingHint": "Sign up with the same phone on the Account page to track your booking."
     }
+  },
+  "orderLookup": {
+    "title": "Order tracking",
+    "eyebrow": "Orders",
+    "subtitle": "Enter your order number and phone number to check status.",
+    "numberPlaceholder": "Order ID (e.g. ORD-20260625-ABC123)",
+    "orderNumber": "Order number",
+    "status": "Status",
+    "date": "Order date",
+    "paymentStatus": "Payment",
+    "paymentMethod": "Method",
+    "retryPayment": "Pay again with VNPay",
+    "retrying": "Redirecting...",
+    "retryError": "Could not create a new payment link.",
+    "submit": "Track order",
+    "searching": "Searching..."
+  },
+  "paymentResult": {
+    "title": "Payment result",
+    "eyebrow": "Payment",
+    "success": "Payment successful!",
+    "failed": "Payment failed",
+    "failedHint": "Your order may still exist. Please track it or contact us.",
+    "orderNumber": "Order: {number}"
+  },
+  "orderStatus": {
+    "new": "New",
+    "processing": "Processing",
+    "shipped": "Shipped",
+    "delivered": "Delivered",
+    "cancelled": "Cancelled"
+  },
+  "paymentStatus": {
+    "pending": "Pending payment",
+    "paid": "Paid",
+    "failed": "Payment failed"
+  },
+  "paymentMethod": {
+    "cod": "Cash on delivery",
+    "vnpay": "VNPay",
+    "bank_transfer": "Bank transfer",
+    "credit_card": "Credit card"
   },
   "products": {
     "label": "Products",
@@ -105,13 +148,58 @@
     "total": "Total",
     "checkoutTitle": "Shipping information",
     "address": "Shipping address",
+    "emailOptional": "Email (order confirmation)",
+    "paymentMethod": "Payment method",
     "submit": "Place order",
     "submitting": "Processing...",
     "formRequired": "Please fill in all shipping details.",
     "orderSuccess": "Order placed successfully! Order ID: {number}",
     "addError": "Could not add item to cart.",
     "checkoutError": "Checkout failed. Please try again.",
-    "lookupError": "Order not found."
+    "lookupError": "Order not found.",
+    "coupon": "Coupon code",
+    "couponPlaceholder": "Enter coupon code",
+    "couponApply": "Apply",
+    "couponApplied": "Discount {amount}",
+    "couponInvalid": "Invalid coupon",
+    "couponError": "Could not validate coupon.",
+    "discount": "Discount",
+    "subtotal": "Subtotal"
+  },
+  "booking": {
+    "preferredDate": "Preferred date",
+    "preferredTime": "Preferred time",
+    "selectTime": "Select time",
+    "loadingSlots": "Loading time slots...",
+    "noSlots": "No available slots on this date.",
+    "success": "Booking request sent! We will confirm shortly.",
+    "error": "Could not submit booking. Please call us directly."
+  },
+  "account": {
+    "title": "Account",
+    "eyebrow": "Customer",
+    "login": "Log in",
+    "register": "Sign up",
+    "logout": "Log out",
+    "password": "Password",
+    "submitting": "Processing...",
+    "welcome": "Welcome",
+    "appointments": "My appointments",
+    "noAppointments": "No appointments yet.",
+    "orders": "My orders",
+    "noOrders": "No orders yet.",
+    "generalBooking": "Service booking",
+    "cancel": "Cancel",
+    "cancelled": "Appointment cancelled.",
+    "loginError": "Login failed.",
+    "registerError": "Registration failed.",
+    "cancelError": "Could not cancel appointment.",
+    "status": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    }
   },
   "connect": {
     "open": "Connect",
@@ -157,7 +245,7 @@
     "featured": "Featured",
     "subtitle": "Beauty tips, trends and news from Thăng Long Chè Việt",
     "viewAll": "View All Articles",
-    "comingSoon": "Full article content will be added in Phase 2."
+    "comingSoon": "Full article content is being updated."
   },
   "home": {
     "pillars": {
@@ -179,6 +267,6 @@
     "eyebrow": "Our Works",
     "title": "Gallery",
     "subtitle": "Salon space and works from our expert team",
-    "comingSoon": "More photos will be added in Phase 2."
+    "comingSoon": "More photos will be added soon."
   }
 }

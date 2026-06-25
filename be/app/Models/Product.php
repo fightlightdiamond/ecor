@@ -7,14 +7,36 @@ use Illuminate\Database\Eloquent\Model;
 class Product extends Model
 {
     protected $fillable = [
-        'name', 'slug', 'description', 'price', 'stock', 'sku', 'images', 'status', 'category_id', 'custom_fields',
+        'name', 'slug', 'description', 'translations', 'price', 'stock', 'sku', 'images', 'status', 'category_id', 'custom_fields',
     ];
 
     protected $casts = [
         'images' => 'array',
+        'translations' => 'array',
         'custom_fields' => 'array',
         'price' => 'decimal:2',
     ];
+
+    protected static function booted(): void
+    {
+        static::saving(function (Product $product) {
+            $translations = $product->translations ?? [];
+            $translations['vi'] = [
+                'name' => $product->name,
+                'description' => $product->description,
+            ];
+            $product->translations = $translations;
+        });
+    }
+
+    public function localized(string $field, string $locale = 'vi'): ?string
+    {
+        $translations = $this->translations ?? [];
+
+        return $translations[$locale][$field]
+            ?? $translations['vi'][$field]
+            ?? $this->{$field};
+    }
 
     public function category()
     {

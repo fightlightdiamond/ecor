@@ -10,6 +10,9 @@ export interface OrderLookupItem {
 export interface OrderLookup {
   number: string
   status: string
+  payment_status?: string
+  payment_method?: string
+  can_retry_payment?: boolean
   total_price: number | string
   customer_name: string
   shipping_address: string
@@ -19,7 +22,7 @@ export interface OrderLookup {
 
 export function useOrder() {
   const { fetchApi } = useApi()
-  const { t } = useI18n()
+  const { t } = useAppI18n()
 
   const lookupOrder = async (number: string, phone: string) => {
     try {
@@ -39,5 +42,24 @@ export function useOrder() {
     return { success: false as const, message: t('cart.lookupError') }
   }
 
-  return { lookupOrder }
+  const retryPayment = async (number: string, phone: string) => {
+    try {
+      const res = await fetchApi<ApiEnvelope<{ payment_url: string }>>('/orders/retry-payment', {
+        method: 'POST',
+        body: { number, phone },
+      })
+      if (res.success && res.data?.payment_url) {
+        return { success: true as const, paymentUrl: res.data.payment_url }
+      }
+    } catch (err) {
+      return {
+        success: false as const,
+        message: parseApiError(err, t('orderLookup.retryError')),
+      }
+    }
+
+    return { success: false as const, message: t('orderLookup.retryError') }
+  }
+
+  return { lookupOrder, retryPayment }
 }

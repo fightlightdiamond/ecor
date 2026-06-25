@@ -31,19 +31,35 @@ class ProductResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Group::make([
-                    Forms\Components\Section::make('Product Details')->schema([
-                        Forms\Components\TextInput::make('name')
-                            ->required()
-                            ->live(onBlur: true)
-                            ->afterStateUpdated(fn (string $operation, $state, Forms\Set $set) => $operation === 'create' ? $set('slug', \Illuminate\Support\Str::slug($state)) : null)
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('slug')
-                            ->required()
-                            ->unique(ignoreRecord: true)
-                            ->maxLength(255),
-                        Forms\Components\RichEditor::make('description')
-                            ->columnSpanFull(),
-                    ])->columns(2),
+                    Forms\Components\Tabs::make('Content')
+                        ->tabs([
+                            Forms\Components\Tabs\Tab::make('Tiếng Việt')
+                                ->schema([
+                                    Forms\Components\TextInput::make('name')
+                                        ->label('Name (Vietnamese)')
+                                        ->required()
+                                        ->live(onBlur: true)
+                                        ->afterStateUpdated(fn (string $operation, $state, Forms\Set $set) => $operation === 'create' ? $set('slug', \Illuminate\Support\Str::slug($state)) : null)
+                                        ->maxLength(255),
+                                    Forms\Components\RichEditor::make('description')
+                                        ->label('Description (Vietnamese)')
+                                        ->columnSpanFull(),
+                                ]),
+                            Forms\Components\Tabs\Tab::make('English')
+                                ->schema([
+                                    Forms\Components\TextInput::make('translations.en.name')
+                                        ->label('Name (English)')
+                                        ->maxLength(255),
+                                    Forms\Components\RichEditor::make('translations.en.description')
+                                        ->label('Description (English)')
+                                        ->columnSpanFull(),
+                                ]),
+                        ])
+                        ->columnSpanFull(),
+                    Forms\Components\TextInput::make('slug')
+                        ->required()
+                        ->unique(ignoreRecord: true)
+                        ->maxLength(255),
 
                     Forms\Components\Section::make('Media')->schema([
                         \Awcodes\Curator\Components\Forms\CuratorPicker::make('images')
@@ -53,7 +69,7 @@ class ProductResource extends Resource
                             ->color('primary')
                             ->columnSpanFull(),
                     ]),
-                    
+
                     Forms\Components\Section::make('Variants')->schema([
                         Forms\Components\Repeater::make('variants')
                             ->relationship()
@@ -63,7 +79,7 @@ class ProductResource extends Resource
                                 Forms\Components\TextInput::make('price_modifier')->numeric()->prefix('$')->default(0),
                                 Forms\Components\TextInput::make('stock')->numeric()->default(0)->required(),
                                 Forms\Components\KeyValue::make('attributes'),
-                            ])->columns(2)
+                            ])->columns(2),
                     ]),
                 ])->columnSpan(['lg' => 2]),
 

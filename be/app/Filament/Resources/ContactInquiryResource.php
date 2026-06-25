@@ -26,11 +26,13 @@ class ContactInquiryResource extends Resource
     {
         return $form
             ->schema([
+                Forms\Components\TextInput::make('type')->disabled(),
                 Forms\Components\TextInput::make('name')->disabled(),
                 Forms\Components\TextInput::make('phone')->disabled(),
                 Forms\Components\TextInput::make('email')->disabled(),
                 Forms\Components\TextInput::make('service')->disabled(),
                 Forms\Components\TextInput::make('source')->disabled(),
+                Forms\Components\DateTimePicker::make('preferred_at')->disabled(),
                 Forms\Components\Textarea::make('message')->disabled()->columnSpanFull(),
             ]);
     }
@@ -39,8 +41,10 @@ class ContactInquiryResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('type')->badge(),
                 Tables\Columns\TextColumn::make('name')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('phone')->searchable(),
+                Tables\Columns\TextColumn::make('preferred_at')->dateTime()->toggleable(),
                 Tables\Columns\TextColumn::make('email')->toggleable(),
                 Tables\Columns\TextColumn::make('service')->toggleable(),
                 Tables\Columns\TextColumn::make('source')->badge(),
@@ -49,10 +53,13 @@ class ContactInquiryResource extends Resource
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
+                Tables\Filters\SelectFilter::make('type')
+                    ->options(['contact' => 'Contact', 'booking' => 'Booking']),
                 Tables\Filters\SelectFilter::make('source')
                     ->options([
                         'contact-page' => 'Contact page',
                         'connect-widget' => 'Connect widget',
+                        'booking-form' => 'Booking form',
                         'website' => 'Website',
                     ]),
             ])
