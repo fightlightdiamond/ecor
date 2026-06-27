@@ -92,10 +92,37 @@ docker compose exec web npm install "tên-thư-viện"
 PHP và Laravel lưu trữ bộ đệm (config, routes, views) ở nhiều lớp khác nhau và có thể gây ra lỗi logic nếu cấu hình thay đổi mà không được xóa. Để dọn dẹp bộ nhớ đệm sạch sẽ, hãy sử dụng các lệnh sau:
 
 ### Dọn dẹp toàn bộ cache của Laravel
-Lệnh này sẽ xoá cấu hình cache, route cache, view cache, và event cache:
+Lệnh tổng hợp dọn dẹp cấu hình, route, view, event cache:
 ```bash
 docker compose exec app php artisan optimize:clear
 ```
+
+### Các lệnh dọn dẹp riêng lẻ (Khi cần thiết)
+Nếu bạn chỉ muốn xóa một loại cache cụ thể:
+* **Xóa cache cấu hình (Configuration):**
+  ```bash
+  docker compose exec app php artisan config:clear
+  ```
+* **Xóa cache định tuyến (Routes):**
+  ```bash
+  docker compose exec app php artisan route:clear
+  ```
+* **Xóa cache giao diện (Compiled Views):**
+  ```bash
+  docker compose exec app php artisan view:clear
+  ```
+* **Xóa cache ứng dụng (Application Cache):**
+  ```bash
+  docker compose exec app php artisan cache:clear
+  ```
+* **Xóa cache sự kiện (Events):**
+  ```bash
+  docker compose exec app php artisan event:clear
+  ```
+* **Xóa các file dịch mã nguồn biên dịch trước (Compiled classes):**
+  ```bash
+  docker compose exec app php artisan clear-compiled
+  ```
 
 ### Xóa sạch cache Redis (nếu cần)
 Nếu hệ thống sử dụng Redis làm cache driver và bạn muốn xoá sạch các key đã lưu:
