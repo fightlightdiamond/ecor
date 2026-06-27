@@ -12,30 +12,14 @@ Dự án được cấu hình chạy hoàn toàn bằng **Docker** để đảm 
 
 Khi bạn vừa clone source code về máy lần đầu tiên, hãy thực hiện các bước sau để khởi động dự án:
 
-### Bước 1: Tạo các file môi trường (.env)
-Sao chép các file cấu hình từ file mẫu:
-
-* **Trên macOS / Linux:**
-  ```bash
-  cp .env.example .env
-  cp be/.env.example be/.env
-  ```
-* **Trên Windows (Command Prompt):**
-  ```cmd
-  copy .env.example .env
-  copy be\.env.example be\.env
-  ```
-
-*(Lưu ý cực kỳ quan trọng: Mở file `be/.env` vừa tạo và sửa giá trị `DB_HOST=tl_che_viet_db` thành `DB_HOST=db` để Laravel kết nối chính xác vào database service).*
-
-### Bước 2: Khởi động các container Docker
-Bật Docker Desktop lên và chạy lệnh:
+### Bước 1: Khởi động các container Docker
+Bật Docker Desktop lên và chạy lệnh ở thư mục gốc của dự án:
 ```bash
 docker compose up -d
 ```
 
-### Bước 3: Chạy script khởi tạo hệ thống trong container
-Để tự động cài đặt các thư viện PHP, tạo cơ sở dữ liệu mẫu và cấu hình ứng dụng, hãy chạy lệnh sau:
+### Bước 2: Chạy script khởi tạo hệ thống trong container
+Để tự động tạo cấu hình môi trường `.env`, cài đặt các thư viện PHP, tạo cơ sở dữ liệu mẫu và cấu hình ứng dụng, hãy chạy lệnh sau:
 ```bash
 docker compose exec app sh docker-init.sh
 ```
