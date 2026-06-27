@@ -84,3 +84,22 @@ Container xử lý Frontend có tên là `web`.
 # Cài thêm thư viện frontend
 docker compose exec web npm install "tên-thư-viện"
 ```
+
+---
+
+## ⚡ 5. Dọn dẹp Bộ nhớ đệm (Clear Cache)
+
+PHP và Laravel lưu trữ bộ đệm (config, routes, views) ở nhiều lớp khác nhau và có thể gây ra lỗi logic nếu cấu hình thay đổi mà không được xóa. Để dọn dẹp bộ nhớ đệm sạch sẽ, hãy sử dụng các lệnh sau:
+
+### Dọn dẹp toàn bộ cache của Laravel
+Lệnh này sẽ xoá cấu hình cache, route cache, view cache, và event cache:
+```bash
+docker compose exec app php artisan optimize:clear
+```
+
+### Xóa sạch cache Redis (nếu cần)
+Nếu hệ thống sử dụng Redis làm cache driver và bạn muốn xoá sạch các key đã lưu:
+```bash
+docker compose exec redis redis-cli flushall
+```
+

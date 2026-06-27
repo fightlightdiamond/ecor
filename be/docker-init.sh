@@ -22,6 +22,10 @@ composer install --no-interaction
 echo "-> Generating application key..."
 php artisan key:generate
 
+# 3.5 Clear any cached configuration or routes to prevent bootstrap errors
+echo "-> Clearing application cache..."
+php artisan optimize:clear
+
 # 4. Running migrations and seeders
 echo "-> Running database migrations and seeders..."
 php artisan migrate:fresh --seed --force
