@@ -17,7 +17,7 @@ if not exist "be\.env" (
     copy be\.env.example be\.env >nul
     
     rem Use PowerShell to replace string values in .env for Docker environment
-    powershell -Command "(gc be\.env) -replace 'DB_CONNECTION=sqlite', 'DB_CONNECTION=mysql' -replace '# DB_HOST=127.0.0.1', 'DB_HOST=db' -replace '# DB_PORT=3306', 'DB_PORT=3306' -replace '# DB_DATABASE=laravel', 'DB_DATABASE=laravel' -replace '# DB_USERNAME=root', 'DB_USERNAME=laravel' -replace '# DB_PASSWORD=', 'DB_PASSWORD=secret' -replace 'REDIS_HOST=127.0.0.1', 'REDIS_HOST=redis' | Out-File -encoding ASCII be\.env"
+    powershell -Command "(gc be\.env) -replace 'DB_HOST=tl_che_viet_db', 'DB_HOST=db' | Out-File -encoding ASCII be\.env"
     
     echo [OK] Created and configured be/.env for Docker
 ) else (

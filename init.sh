@@ -20,16 +20,8 @@ fi
 # Backend .env
 if [ ! -f "be/.env" ]; then
     cp be/.env.example be/.env
-    # Update be/.env for Docker environment
-    sed -i.bak -e 's/DB_CONNECTION=sqlite/DB_CONNECTION=mysql/' be/.env
-    sed -i.bak -e 's/# DB_HOST=127.0.0.1/DB_HOST=db/' be/.env
-    sed -i.bak -e 's/# DB_PORT=3306/DB_PORT=3306/' be/.env
-    sed -i.bak -e 's/# DB_DATABASE=laravel/DB_DATABASE=laravel/' be/.env
-    sed -i.bak -e 's/# DB_USERNAME=root/DB_USERNAME=laravel/' be/.env
-    sed -i.bak -e 's/# DB_PASSWORD=/DB_PASSWORD=secret/' be/.env
-    
-    sed -i.bak -e 's/REDIS_HOST=127.0.0.1/REDIS_HOST=redis/' be/.env
-    
+    # Ensure DB_HOST is set to db (the service name in docker-compose.yml)
+    sed -i.bak -e 's/DB_HOST=tl_che_viet_db/DB_HOST=db/' be/.env 2>/dev/null || sed -i '' -e 's/DB_HOST=tl_che_viet_db/DB_HOST=db/' be/.env
     rm -f be/.env.bak
     echo "✅ Created and configured be/.env for Docker"
 else

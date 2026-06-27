@@ -102,7 +102,7 @@ cp be/.env.example be/.env
 copy .env.example .env
 copy be\.env.example be\.env
 ```
-*(Lưu ý cực kỳ quan trọng: Sau khi copy xong, hãy mở file `be/.env` bằng trình soạn thảo và sửa các dòng kết nối Database thành: `DB_CONNECTION=mysql`, `DB_HOST=db`, `DB_PORT=3306`, `DB_DATABASE=laravel`, `DB_USERNAME=laravel`, `DB_PASSWORD=secret`, `REDIS_HOST=redis`)*
+*(Lưu ý cực kỳ quan trọng: Sau khi copy xong, hãy mở file `be/.env` bằng trình soạn thảo và sửa giá trị `DB_HOST=tl_che_viet_db` thành `DB_HOST=db` để Laravel kết nối chính xác vào database container)*
 
 **2. Bật Docker**
 ```bash
@@ -114,5 +114,6 @@ docker compose up -d
 docker compose exec app composer install
 docker compose exec app php artisan key:generate
 docker compose exec app php artisan migrate:fresh --seed
-docker compose exec app php artisan storage:link
+docker compose exec app php artisan storage:link || true
+docker compose exec app php artisan l5-swagger:generate || true
 ```
