@@ -1,0 +1,39 @@
+#!/bin/sh
+set -e
+
+echo "=========================================="
+echo "🚀 Initializing Backend inside Docker container..."
+echo "=========================================="
+
+# 1. Setup env file if not exists
+if [ ! -f "/var/www/.env" ]; then
+    echo "-> Creating .env from .env.example..."
+    cp /var/www/.env.example /var/www/.env
+    # Ensure DB_HOST is set to db
+    sed -i -e 's/DB_HOST=tl_che_viet_db/DB_HOST=db/' /var/www/.env
+    echo "✅ .env created and configured"
+fi
+
+# 2. Install Composer dependencies
+echo "-> Installing Composer dependencies..."
+composer install --no-interaction
+
+# 3. Generate application key
+echo "-> Generating application key..."
+php artisan key:generate
+
+# 4. Running migrations and seeders
+echo "-> Running database migrations and seeders..."
+php artisan migrate:fresh --seed --force
+
+# 5. Creating storage link
+echo "-> Creating storage link..."
+php artisan storage:link || true
+
+# 6. Generating Swagger API documentation
+echo "-> Generating Swagger API documentation..."
+php artisan l5-swagger:generate || true
+
+echo "=========================================="
+echo "✅ Backend Initialization Completed!"
+echo "=========================================="

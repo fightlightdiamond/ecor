@@ -10,25 +10,41 @@ Dự án được cấu hình chạy hoàn toàn bằng **Docker** để đảm 
 
 ## 🚀 1. Khởi tạo dự án lần đầu (Initial Setup)
 
-Khi bạn vừa clone source code về máy lần đầu tiên, hãy chạy file kịch bản cài đặt tự động. File này sẽ tự động tạo cấu hình, tải các thư viện cần thiết, cài đặt Database và khởi động toàn bộ ứng dụng.
+Khi bạn vừa clone source code về máy lần đầu tiên, hãy thực hiện các bước sau để khởi động dự án:
 
-### Đối với Mac / Linux:
-Mở Terminal, di chuyển vào thư mục dự án và gõ:
+### Bước 1: Tạo các file môi trường (.env)
+Sao chép các file cấu hình từ file mẫu:
+
+* **Trên macOS / Linux:**
+  ```bash
+  cp .env.example .env
+  cp be/.env.example be/.env
+  ```
+* **Trên Windows (Command Prompt):**
+  ```cmd
+  copy .env.example .env
+  copy be\.env.example be\.env
+  ```
+
+*(Lưu ý cực kỳ quan trọng: Mở file `be/.env` vừa tạo và sửa giá trị `DB_HOST=tl_che_viet_db` thành `DB_HOST=db` để Laravel kết nối chính xác vào database service).*
+
+### Bước 2: Khởi động các container Docker
+Bật Docker Desktop lên và chạy lệnh:
 ```bash
-./init.sh
+docker compose up -d
 ```
 
-### Đối với Windows:
-Bạn chỉ cần mở thư mục mã nguồn và **nhấp đúp chuột (Double click)** vào file:
-- `init.bat`
-
-*(Hoặc mở Command Prompt / PowerShell, di chuyển vào thư mục dự án và gõ `.\init.bat`)*
+### Bước 3: Chạy script khởi tạo hệ thống trong container
+Để tự động cài đặt các thư viện PHP, tạo cơ sở dữ liệu mẫu và cấu hình ứng dụng, hãy chạy lệnh sau:
+```bash
+docker compose exec app sh docker-init.sh
+```
 
 ---
 
 ## 💻 2. Khởi động làm việc hằng ngày
 
-Khi bạn đã setup lần đầu xong, những ngày sau đó bạn không cần chạy lại script nữa. Chỉ cần khởi động hệ thống qua lệnh Docker cơ bản:
+Khi đã thiết lập dự án thành công lần đầu tiên, những ngày sau đó bạn chỉ cần khởi động hệ thống qua lệnh Docker cơ bản:
 
 **Bật hệ thống (chạy ngầm):**
 ```bash
@@ -46,14 +62,14 @@ docker compose stop
 
 Sau khi khởi động thành công, các dịch vụ sẽ khả dụng tại:
 
-- **🌍 Frontend (Nuxt):** [http://localhost:3000](http://localhost:3000)
+- **🌍 Giao diện Frontend (Nuxt):** [http://localhost:3000](http://localhost:3000)
 - **🔌 Backend API:** [http://localhost:8000](http://localhost:8000)
 - **📚 API Document (Swagger):** [http://localhost:8000/api/documentation](http://localhost:8000/api/documentation)
-- **📧 Test Email (Mailpit):** [http://localhost:8025](http://localhost:8025)
+- **📧 Hộp thư test (Mailpit):** [http://localhost:8025](http://localhost:8025)
 
 > **Tài khoản quản trị (Admin Panel):**
 > 
-> Truy cập vào: [http://localhost:8000/admin](http://localhost:8000/admin) (hoặc đường dẫn đăng nhập backend của bạn)
+> Truy cập vào: [http://localhost:8000/admin](http://localhost:8000/admin)
 > - **Email**: `admin@thanglongcheviet.vn`
 > - **Mật khẩu**: `admin@123`
 
@@ -83,37 +99,4 @@ Container xử lý Frontend có tên là `web`.
 ```bash
 # Cài thêm thư viện frontend
 docker compose exec web npm install "tên-thư-viện"
-```
-
----
-
-## 📝 5. Hướng dẫn chạy hoàn toàn thủ công (Thay thế script)
-Trong trường hợp bạn không muốn dùng script khởi tạo tự động, bạn có thể tự tay chạy từng bước dưới đây (áp dụng cả Mac và Windows):
-
-**1. Chuẩn bị file cấu hình (.env)**
-Đầu tiên bạn phải tạo 2 file `.env` từ file mẫu:
-
-```bash
-# Trên Mac/Linux:
-cp .env.example .env
-cp be/.env.example be/.env
-
-# Trên Windows (CMD/PowerShell):
-copy .env.example .env
-copy be\.env.example be\.env
-```
-*(Lưu ý cực kỳ quan trọng: Sau khi copy xong, hãy mở file `be/.env` bằng trình soạn thảo và sửa giá trị `DB_HOST=tl_che_viet_db` thành `DB_HOST=db` để Laravel kết nối chính xác vào database container)*
-
-**2. Bật Docker**
-```bash
-docker compose up -d
-```
-
-**3. Khởi tạo Backend (Chạy lần lượt)**
-```bash
-docker compose exec app composer install
-docker compose exec app php artisan key:generate
-docker compose exec app php artisan migrate:fresh --seed
-docker compose exec app php artisan storage:link || true
-docker compose exec app php artisan l5-swagger:generate || true
 ```
