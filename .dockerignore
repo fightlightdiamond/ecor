@@ -1,0 +1,11 @@
+# Giảm build context gửi tới Docker daemon
+**/node_modules
+**/dist
+**/.nuxt
+**/.output
+**/.git
+be/vendor
+be
+**/*.log
+**/.env
+**/coverage

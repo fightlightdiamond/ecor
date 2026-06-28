@@ -15,6 +15,9 @@ if [ ! -f "/var/www/.env" ]; then
 fi
 
 # 2. Install Composer dependencies
+echo "-> Disabling HTTP/2 to avoid HTTP/2 400 errors from GitHub..."
+export COMPOSER_DISABLE_HTTP2=1
+
 echo "-> Installing Composer dependencies..."
 composer install --no-interaction
 

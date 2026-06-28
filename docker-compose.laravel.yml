@@ -1,3 +1,14 @@
+# ==========================================================================
+# [LEGACY] Stack Laravel cũ — ĐÃ VÔ HIỆU mặc định trong quá trình migration.
+#
+# KHÔNG chạy đồng thời với hạ tầng API mới (apps/api/docker-compose.yml):
+# sẽ xung đột cổng 3000 (web), 8025/1025 (mailpit).
+#
+# Chỉ chạy có chủ đích để tham chiếu nguồn:
+#   docker compose -f docker-compose.laravel.yml up -d
+# Hạ tầng cho API mới dùng:
+#   docker compose -f apps/api/docker-compose.yml up -d
+# ==========================================================================
 version: '3.9'
 
 services:
