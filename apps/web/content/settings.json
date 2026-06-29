@@ -1,16 +1,16 @@
 {
-  "salon": {
+  "site": {
     "name": {
       "vi": "Thăng Long Chè Việt",
       "en": "Thăng Long Chè Việt"
     },
     "tagline": {
-      "vi": "Nghệ thuật làm đẹp truyền thống",
-      "en": "The Art of Traditional Beauty"
+      "vi": "Tinh hoa trà Việt",
+      "en": "The Essence of Vietnamese Tea"
     },
     "description": {
-      "vi": "Thăng Long Chè Việt — nơi hội tụ những giá trị thẩm mỹ truyền thống kết hợp kỹ thuật hiện đại, mang đến trải nghiệm làm đẹp đẳng cấp tại Hà Nội.",
-      "en": "Thăng Long Chè Việt — where traditional aesthetic values meet modern techniques, delivering a premium beauty experience in Hanoi."
+      "vi": "Thăng Long Chè Việt — trà đặc sản tuyển chọn từ những vùng trà danh tiếng, chế biến thủ công, mang hương vị trà Việt nguyên bản đến mọi nhà.",
+      "en": "Thăng Long Chè Việt — premium specialty tea, handcrafted from Vietnam's renowned tea regions, bringing authentic Vietnamese tea to every home."
     }
   },
   "contact": {
@@ -26,7 +26,7 @@
     "coordinates": { "lat": 21.0285, "lng": 105.8342 }
   },
   "hours": [
-    { "days": { "vi": "Thứ Hai – Thứ Sáu", "en": "Monday – Friday" }, "time": "09:00 – 21:00" },
+    { "days": { "vi": "Thứ Hai – Thứ Sáu", "en": "Monday – Friday" }, "time": "08:00 – 21:00" },
     { "days": { "vi": "Thứ Bảy – Chủ Nhật", "en": "Saturday – Sunday" }, "time": "08:00 – 22:00" }
   ],
   "social": {
@@ -37,28 +37,28 @@
   },
   "hero": {
     "eyebrow": {
-      "vi": "Salon làm đẹp",
-      "en": "Beauty Salon"
+      "vi": "Trà Việt thượng hạng",
+      "en": "Premium Vietnamese Tea"
     },
     "commitment": {
-      "vi": "Cam kết chất lượng và dịch vụ tận tâm.",
-      "en": "Our commitment to quality and services."
+      "vi": "Cam kết trà sạch, nguyên bản, chế biến thủ công.",
+      "en": "Our commitment to clean, authentic, handcrafted tea."
     },
     "slides": [
       {
         "id": 1,
         "image": "/images/hero/hero-1.jpg",
         "imageAlt": {
-          "vi": "Salon tóc cao cấp Thăng Long Chè Việt",
-          "en": "Premium Thăng Long Chè Việt hair salon"
+          "vi": "Trà đặc sản Thăng Long Chè Việt",
+          "en": "Thăng Long Chè Việt specialty tea"
         },
         "heading": {
-          "vi": "Từ đầu\nđến chân.",
-          "en": "From Head\nTo Toe."
+          "vi": "Tinh hoa\ntrà Việt.",
+          "en": "The Essence\nof Vietnamese Tea."
         },
         "subheading": {
-          "vi": "Trải nghiệm dịch vụ chăm sóc tóc và spa cao cấp với đội ngũ chuyên gia hàng đầu Hà Nội",
-          "en": "Experience premium hair care and spa services with Hanoi's leading specialists"
+          "vi": "Trà đặc sản tuyển chọn từ những vùng trà danh tiếng, chế biến thủ công, hương vị nguyên bản",
+          "en": "Specialty tea selected from renowned regions, handcrafted to preserve its authentic flavor"
         },
         "overlayOpacity": 50
       },
@@ -66,16 +66,16 @@
         "id": 2,
         "image": "/images/hero/hero-2.jpg",
         "imageAlt": {
-          "vi": "Dịch vụ làm đẹp cao cấp tại Thăng Long Chè Việt",
-          "en": "Premium beauty services at Thăng Long Chè Việt"
+          "vi": "Hộp quà trà cao cấp Thăng Long Chè Việt",
+          "en": "Thăng Long Chè Việt premium tea gift box"
         },
         "heading": {
-          "vi": "Dịch vụ\ntoàn diện.",
-          "en": "Full\nServices."
+          "vi": "Quà tặng\ntừ trà.",
+          "en": "Gifts\nfrom Tea."
         },
         "subheading": {
-          "vi": "Chăm sóc tóc, nail, spa và nhiều dịch vụ làm đẹp toàn diện khác",
-          "en": "Hair care, nails, spa and many other comprehensive beauty services"
+          "vi": "Hộp quà trà cao cấp cho mọi dịp, gói tinh tế, sang trọng và ý nghĩa",
+          "en": "Premium tea gift boxes for every occasion — elegantly packaged and meaningful"
         },
         "overlayOpacity": 45
       }
@@ -84,36 +84,36 @@
   "promo": {
     "active": true,
     "badge": {
-      "vi": "Ưu đãi tháng 6",
-      "en": "June Special"
+      "vi": "Ưu đãi đặc biệt",
+      "en": "Special Offer"
     },
     "heading": {
-      "vi": "Giảm 30% tất cả dịch vụ làm tóc",
-      "en": "30% Off All Hair Services"
+      "vi": "Giảm 20% trà đặc sản",
+      "en": "20% Off Specialty Tea"
     },
     "subheading": {
-      "vi": "Áp dụng cho khách hàng đặt lịch trước qua website. Không áp dụng cùng các chương trình khuyến mãi khác.",
-      "en": "Valid for customers who book in advance via website. Cannot be combined with other promotions."
+      "vi": "Áp dụng cho đơn hàng đặt trước qua website. Không áp dụng cùng các chương trình khuyến mãi khác.",
+      "en": "Valid for orders placed in advance via website. Cannot be combined with other promotions."
     },
-    "discount": "30%",
-    "expiry": "2026-06-30",
+    "discount": "20%",
+    "expiry": "2026-12-31",
     "backgroundImage": "/images/promo-bg.jpg",
     "backgroundColor": "#1a1a1a"
   },
   "skills": [
-    { "id": "hair", "label": { "vi": "Tóc", "en": "Hair" }, "percent": 95 },
-    { "id": "makeup", "label": { "vi": "Trang điểm", "en": "Make Up" }, "percent": 88 },
-    { "id": "facial", "label": { "vi": "Chăm sóc da", "en": "Facial" }, "percent": 90 },
-    { "id": "massage", "label": { "vi": "Massage", "en": "Massage" }, "percent": 92 },
-    { "id": "nail", "label": { "vi": "Nail", "en": "Nail" }, "percent": 90 },
-    { "id": "waxing", "label": { "vi": "Tẩy lông", "en": "Waxing" }, "percent": 85 }
+    { "id": "pure", "label": { "vi": "Trà nguyên chất", "en": "Pure Tea" }, "percent": 98 },
+    { "id": "handmade", "label": { "vi": "Chế biến thủ công", "en": "Handcrafted" }, "percent": 95 },
+    { "id": "flavor", "label": { "vi": "Hương vị", "en": "Flavor" }, "percent": 92 },
+    { "id": "packaging", "label": { "vi": "Đóng gói", "en": "Packaging" }, "percent": 90 },
+    { "id": "delivery", "label": { "vi": "Giao hàng", "en": "Delivery" }, "percent": 88 },
+    { "id": "consult", "label": { "vi": "Tư vấn", "en": "Consulting" }, "percent": 90 }
   ],
   "discoverServices": [
-    { "icon": "✂️", "label": { "vi": "Chăm sóc tóc", "en": "Hair Care" } },
-    { "icon": "💄", "label": { "vi": "Trang điểm", "en": "Make Up" } },
-    { "icon": "🌿", "label": { "vi": "Chăm sóc da", "en": "Facial" } },
-    { "icon": "💆", "label": { "vi": "Massage", "en": "Massage" } },
-    { "icon": "💅", "label": { "vi": "Nail", "en": "Nail Care" } },
-    { "icon": "✨", "label": { "vi": "Tẩy lông", "en": "Waxing" } }
+    { "icon": "🍵", "label": { "vi": "Trà xanh", "en": "Green Tea" } },
+    { "icon": "🫖", "label": { "vi": "Trà ô long", "en": "Oolong Tea" } },
+    { "icon": "🌸", "label": { "vi": "Trà ướp hương", "en": "Scented Tea" } },
+    { "icon": "🌿", "label": { "vi": "Trà thảo mộc", "en": "Herbal Tea" } },
+    { "icon": "🎁", "label": { "vi": "Quà tặng trà", "en": "Tea Gifts" } },
+    { "icon": "🚚", "label": { "vi": "Giao hàng tận nơi", "en": "Home Delivery" } }
   ]
 }

@@ -1,11 +1,11 @@
 <script setup lang="ts">
 const { t } = useI18n()
-const { salon } = useSettings()
+const { site } = useSettings()
 
 useScrollAnimation()
 
 useSeoMeta({
-  title: () => `${t('nav.blog')} | ${salon.value.name}`,
+  title: () => `${t('nav.blog')} | ${site.value.name}`,
   description: () => t('blog.subtitle'),
 })
 </script>

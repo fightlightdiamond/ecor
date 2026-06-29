@@ -2,7 +2,7 @@
 import type { OrderLookup } from '~/composables/useOrder'
 
 const { t } = useI18n()
-const { salon } = useSettings()
+const { site } = useSettings()
 const { lookupOrder, retryPayment } = useOrder()
 const { orderStatusLabel, paymentStatusLabel, paymentMethodLabel } = useOrderLabels()
 
@@ -44,7 +44,7 @@ const handleRetryPayment = async () => {
 }
 
 useSeoMeta({
-  title: () => `${t('orderLookup.title')} | ${salon.value.name}`,
+  title: () => `${t('orderLookup.title')} | ${site.value.name}`,
 })
 </script>
 

@@ -11,17 +11,23 @@ import {
 import { RESOURCES } from '../resources';
 import { api } from '../lib/api';
 import { clearToken } from '../lib/http';
+import { currentLocale, setLocale } from '../lib/locale';
+import { MULTILANG } from '../config';
+
+if (!MULTILANG) setLocale('vi');
 
 const route = useRoute();
 const router = useRouter();
 
-const GROUPS: { name: string; icon: Component }[] = [
-  { name: 'Catalog', icon: LayoutGrid },
-  { name: 'Content', icon: FileText },
-  { name: 'Sales', icon: Box },
-  { name: 'CRM', icon: Users },
-  { name: 'Support', icon: Headphones },
-  { name: 'System', icon: Settings },
+// key khớp với `group` trong resources.ts; label là tên hiển thị.
+const GROUPS: { key: string; label: string; icon: Component }[] = [
+  { key: 'System', label: 'Hệ thống', icon: Settings },
+  { key: 'Danh mục', label: 'Danh mục', icon: FolderTree },
+  { key: 'product', label: 'Sản phẩm', icon: Package },
+  { key: 'Bài viết', label: 'Bài viết', icon: Newspaper },
+  { key: 'Sales', label: 'Bán hàng', icon: Box },
+  { key: 'CRM', label: 'CRM', icon: Users },
+  { key: 'Support', label: 'Hỗ trợ', icon: Headphones },
 ];
 
 const ICONS: Record<string, Component> = {
@@ -34,7 +40,9 @@ const ICONS: Record<string, Component> = {
 };
 
 const grouped = computed(() =>
-  GROUPS.map((g) => ({ ...g, items: RESOURCES.filter((r) => r.group === g.name) })).filter((x) => x.items.length),
+  GROUPS.map((g) => ({ ...g, items: RESOURCES.filter((r) => r.group === g.key) }))
+    // Giữ nhóm có resource; riêng System luôn hiển thị vì chứa link "Cấu hình chung".
+    .filter((x) => x.items.length || x.key === 'System'),
 );
 
 // Trạng thái mở/thu gọn từng nhóm (lưu localStorage). Mặc định: mở.
@@ -67,17 +75,35 @@ function logout() {
       </div>
 
       <nav class="flex-1 overflow-y-auto px-2 py-3">
-        <div v-for="g in grouped" :key="g.name" class="mb-2">
+        <div v-for="g in grouped" :key="g.key" class="mb-2">
           <button
             class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs font-semibold uppercase tracking-wide text-gray-500 hover:bg-gray-100"
-            @click="toggle(g.name)"
+            @click="toggle(g.key)"
           >
             <component :is="g.icon" class="h-4 w-4 shrink-0 text-gray-400" />
-            <span class="flex-1 text-left">{{ g.name }}</span>
-            <component :is="collapsed[g.name] ? ChevronRight : ChevronDown" class="h-4 w-4 shrink-0" />
+            <span class="flex-1 text-left">{{ g.label }}</span>
+            <component :is="collapsed[g.key] ? ChevronRight : ChevronDown" class="h-4 w-4 shrink-0" />
           </button>
 
-          <div v-show="!collapsed[g.name]" class="mt-1 ml-4 space-y-0.5 border-l border-gray-200 pl-2">
+          <div v-show="!collapsed[g.key]" class="mt-1 ml-4 space-y-0.5 border-l border-gray-200 pl-2">
+            <RouterLink
+              v-if="g.key === 'System'"
+              to="/settings"
+              class="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm"
+              :class="route.path === '/settings' ? 'bg-brand text-white' : 'text-gray-700 hover:bg-gray-100'"
+            >
+              <Settings class="h-4 w-4 shrink-0" :class="route.path === '/settings' ? 'text-white' : 'text-gray-400'" />
+              <span class="truncate">Cấu hình chung</span>
+            </RouterLink>
+            <RouterLink
+              v-if="g.key === 'product'"
+              to="/promotions"
+              class="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm"
+              :class="route.path === '/promotions' ? 'bg-brand text-white' : 'text-gray-700 hover:bg-gray-100'"
+            >
+              <TicketPercent class="h-4 w-4 shrink-0" :class="route.path === '/promotions' ? 'text-white' : 'text-gray-400'" />
+              <span class="truncate">Ưu đãi trong tháng</span>
+            </RouterLink>
             <RouterLink
               v-for="r in g.items"
               :key="r.name"
@@ -101,6 +127,10 @@ function logout() {
       <header class="flex items-center justify-between border-b border-gray-200 bg-white px-6 py-3">
         <div class="text-sm text-gray-500">Bảng điều khiển</div>
         <div class="flex items-center gap-3">
+          <div v-if="MULTILANG" class="inline-flex overflow-hidden rounded border border-gray-300 text-xs">
+            <button class="px-2 py-1" :class="currentLocale === 'vi' ? 'bg-brand text-white' : 'bg-white text-gray-600'" @click="setLocale('vi')">VI</button>
+            <button class="px-2 py-1" :class="currentLocale === 'en' ? 'bg-brand text-white' : 'bg-white text-gray-600'" @click="setLocale('en')">EN</button>
+          </div>
           <span class="text-sm text-gray-700">{{ identity?.name || identity?.email || 'Admin' }}</span>
           <button class="btn-outline" @click="logout">
             <LogOut class="h-4 w-4" /> Đăng xuất

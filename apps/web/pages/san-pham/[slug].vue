@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const { t } = useI18n()
-const { salon } = useSettings()
+const { site } = useSettings()
 const { getBySlug } = useProducts()
 const { addToCart, loading: cartLoading } = useCart()
 const localePath = useLocalePath()
@@ -44,7 +44,7 @@ const handleAddToCart = async () => {
 }
 
 useSeoMeta({
-  title: () => `${product.value?.title} | ${salon.value.name}`,
+  title: () => `${product.value?.title} | ${site.value.name}`,
   description: () => product.value?.shortDesc,
   ogImage: () => product.value?.image,
 })

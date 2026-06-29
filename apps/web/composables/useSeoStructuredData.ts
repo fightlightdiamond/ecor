@@ -38,7 +38,7 @@ export function useProductStructuredData(product: Ref<Product | null>) {
 export function useArticleStructuredData(post: Ref<BlogPost | null | undefined>) {
   const config = useRuntimeConfig()
   const route = useRoute()
-  const { salon } = useSettings()
+  const { site } = useSettings()
 
   useHead({
     script: computed(() => {
@@ -58,7 +58,7 @@ export function useArticleStructuredData(post: Ref<BlogPost | null | undefined>)
           datePublished: post.value.date,
           author: {
             '@type': 'Organization',
-            name: salon.value.name,
+            name: site.value.name,
           },
           mainEntityOfPage: pageUrl,
         }),

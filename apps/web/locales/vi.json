@@ -103,7 +103,7 @@
     "eyebrow": "Thanh toán",
     "success": "Thanh toán thành công!",
     "failed": "Thanh toán không thành công",
-    "failedHint": "Đơn hàng có thể vẫn được tạo. Vui lòng tra cứu hoặc liên hệ salon.",
+    "failedHint": "Đơn hàng có thể vẫn được tạo. Vui lòng tra cứu hoặc liên hệ chúng tôi.",
     "orderNumber": "Mã đơn: {number}"
   },
   "orderStatus": {
@@ -266,7 +266,7 @@
   "gallery": {
     "eyebrow": "Tác phẩm của chúng tôi",
     "title": "Bộ sưu tập",
-    "subtitle": "Không gian salon và tác phẩm từ đội ngũ chuyên gia",
+    "subtitle": "Không gian và tác phẩm từ đội ngũ chuyên gia",
     "comingSoon": "Nhiều hình ảnh hơn sẽ được cập nhật sớm."
   }
 }

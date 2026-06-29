@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const { t } = useI18n()
 const localePath = useLocalePath()
-const { salon } = useSettings()
+const { site } = useSettings()
 const {
   items,
   loading,
@@ -91,7 +91,7 @@ const handleCheckout = async () => {
 }
 
 useSeoMeta({
-  title: () => `${t('cart.title')} | ${salon.value.name}`,
+  title: () => `${t('cart.title')} | ${site.value.name}`,
 })
 </script>
 

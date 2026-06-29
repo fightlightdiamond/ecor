@@ -27,6 +27,7 @@ model Product {
   description  String?
   translations Json?
   price        Decimal  @default(0) @db.Decimal(10, 2)
+  priceUnit    String?  @default("VND") @map("price_unit") // đơn vị tiền tệ: k/M/B/$/VND
   stock        Int      @default(0)
   sku          String?  @unique
   images       Json?
@@ -358,6 +359,7 @@ model Post {
   id               Int       @id @default(autoincrement())
   authorId         Int?      @map("author_id")
   authorType       String?   @map("author_type")
+  categoryId       Int?      @map("category_id")
   type             String?   @default("post")
   title            Json
   slug             String    @unique

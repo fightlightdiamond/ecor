@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const { t } = useI18n()
-const { salon } = useSettings()
+const { site } = useSettings()
 const { orderStatusLabel, paymentStatusLabel } = useOrderLabels()
 const {
   customer,
@@ -84,7 +84,7 @@ const handleCancel = async (id: number) => {
 }
 
 useSeoMeta({
-  title: () => `${t('account.title')} | ${salon.value.name}`,
+  title: () => `${t('account.title')} | ${site.value.name}`,
 })
 </script>
 

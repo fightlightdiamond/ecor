@@ -9,16 +9,17 @@ export interface AdminResourceDef {
   searchable: string[]; // field string để search `q`
   hidden: string[]; // field ẩn khỏi response (vd password)
   hash: string[]; // field cần bcrypt khi tạo/sửa
+  slugFrom?: string; // field nguồn để tự sinh `slug` khi bỏ trống (vd 'name' | 'title')
 }
 
 export const ADMIN_RESOURCES: Record<string, AdminResourceDef> = {
-  product: { model: 'product', label: 'Sản phẩm', group: 'Catalog', searchable: ['name', 'slug', 'sku'], hidden: [], hash: [] },
+  product: { model: 'product', label: 'Sản phẩm', group: 'Catalog', searchable: ['name', 'slug', 'sku'], hidden: [], hash: [], slugFrom: 'name' },
   productVariant: { model: 'productVariant', label: 'Biến thể', group: 'Catalog', searchable: ['name', 'sku'], hidden: [], hash: [] },
-  category: { model: 'category', label: 'Danh mục', group: 'Catalog', searchable: ['slug'], hidden: [], hash: [] },
+  category: { model: 'category', label: 'Danh mục', group: 'Catalog', searchable: ['slug'], hidden: [], hash: [], slugFrom: 'name' },
   review: { model: 'review', label: 'Đánh giá', group: 'Catalog', searchable: ['comment'], hidden: [], hash: [] },
   warehouse: { model: 'warehouse', label: 'Kho', group: 'Catalog', searchable: ['name', 'location'], hidden: [], hash: [] },
   media: { model: 'media', label: 'Media', group: 'Catalog', searchable: ['name', 'path'], hidden: [], hash: [] },
-  post: { model: 'post', label: 'Bài viết', group: 'Content', searchable: ['slug'], hidden: [], hash: [] },
+  post: { model: 'post', label: 'Bài viết', group: 'Content', searchable: ['slug'], hidden: [], hash: [], slugFrom: 'title' },
   storefrontSection: { model: 'storefrontSection', label: 'Khối nội dung', group: 'Content', searchable: ['key', 'label'], hidden: [], hash: [] },
   order: { model: 'order', label: 'Đơn hàng', group: 'Sales', searchable: ['number', 'customerName', 'customerPhone'], hidden: [], hash: [] },
   orderItem: { model: 'orderItem', label: 'Dòng đơn', group: 'Sales', searchable: [], hidden: [], hash: [] },

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const { t, locale } = useI18n()
 const localePath = useLocalePath()
-const { salon, contact, hours } = useSettings()
+const { site, contact, hours } = useSettings()
 const { products, categories, byCategory } = useProducts()
 const { latestPosts } = useBlog()
 
@@ -125,7 +125,7 @@ useHead({
 })
 
 useSeoMeta({
-  title: () => `${t('products.title')} | ${salon.value.name}`,
+  title: () => `${t('products.title')} | ${site.value.name}`,
   description: () => t('products.subtitle'),
 })
 </script>
@@ -145,7 +145,7 @@ useSeoMeta({
       </div>
       <div class="tlcv-hero-overlay" />
       <div class="tlcv-hero-caption">
-        <div class="sub">{{ salon.name }}</div>
+        <div class="sub">{{ site.name }}</div>
         <h2>{{ t('products.subtitle') }}</h2>
         <p>{{ localLabel('Bộ sưu tập sản phẩm nổi bật — Quà Tết An Tâm', 'Featured collection — Tet An Tam gifts') }}</p>
         <a href="#section-services-tab" class="btn-slider">{{ localLabel('Khám phá sản phẩm', 'Explore products') }}</a>

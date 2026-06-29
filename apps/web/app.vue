@@ -1,11 +1,11 @@
 <script setup lang="ts">
 const { t, locale } = useI18n()
-const { salon } = useSettings()
+const { site } = useSettings()
 
 useSeoHreflang()
 
 useSeoMeta({
-  titleTemplate: (title) => title ? `${title} | ${salon.value.name}` : salon.value.name,
+  titleTemplate: (title) => title ? `${title} | ${site.value.name}` : site.value.name,
   ogSiteName: 'Thăng Long Chè Việt',
 })
 

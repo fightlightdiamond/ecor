@@ -8,6 +8,8 @@ export const SITE_SECTIONS = [
   { key: 'services', label: 'Dịch vụ' },
   { key: 'gallery', label: 'Thư viện ảnh' },
   { key: 'testimonials', label: 'Đánh giá' },
+  // Ưu đãi trong tháng: danh sách sản phẩm ưu đãi { title, productIds: number[] }
+  { key: 'promotions', label: 'Ưu đãi trong tháng' },
 ];
 
 @Injectable()

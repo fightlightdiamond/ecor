@@ -73,7 +73,7 @@ const modules = [Autoplay, EffectFade, Navigation, Pagination]
               class="w-full max-w-sm lg:max-w-xs xl:max-w-sm flex-shrink-0
                      bg-dark/90 backdrop-blur-sm border border-white/10 p-6 md:p-8
                      text-white animate-on-scroll"
-              aria-label="Salon information"
+              aria-label="Thông tin website"
             >
               <div class="space-y-6">
                 <div>

@@ -7,10 +7,13 @@ export function useSettings() {
   const localizedText = (field: Record<string, string> | undefined) =>
     localText(field, locale.value)
 
-  const salon = computed(() => ({
-    name: localizedText(settingsData.value.salon.name),
-    tagline: localizedText(settingsData.value.salon.tagline),
-    description: localizedText(settingsData.value.salon.description),
+  // Tương thích cả key mới 'site' lẫn key cũ 'salon' (trong dữ liệu cũ/DB).
+  const siteInfo = computed<any>(() => settingsData.value.site ?? (settingsData.value as any).salon ?? {})
+
+  const site = computed(() => ({
+    name: localizedText(siteInfo.value.name),
+    tagline: localizedText(siteInfo.value.tagline),
+    description: localizedText(siteInfo.value.description),
   }))
 
   const contact = computed(() => settingsData.value.contact)
@@ -59,5 +62,5 @@ export function useSettings() {
     subheading: localizedText(settingsData.value.promo.subheading),
   }))
 
-  return { settings: settingsData, salon, contact, hours, social, heroSlides, heroMeta, skills, discoverServices, promo }
+  return { settings: settingsData, site, contact, hours, social, heroSlides, heroMeta, skills, discoverServices, promo }
 }

@@ -1,4 +1,4 @@
-import { API_URL, apiFetch, setToken } from './http';
+import { API_URL, apiFetch, getToken, handleUnauthorized, setToken } from './http';
 
 const BASE = '/admin/resources';
 
@@ -54,5 +54,65 @@ export const api = {
 
   remove(resource: string, id: string | number) {
     return apiFetch(`${BASE}/${resource}/${id}`, { method: 'DELETE' }).then((b) => b.data);
+  },
+
+  // ── Cấu hình website (StorefrontSection) ────────────────────────────────
+  getSiteSettings() {
+    return apiFetch('/admin/site-settings').then(
+      (b) => b.data as { key: string; label: string; content: any }[],
+    );
+  },
+  putSiteSection(key: string, content: any) {
+    return apiFetch(`/admin/site-settings/${key}`, {
+      method: 'PUT',
+      body: JSON.stringify({ content }),
+    }).then((b) => b.data);
+  },
+
+  // Upload 1 file (ảnh/video/media) vào thư mục `folder` → trả { url, type }.
+  async upload(file: File, folder = ''): Promise<{ url: string; type: string }> {
+    const fd = new FormData();
+    fd.append('file', file);
+    const token = getToken();
+    const qs = folder ? `?folder=${encodeURIComponent(folder)}` : '';
+    const res = await fetch(`${API_URL}/admin/upload${qs}`, {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: fd,
+    });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      if (res.status === 401) handleUnauthorized();
+      throw { message: body?.message || 'Tải lên thất bại', statusCode: res.status };
+    }
+    return { url: body.url as string, type: (body.type as string) || 'file' };
+  },
+
+  // Liệt kê media + thư mục con trong 1 thư mục.
+  listMedia(folder = '') {
+    const qs = folder ? `?folder=${encodeURIComponent(folder)}` : '';
+    return apiFetch(`/admin/upload${qs}`).then(
+      (b) =>
+        b.data as {
+          folder: string;
+          folders: string[];
+          files: { name: string; url: string; path: string; type: string; size: number }[];
+        },
+    );
+  },
+
+  // Tạo thư mục con.
+  createFolder(parent: string, name: string) {
+    return apiFetch('/admin/upload/folder', {
+      method: 'POST',
+      body: JSON.stringify({ parent, name }),
+    }).then((b) => b.data as { folder: string });
+  },
+
+  // Xoá 1 file media theo path tương đối (vd 'tra/abc.png').
+  deleteMedia(path: string) {
+    return apiFetch(`/admin/upload?path=${encodeURIComponent(path)}`, { method: 'DELETE' }).then(
+      (b) => b.data,
+    );
   },
 };

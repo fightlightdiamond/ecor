@@ -3,7 +3,8 @@ import { getToken } from './lib/http';
 import { RESOURCES } from './resources';
 
 const router = createRouter({
-  history: createWebHistory(),
+  // Admin chạy dưới sub-path /admin/ (khớp base của Vite).
+  history: createWebHistory('/admin/'),
   routes: [
     { path: '/login', name: 'login', component: () => import('./pages/Login.vue'), meta: { public: true } },
     {
@@ -11,6 +12,8 @@ const router = createRouter({
       component: () => import('./components/AppLayout.vue'),
       children: [
         { path: '', redirect: `/r/${RESOURCES[0].name}` },
+        { path: 'settings', name: 'site-settings', component: () => import('./pages/SiteSettings.vue') },
+        { path: 'promotions', name: 'promotions', component: () => import('./pages/Promotions.vue') },
         { path: 'r/:resource', name: 'list', component: () => import('./pages/ResourceList.vue') },
       ],
     },

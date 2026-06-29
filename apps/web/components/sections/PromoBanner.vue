@@ -1,14 +1,14 @@
 <script setup lang="ts">
 const { t, locale } = useI18n()
 const localePath = useLocalePath()
-const { promo, salon } = useSettings()
+const { promo, site } = useSettings()
 
 const promos = computed(() => [
   {
     id: 'special',
     badge: t('promo.badgeLabel'),
     heading: locale.value === 'vi' ? 'Ưu đãi tháng này' : 'This Month\'s Offer',
-    desc: salon.value.description,
+    desc: site.value.description,
     image: '/images/gallery/hair-2.jpg',
     cta: t('nav.bookNow'),
   },
