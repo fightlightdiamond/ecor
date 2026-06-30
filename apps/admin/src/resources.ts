@@ -23,8 +23,8 @@ export const RESOURCES: ResourceDef[] = [
   // { name: 'customer', label: 'Khách hàng', group: 'CRM' },
   // { name: 'appointment', label: 'Lịch hẹn', group: 'CRM' },
   // { name: 'appointmentStatusHistory', label: 'Lịch sử lịch hẹn', group: 'CRM' },
-  // { name: 'contactInquiry', label: 'Liên hệ', group: 'CRM' },
-  { name: 'ticket', label: 'Ticket', group: 'Support' },
+  { name: 'contactInquiry', label: 'Liên hệ', group: 'CRM' },
+  // { name: 'ticket', label: 'Ticket', group: 'Support' },
   // { name: 'ticketResponse', label: 'Phản hồi ticket', group: 'Support' },
   // { name: 'message', label: 'Tin nhắn', group: 'Support' },
   // { name: 'user', label: 'Người dùng', group: 'System' }, // ẩn menu người dùng

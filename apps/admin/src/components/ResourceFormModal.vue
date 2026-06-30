@@ -59,7 +59,7 @@ const allItems = computed<Item[]>(() => {
   const virt: Item[] = getVirtual(props.resource).map((v) => ({
     key: v.key,
     path: v.path,
-    cfg: { label: v.label, type: v.type, required: v.required, hint: v.hint },
+    cfg: { label: v.label, type: v.type, required: v.required, hint: v.hint, readonly: v.readonly },
   }));
   return [...real, ...virt];
 });
@@ -179,7 +179,7 @@ function submit() {
     </div>
 
     <!-- XEM / THÊM / SỬA — dùng chung 1 bố cục; chế độ Xem chỉ khoá nhập liệu -->
-    <form v-else class="mx-auto max-w-6xl" @submit.prevent="submit">
+    <form v-else class="mx-auto max-w-6xl pb-12" @submit.prevent="submit">
       <div v-if="err" class="mb-4 flex items-start gap-2 rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
         <AlertCircle class="mt-0.5 h-4 w-4 shrink-0" />
         <span>{{ err }}</span>
@@ -211,7 +211,7 @@ function submit() {
                   v-if="itemByKey[key]"
                   :cfg="itemByKey[key].cfg"
                   v-model="values[key]"
-                  :readonly="isShow"
+                  :readonly="isShow || !!itemByKey[key].cfg.readonly"
                   :error="fieldErrors[key]"
                 />
               </template>
@@ -223,11 +223,11 @@ function submit() {
         <!-- Bố cục mặc định: trái 2/3 (nội dung) — phải 1/3 (cấu hình) -->
         <div v-else class="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <div class="space-y-5 lg:col-span-2">
-            <FormField v-for="item in leftItems" :key="item.key" :cfg="item.cfg" v-model="values[item.key]" :readonly="isShow" :error="fieldErrors[item.key]" />
+            <FormField v-for="item in leftItems" :key="item.key" :cfg="item.cfg" v-model="values[item.key]" :readonly="isShow || !!item.cfg.readonly" :error="fieldErrors[item.key]" />
           </div>
 
           <div class="space-y-5">
-            <FormField v-for="item in rightItems" :key="item.key" :cfg="item.cfg" v-model="values[item.key]" :readonly="isShow" :error="fieldErrors[item.key]" />
+            <FormField v-for="item in rightItems" :key="item.key" :cfg="item.cfg" v-model="values[item.key]" :readonly="isShow || !!item.cfg.readonly" :error="fieldErrors[item.key]" />
 
             <div v-if="boolItems.length" class="rounded-md border border-gray-200 p-3">
               <div class="mb-2 text-xs font-medium uppercase tracking-wide text-gray-400">Tuỳ chọn</div>
@@ -242,7 +242,7 @@ function submit() {
         </div>
       </fieldset>
 
-      <div class="sticky bottom-0 mt-6 flex justify-end gap-2 border-t border-gray-200 bg-white py-3">
+      <div class="fixed w-full bottom-0 mt-6 flex justify-end gap-2 border-t border-gray-200 bg-white py-3 mx-0 left-0 px-6">
         <button type="button" class="btn-outline" @click="emit('close')">{{ isShow ? 'Đóng' : 'Huỷ' }}</button>
         <button v-if="!isShow" class="btn-primary" :disabled="save.isPending.value">
           {{ save.isPending.value ? 'Đang lưu…' : 'Lưu' }}

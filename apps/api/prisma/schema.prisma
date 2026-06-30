@@ -294,6 +294,8 @@ model ContactInquiry {
   preferredAt DateTime? @map("preferred_at")
   metadata    Json?
   source      String    @default("website")
+  status      String    @default("new") // trạng thái xử lý: new/contacted/consulting/done/cancelled
+  note        String?   // ghi chú nội bộ sau khi liên hệ/tư vấn
   createdAt   DateTime? @map("created_at")
   updatedAt   DateTime? @map("updated_at")
 

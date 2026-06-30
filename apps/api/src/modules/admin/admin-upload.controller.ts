@@ -12,8 +12,8 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { existsSync, mkdirSync, readdirSync, statSync, unlinkSync } from 'fs';
-import { extname, join, resolve, sep } from 'path';
+import { existsSync, mkdirSync, readdirSync, renameSync, statSync, unlinkSync } from 'fs';
+import { basename, extname, join, resolve, sep } from 'path';
 import { randomUUID } from 'crypto';
 import { ApiTags } from '@nestjs/swagger';
 import { AdminGuard } from './admin.guard';
@@ -154,5 +154,26 @@ export class AdminUploadController {
     }
     unlinkSync(abs);
     return { success: true, data: { path } };
+  }
+
+  // ── Di chuyển 1 file sang thư mục khác (kéo-thả) ──────────────────────────
+  @Post('move')
+  move(@Body() body: { from?: string; toFolder?: string }) {
+    const src = resolveSafe(body?.from);
+    const destDir = resolveSafe(body?.toFolder);
+    if (!src || !existsSync(src) || !statSync(src).isFile()) {
+      throw new BadRequestException('File nguồn không hợp lệ');
+    }
+    if (!destDir) throw new BadRequestException('Thư mục đích không hợp lệ');
+    if (!existsSync(destDir)) mkdirSync(destDir, { recursive: true });
+
+    const name = basename(src);
+    const dest = join(destDir, name);
+    if (dest === src) return { success: true, data: { path: body.from } }; // cùng chỗ → bỏ qua
+    renameSync(src, dest);
+
+    const relDir = String(body.toFolder || '').replace(/\\/g, '/').replace(/^\/+|\/+$/g, '');
+    const relPath = [relDir, name].filter(Boolean).join('/');
+    return { success: true, data: { path: relPath, url: `${publicBase()}/uploads/${relPath}` } };
   }
 }

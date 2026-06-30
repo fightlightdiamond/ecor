@@ -114,6 +114,32 @@ function confirmMulti() {
 function cancel() {
   resolvePick(null);
 }
+
+// ── kéo-thả: di chuyển file vào thư mục ──
+const dragging = ref<string | null>(null); // path file đang kéo
+const dropTarget = ref<string | null>(null); // key vùng đang hover để thả
+function folderPathOf(name: string) {
+  return [currentFolder.value, name].filter(Boolean).join('/');
+}
+function onDragStart(path: string, e: DragEvent) {
+  dragging.value = path;
+  if (e.dataTransfer) {
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', path);
+  }
+}
+function onDragEnd() {
+  dragging.value = null;
+  dropTarget.value = null;
+}
+async function moveTo(folderPath: string) {
+  const from = dragging.value;
+  dragging.value = null;
+  dropTarget.value = null;
+  if (!from) return;
+  await api.moveMedia(from, folderPath).catch(() => {});
+  await mediaQ.refetch();
+}
 </script>
 
 <template>
@@ -138,12 +164,28 @@ function cancel() {
         <div class="flex flex-wrap items-center gap-2 border-b border-gray-100 px-5 py-2">
           <!-- breadcrumb -->
           <nav class="flex flex-1 flex-wrap items-center gap-1 text-sm text-gray-600">
-            <button class="flex items-center gap-1 rounded px-1.5 py-0.5 hover:bg-gray-100" @click="goTo('')">
+            <button
+              class="flex items-center gap-1 rounded px-1.5 py-0.5 hover:bg-gray-100"
+              :class="dropTarget === 'home' ? 'bg-brand/10 ring-1 ring-brand' : ''"
+              @click="goTo('')"
+              @dragover.prevent
+              @dragenter.prevent="dropTarget = 'home'"
+              @dragleave="dropTarget = null"
+              @drop.prevent="moveTo('')"
+            >
               <Home class="h-3.5 w-3.5" /> Kho media
             </button>
             <template v-for="c in crumbs" :key="c.path">
               <ChevronRight class="h-3.5 w-3.5 text-gray-300" />
-              <button class="rounded px-1.5 py-0.5 hover:bg-gray-100" @click="goTo(c.path)">{{ c.name }}</button>
+              <button
+                class="rounded px-1.5 py-0.5 hover:bg-gray-100"
+                :class="dropTarget === 'crumb:' + c.path ? 'bg-brand/10 ring-1 ring-brand' : ''"
+                @click="goTo(c.path)"
+                @dragover.prevent
+                @dragenter.prevent="dropTarget = 'crumb:' + c.path"
+                @dragleave="dropTarget = null"
+                @drop.prevent="moveTo(c.path)"
+              >{{ c.name }}</button>
             </template>
           </nav>
 
@@ -172,8 +214,14 @@ function cancel() {
                 v-for="f in folders"
                 :key="f"
                 type="button"
-                class="flex items-center gap-2 rounded-md border border-gray-200 px-3 py-2 text-sm hover:border-brand hover:bg-brand/5"
+                class="flex items-center gap-2 rounded-md border px-3 py-2 text-sm"
+                :class="dropTarget === 'folder:' + f ? 'border-brand bg-brand/10 ring-1 ring-brand' : 'border-gray-200 hover:border-brand hover:bg-brand/5'"
+                :title="dragging ? `Thả vào thư mục ${f}` : ''"
                 @click="openFolder(f)"
+                @dragover.prevent
+                @dragenter.prevent="dropTarget = 'folder:' + f"
+                @dragleave="dropTarget = null"
+                @drop.prevent="moveTo(folderPathOf(f))"
               >
                 <Folder class="h-4 w-4 text-amber-500" /> {{ f }}
               </button>
@@ -187,8 +235,11 @@ function cancel() {
               <div
                 v-for="m in files"
                 :key="m.url"
-                class="group relative aspect-square overflow-hidden rounded-md border-2"
-                :class="isChosen(m.url) ? 'border-brand' : 'border-gray-200 hover:border-gray-300'"
+                class="group relative aspect-square cursor-move overflow-hidden rounded-md border-2"
+                :class="[isChosen(m.url) ? 'border-brand' : 'border-gray-200 hover:border-gray-300', dragging === m.path ? 'opacity-50' : '']"
+                draggable="true"
+                @dragstart="onDragStart(m.path, $event)"
+                @dragend="onDragEnd"
               >
                 <button type="button" class="block h-full w-full" @click="choose(m.url)">
                   <img v-if="m.type === 'image'" :src="m.url" class="h-full w-full object-cover" :alt="m.name" loading="lazy" />

@@ -115,4 +115,12 @@ export const api = {
       (b) => b.data,
     );
   },
+
+  // Di chuyển 1 file sang thư mục khác → trả { path, url } mới.
+  moveMedia(from: string, toFolder: string) {
+    return apiFetch('/admin/upload/move', {
+      method: 'POST',
+      body: JSON.stringify({ from, toFolder }),
+    }).then((b) => b.data as { path: string; url: string });
+  },
 };

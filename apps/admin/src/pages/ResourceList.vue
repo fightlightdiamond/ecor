@@ -5,7 +5,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import { Eye, Pencil, Trash2, MoreVertical } from 'lucide-vue-next';
 import { api } from '../lib/api';
 import { cellText, currentLocale } from '../lib/locale';
-import { getListColumns, labelOf, listShowsThumbnail, resolveField, rowThumbnail } from '../lib/schema';
+import { canCreate, getListColumns, labelOf, listShowsThumbnail, resolveField, rowThumbnail } from '../lib/schema';
 import { RESOURCE_TITLE } from '../resources';
 import ResourceFormModal from '../components/ResourceFormModal.vue';
 
@@ -71,6 +71,12 @@ const columns = computed(() => {
 const showThumb = computed(() => listShowsThumbnail(resource.value));
 // Tổng số cột (gồm thumbnail nếu có + cột thao tác) — dùng cho colspan.
 const colCount = computed(() => columns.value.length + (showThumb.value ? 1 : 0) + 1);
+// Cột "tên" để bấm mở sửa: ưu tiên name → title, nếu không có thì cột đầu tiên.
+const titleCol = computed(() => {
+  const cols = columns.value;
+  return cols.includes('name') ? 'name' : cols.includes('title') ? 'title' : cols[0];
+});
+const showCreate = computed(() => canCreate(resource.value));
 
 const del = useMutation({
   mutationFn: (id: number) => api.remove(resource.value, id),
@@ -112,7 +118,7 @@ function onSaved() {
   <div>
     <div class="mb-4 flex items-center justify-between">
       <h1 class="text-xl font-semibold">{{ RESOURCE_TITLE[resource] ?? resource }}</h1>
-      <button class="btn-primary" @click="openCreate">+ Thêm mới</button>
+      <button v-if="showCreate" class="btn-primary" @click="openCreate">+ Thêm mới</button>
     </div>
 
     <form class="mb-3 flex gap-2" @submit.prevent="applySearch">
@@ -148,7 +154,16 @@ function onSaved() {
               />
               <div v-else class="h-10 w-10 rounded border border-dashed border-gray-200 bg-gray-50"></div>
             </td>
-            <td v-for="c in columns" :key="c" class="px-3 py-2">{{ cellText(row[c], currentLocale) }}</td>
+            <td v-for="c in columns" :key="c" class="px-3 py-2">
+              <button
+                v-if="c === titleCol"
+                class="text-left font-medium text-brand hover:underline"
+                @click="openEdit(row.id)"
+              >
+                {{ cellText(row[c], currentLocale) || '(không có tên)' }}
+              </button>
+              <template v-else>{{ cellText(row[c], currentLocale) }}</template>
+            </td>
             <td class="px-3 py-2 text-right">
               <button
                 class="rounded-md p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-700"

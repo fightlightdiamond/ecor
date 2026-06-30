@@ -40,6 +40,8 @@ export interface VirtualField {
   path: string; // vd 'meta.image'
   required?: boolean;
   hint?: string;
+  defaultValue?: any;
+  readonly?: boolean;
 }
 
 /** Cột text-nhiều (trái 2/3) vs cấu hình (phải 1/3). */
@@ -78,7 +80,7 @@ const LABELS: Record<string, string> = {
   expiresAt: 'Hết hạn', quantity: 'Số lượng', qty: 'Số lượng', totalPrice: 'Tổng tiền',
   shippingFee: 'Phí ship', taxFee: 'Thuế', customerName: 'Tên khách', customerPhone: 'SĐT khách',
   customerEmail: 'Email khách', paymentMethod: 'Phương thức TT', paymentStatus: 'Trạng thái TT',
-  paymentMeta: 'Dữ liệu TT', shippingAddress: 'Địa chỉ giao', number: 'Mã đơn', notes: 'Ghi chú',
+  paymentMeta: 'Dữ liệu TT', shippingAddress: 'Địa chỉ giao', number: 'Mã đơn', notes: 'Ghi chú', note: 'Ghi chú',
   scheduledAt: 'Thời gian hẹn', service: 'Dịch vụ', metadata: 'Thông tin thêm', source: 'Nguồn',
   preferredAt: 'Thời gian mong muốn', subject: 'Tiêu đề', message: 'Nội dung', priority: 'Ưu tiên',
   key: 'Khoá', label: 'Nhãn', content: 'Nội dung', meta: 'Meta', keywords: 'Từ khoá',
@@ -220,10 +222,44 @@ const SCHEMA: Record<string, Record<string, Partial<FieldConfig>>> = {
     notes: { type: 'textarea' },
   },
   contactInquiry: {
-    type: { type: 'select', options: opts(['contact', 'booking']) },
-    preferredAt: { type: 'datetime' },
-    message: { type: 'textarea' },
-    metadata: { type: 'json' },
+    // ── Thông tin do KHÁCH điền → chỉ đọc (admin không sửa) ──
+    name: { readonly: true },
+    phone: { readonly: true },
+    email: { readonly: true },
+    service: { readonly: true },
+    type: {
+      type: 'select',
+      label: 'Loại',
+      readonly: true,
+      options: [
+        { value: 'contact', label: 'Liên hệ' },
+        { value: 'booking', label: 'Đặt lịch' },
+      ],
+    },
+    // ── Admin quản lý ──
+    status: {
+      type: 'select',
+      label: 'Trạng thái xử lý',
+      options: [
+        { value: 'new', label: 'Mới' },
+        { value: 'contacted', label: 'Đã liên hệ' },
+        { value: 'consulting', label: 'Đang tư vấn' },
+        { value: 'done', label: 'Hoàn tất' },
+        { value: 'cancelled', label: 'Huỷ' },
+      ],
+      defaultValue: 'new',
+      hint: 'Trạng thái xử lý của liên hệ này (cập nhật khi đã liên hệ/tư vấn xong).',
+    },
+    source: { type: 'text', label: 'Nguồn', readonly: true, hint: 'Nguồn phát sinh liên hệ (vd: website, booking-form, facebook…).' },
+    preferredAt: { type: 'datetime', readonly: false },
+    message: { type: 'textarea', label: 'Nội dung liên hệ', readonly: true, hint: 'Nội dung khách gửi qua form liên hệ/đặt lịch.' },
+    note: {
+      type: 'textarea',
+      label: 'Ghi chú sau tư vấn',
+      hint: 'Ghi lại nội dung/diễn biến sau khi đã liên hệ và tư vấn cho khách.',
+    },
+    // metadata được nhập qua các trường ảo bên dưới → tự gói thành JSON khi lưu.
+    metadata: { type: 'hidden' },
   },
   ticket: {
     status: { type: 'select', options: opts(['open', 'pending', 'resolved', 'closed']) },
@@ -246,6 +282,21 @@ const VIRTUAL: Record<string, VirtualField[]> = {
       type: 'image',
       path: 'meta.image',
       hint: 'Ảnh hiển thị ở danh sách/bài viết. Lưu vào meta.image.',
+    },
+  ],
+  // "Thông tin thêm" của liên hệ → các trường rõ ràng, lưu gói vào metadata (JSON).
+  contactInquiry: [
+    { key: '__preferredTime', label: 'Giờ khách mong muốn', type: 'text', path: 'metadata.preferred_time', readonly: true },
+    { key: '__staffId', label: 'Nhân viên phụ trách (ID)', type: 'number', path: 'metadata.staff_id', readonly: true },
+    { key: '__staffName', label: 'Nhân viên phụ trách', type: 'text', path: 'metadata.staff_name', },
+    {
+      key: '__appointmentId',
+      label: 'Mã lịch hẹn liên kết',
+      type: 'text',
+      path: 'metadata.appointment_id',
+      hint: 'ID lịch hẹn tạo từ form đặt lịch (nếu có). Thường không cần sửa.',
+      // defaultValue: get ramdom string
+      defaultValue: Math.random().toString(36).substring(2, 10),
     },
   ],
 };
@@ -275,10 +326,17 @@ export function listShowsThumbnail(resource: string): boolean {
 // KHÔNG khai báo → tự suy ra (7 cột đầu, bỏ field 'hidden').
 const LIST_COLUMNS: Record<string, string[]> = {
   product: ['name', 'price', 'priceUnit', 'stock', 'status', 'sku'],
+  contactInquiry: ['name', 'phone', 'type', 'source', 'status', 'createdAt'],
 };
 
 export function getListColumns(resource: string): string[] | undefined {
   return LIST_COLUMNS[resource];
+}
+
+// Resource KHÔNG cho tạo mới từ admin (vd liên hệ — chỉ phát sinh từ khách).
+const NO_CREATE = new Set<string>(['contactInquiry']);
+export function canCreate(resource: string): boolean {
+  return !NO_CREATE.has(resource);
 }
 
 // ── Bố cục tuỳ biến theo resource ─────────────────────────────────────────
@@ -307,6 +365,10 @@ const LAYOUT: Record<string, ResourceLayout> = {
   post: {
     left: [['title'], ['shortDescription', 'keywords'], ['body']],
     right: [ ['__thumbnail'], ['isPublished', 'isTrend'], ['type'], ['categoryId'], ['likes', 'views'], ['publishedAt'], ['metaUrl'], ['metaRedirect']],
+  },
+  contactInquiry: {
+    left: [['name'], ['phone', 'email'], ['message'], ['note']],
+    right: [[ 'source', 'type'], ['status'], ['preferredAt'], ['__staffName'], ['__appointmentId']],
   },
 };
 

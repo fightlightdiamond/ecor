@@ -71,7 +71,11 @@ function makeCover(i: number) {
 </script>
 
 <template>
-  <div :class="error ? '-ml-2 border-l-2 border-red-400 pl-2' : ''">
+  <fieldset
+    :disabled="readonly"
+    class="m-0 min-w-0 border-0 p-0"
+    :class="error ? '-ml-2 border-l-2 border-red-400 pl-2' : ''"
+  >
     <!-- Localized: VI (và EN nếu bật đa ngôn ngữ) -->
     <template v-if="cfg.type === 'localized' || cfg.type === 'localizedRich'">
       <div class="label flex items-center gap-1">
@@ -266,5 +270,21 @@ function makeCover(i: number) {
     <p v-if="error" class="mt-1 flex items-center gap-1 text-xs text-red-600">
       <AlertCircle class="h-3.5 w-3.5 shrink-0" /> {{ error }} là bắt buộc
     </p>
-  </div>
+  </fieldset>
 </template>
+
+<style scoped>
+/* VueDatePicker: đưa icon lịch sang BÊN PHẢI ô input (mặc định nằm trái). */
+:deep(.dp__input_icon) {
+  left: auto;
+  right: 10px;
+  pointer-events: none; /* bấm vào icon vẫn mở lịch (xuyên xuống input) */
+}
+:deep(.dp__input) {
+  padding-left: 12px; /* bỏ khoảng chừa icon bên trái */
+  padding-right: 34px; /* chừa chỗ icon bên phải */
+}
+:deep(.dp__clear_icon) {
+  right: 30px; /* nút xoá nằm bên trái icon lịch, không đè nhau */
+}
+</style>
