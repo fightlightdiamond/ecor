@@ -1,0 +1,132 @@
+---
+description: Medusa v2 conventions, admin extension pitfalls, and lessons from past mistakes. Read Medusa docs before implementing any Medusa-related task.
+alwaysApply: true
+---
+
+# Medusa — read docs first
+
+Before implementing or changing anything related to Medusa (modules, API routes, admin UI, workflows, config), **read the official documentation** and match existing patterns in this repo.
+
+Primary references:
+- https://docs.medusajs.com/learn
+- Admin UI routes: https://docs.medusajs.com/learn/fundamentals/admin/ui-routes
+- Custom modules: https://docs.medusajs.com/learn/fundamentals/modules
+- API routes: https://docs.medusajs.com/learn/fundamentals/api-routes
+- Medusa JS SDK (admin): https://docs.medusajs.com/resources/js-sdk
+
+Do not guess Medusa-specific APIs, file locations, or bundler behavior. Search docs + this codebase first.
+
+---
+
+# Architecture in this monorepo
+
+| App | Path | Runtime |
+|-----|------|---------|
+| Backend + Admin | `apps/backend` | Medusa server; **Admin is a Vite SPA (client-only)** |
+| Storefront | `apps/storefront` | Next.js App Router (server + client components) |
+
+**Do not confuse Admin (client SPA) with Storefront (Next.js SSR/RSC).** Admin transform/router errors are bundling issues, not SSR mistakes.
+
+---
+
+# `medusa-config.ts` — admin Vite config (critical)
+
+Medusa calls `mergeConfig(baseConfig, customConfig)` for `admin.vite`. **Never spread the incoming config:**
+
+```ts
+// WRONG — duplicates @vitejs/plugin-react → esbuild errors:
+// "inWebWorker", "prevRefreshReg", "prevRefreshSig" already declared
+vite: (config) => ({
+  ...config,
+  resolve: { ... },
+})
+
+// CORRECT — return only the delta; Medusa merges it
+vite: () => ({
+  resolve: {
+    dedupe: ["react", "react-dom", "react-router-dom"],
+    alias: {
+      "react-router-dom": dashboardReactRouterDom,
+    },
+  },
+}),
+```
+
+Reference: https://github.com/medusajs/medusa/issues/11154
+
+When changing `react-router-dom` resolution, resolve the dashboard copy via `createRequire` from `apps/backend/package.json` → `@medusajs/dashboard`, not `process.cwd()` guesses.
+
+---
+
+# Admin UI extensions (`apps/backend/src/admin/`)
+
+Follow official Medusa admin patterns:
+
+- **List pages:** `@medusajs/ui` `DataTable` + `useDataTable` + `useNavigate` from `react-router-dom`
+- **API calls:** `@medusajs/js-sdk` via shared `src/admin/lib/sdk.ts` (`sdk.client.fetch`), not raw `fetch` (except where SDK cannot be used)
+- **Route config:** `defineRouteConfig` on list/index pages only; create/edit sub-routes stay out of sidebar
+- **Edit/detail pages:** prefer `loader` + `useLoaderData` + `handle.breadcrumb` per docs
+- **Navigation:** `useNavigate()` with relative paths (`"create"`, `".."`, `row.id`) — never `window.location` hacks
+- **Do not add** a separate `react-router-dom` dependency for admin unless unavoidable; monorepo duplicate copies break Router context (`useNavigate() may be used only in the context of a <Router>`, `basename` null)
+
+After Vite/config changes, clear cache:
+
+```bash
+cd apps/backend && rm -rf node_modules/.vite .medusa/client && npm run dev
+# or: npm run dev:clean
+```
+
+---
+
+# Custom modules (`apps/backend/src/modules/`)
+
+- Use DML models + `MedusaService` + module `index.ts` with a unique module key
+- Register in `medusa-config.ts` `modules` array
+- Add migrations under `migrations/`
+- Expose admin + store API routes under `src/api/admin/` and `src/api/store/`
+- Use `validateAndTransformQuery` + `createFindParams()` in `src/api/middlewares.ts` for list endpoints
+
+---
+
+# Storefront (`apps/storefront/`)
+
+- Fetch store API via existing data helpers in `src/lib/data/`
+- Campaign/editor content: Tiptap JSON in admin; render on storefront with `generateHTML`
+- Routes live under `src/app/[countryCode]/(main)/`
+
+---
+
+# Mistakes to avoid (from this project)
+
+1. **Spreading `...config` in `admin.vite`** — causes duplicate React Refresh plugin and Vite transform failures on all custom admin routes/widgets.
+2. **Installing/using a second `react-router-dom`** — breaks admin Router context; use dedupe + alias to dashboard's copy.
+3. **Raw `fetch("/admin/...")` in admin** — use `sdk.client.fetch` for session auth and consistent base URL.
+4. **Reinventing admin navigation** — use `react-router-dom` hooks; Medusa admin is already wrapped in a Router.
+5. **Skipping doc review** — Medusa v2 admin bundling, module system, and SDK patterns are not interchangeable with generic React/Next.js habits.
+6. **Assuming SSR issues for admin errors** — admin errors are almost always Vite plugin duplication, duplicate React packages, or wrong import paths.
+
+---
+
+# Pre-task checklist
+
+Before coding a Medusa task:
+
+1. Read the relevant Medusa doc section(s) listed above
+2. Find a similar pattern in `node_modules/@medusajs/dashboard` or this repo's `src/admin/`
+3. Confirm whether the change targets **admin (SPA)**, **API**, **module**, or **storefront (Next.js)**
+4. If touching `medusa-config.ts` `admin.vite`, never spread `config`; only return overrides
+5. After admin changes, verify with `npm run build` in `apps/backend` and dev with a clean Vite cache
+
+---
+
+# Tiptap editor (campaign posts)
+
+Use [Tiptap](https://tiptap.dev/docs/editor/getting-started/overview) — not Editor.js.
+
+- Admin editor: `@tiptap/react` + `useEditor` + `EditorContent` + `StarterKit` + `Image` + `Link`
+- Store content as ProseMirror JSON (`{ type: "doc", content: [...] }`) in the `content` json column
+- Storefront render: `@tiptap/html` `generateHTML()` with the same extensions as admin
+- Empty content fallback: `EMPTY_TIPTAP_DOC` from `tiptap-editor/extensions.ts`
+- Image upload: Medusa `sdk.client.fetch("/admin/uploads")` then `editor.chain().focus().setImage({ src })`
+- Keep toolbar visible (Bold, Italic, H2, H3, lists, image) — do not rely on hidden block toolboxes
+- Stop event propagation on editor wrapper inside `<form>` (keydown/mousedown)

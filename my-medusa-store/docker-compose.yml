@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  medusa-postgres:
+    image: postgres:15
+    container_name: medusa-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
