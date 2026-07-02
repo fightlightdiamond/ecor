@@ -91,6 +91,13 @@ export default defineNuxtConfig({
       siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'https://thanglongcheviet.vn',
       siteName: 'Thăng Long Chè Việt',
       googleMapsApiKey: process.env.NUXT_PUBLIC_GOOGLE_MAPS_API_KEY || '',
+      // Medusa commerce backend (products + cart/checkout). Publishable key
+      // and region id are auto-provisioned by
+      // apps/admin-medusa/scripts/setup-web-integration.mjs — no manual
+      // dashboard setup needed.
+      medusaBackendUrl: process.env.NUXT_PUBLIC_MEDUSA_BACKEND_URL || 'http://localhost:9000',
+      medusaPublishableKey: process.env.NUXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || '',
+      medusaRegionId: process.env.NUXT_PUBLIC_MEDUSA_REGION_ID || '',
     },
   },
 

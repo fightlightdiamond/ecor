@@ -29,7 +29,7 @@ const teaTabs = computed(() => {
     id: 'all',
     label: localLabel('Tất cả', 'All'),
     image: products.value[0]?.image ?? assetUrl('sp-001.jpg'),
-    categoryId: null as number | null,
+    categoryId: null as string | null,
   }
 
   const fromApi = categories.value.map(c => ({

@@ -39,7 +39,7 @@ const priceText = computed(() =>
 
 const handleAddToCart = async () => {
   if (!product.value) return
-  const res = await addToCart(product.value.id)
+  const res = await addToCart(product.value.variantId)
   if (res.success) added.value = true
 }
 

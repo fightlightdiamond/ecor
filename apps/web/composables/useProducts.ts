@@ -1,99 +1,71 @@
-import type { ApiEnvelope, Product, ProductCategory, RawProduct } from '~/utils/storefront'
-import { categoryLabel, transformProduct } from '~/utils/storefront'
+import type { MedusaCategory, MedusaProduct } from '~/utils/medusa'
+import type { Product } from '~/utils/storefront'
+import { transformMedusaCategory, transformMedusaProduct } from '~/utils/medusa'
+import { categoryLabel } from '~/utils/storefront'
 
 export type { Product } from '~/utils/storefront'
 
-async function fetchAllProducts(fetchApi: ReturnType<typeof useApi>['fetchApi']) {
-  const first = await fetchApi<ApiEnvelope<RawProduct[]>>('/products?per_page=100')
-  const all = [...(first.data ?? [])]
-  const lastPage = first.meta?.last_page ?? 1
-
-  if (lastPage > 1) {
-    const pages = await Promise.all(
-      Array.from({ length: lastPage - 1 }, (_, i) =>
-        fetchApi<ApiEnvelope<RawProduct[]>>(`/products?per_page=100&page=${i + 2}`),
-      ),
-    )
-    for (const page of pages) {
-      all.push(...(page.data ?? []))
-    }
-  }
-
-  return { success: true, data: all, meta: first.meta }
-}
+const PRODUCT_FIELDS = 'id,title,handle,description,thumbnail,*images,*categories,*variants.calculated_price'
 
 export function useProducts() {
   const { locale } = useI18n()
-  const { fetchApi } = useApi()
+  const { fetchMedusa, regionId } = useMedusaApi()
 
   const { data: productsData, pending } = useAsyncData(
-    () => `products-${locale.value}`,
-    () => fetchAllProducts(fetchApi),
-    { default: () => ({ success: true, data: [] as RawProduct[] }) },
+    'medusa-products',
+    () => fetchMedusa<{ products: MedusaProduct[] }>(
+      `/store/products?limit=100&region_id=${regionId}&fields=${PRODUCT_FIELDS}`,
+    ),
+    { default: () => ({ products: [] as MedusaProduct[] }) },
   )
 
-  const products = computed<Product[]>(() => {
-    const raw = productsData.value?.data ?? []
-    return (Array.isArray(raw) ? raw : []).map(p => transformProduct(p, locale.value))
-  })
-
-  const { data: featuredData } = useAsyncData(
-    () => `featured-products-${locale.value}`,
-    () => fetchApi<ApiEnvelope<RawProduct[]>>('/products/featured'),
-    { default: () => ({ success: true, data: [] as RawProduct[] }) },
+  const products = computed<Product[]>(() =>
+    (productsData.value?.products ?? []).map(transformMedusaProduct),
   )
 
-  const featuredProducts = computed<Product[]>(() => {
-    const raw = featuredData.value?.data ?? []
-    return (Array.isArray(raw) ? raw : []).map(p => transformProduct(p, locale.value))
-  })
+  // Medusa has no built-in "featured" flag out of the box — surface the
+  // first few products instead. Curate via a real flag (e.g. metadata.featured)
+  // once real product data replaces the seeded demo catalog.
+  const featuredProducts = computed<Product[]>(() => products.value.slice(0, 6))
 
   const { data: categoriesData } = useAsyncData(
-    'product-categories',
-    () => fetchApi<ApiEnvelope<ProductCategory[]>>('/categories'),
-    { default: () => ({ success: true, data: [] as ProductCategory[] }) },
+    'medusa-product-categories',
+    () => fetchMedusa<{ product_categories: MedusaCategory[] }>('/store/product-categories?limit=100'),
+    { default: () => ({ product_categories: [] as MedusaCategory[] }) },
   )
 
-  const categories = computed(() => {
-    const raw = categoriesData.value?.data ?? []
-    return (Array.isArray(raw) ? raw : []).map(c => ({
-      id: c.id,
-      slug: c.slug,
-      label: categoryLabel(c.name, locale.value),
-    }))
-  })
+  const categories = computed<{ id: string, slug: string, label: string }[]>(() =>
+    (categoriesData.value?.product_categories ?? []).map((c) => {
+      const cat = transformMedusaCategory(c)
+      return { id: cat.id, slug: cat.slug, label: categoryLabel(cat.name, locale.value) }
+    }),
+  )
 
   const getBySlug = async (slug: string) => {
     try {
-      const res = await fetchApi<ApiEnvelope<RawProduct> & { related?: RawProduct[] }>(`/products/${slug}`)
-      if (res.success && res.data) {
-        const product = transformProduct(res.data, locale.value)
-        const relatedFromApi = (res.related ?? []).map(p => transformProduct(p, locale.value))
-        return { product, relatedFromApi }
+      const res = await fetchMedusa<{ products: MedusaProduct[] }>(
+        `/store/products?handle=${encodeURIComponent(slug)}&region_id=${regionId}&fields=${PRODUCT_FIELDS}`,
+      )
+      const raw = res.products?.[0]
+      if (raw) {
+        const product = transformMedusaProduct(raw)
+        return { product, relatedFromApi: related(product.slug, product.categoryId, 3) }
       }
     } catch (e) {
       console.error(e)
     }
 
-    const found = products.value.find(p => p.slug === slug)
-    if (found) {
-      return {
-        product: found,
-        relatedFromApi: related(found.slug, found.categoryId, 3),
-      }
-    }
-
     return { product: null, relatedFromApi: [] as Product[] }
   }
 
-  const related = (slug: string, categoryId: number | null, count = 3) => {
+  const related = (slug: string, categoryId: string | null, count = 3) => {
     const pool = categoryId
       ? products.value.filter(p => p.categoryId === categoryId && p.slug !== slug)
       : products.value.filter(p => p.slug !== slug)
     return pool.slice(0, count)
   }
 
-  const byCategory = (categoryId: number | null) => {
+  const byCategory = (categoryId: string | null) => {
     if (!categoryId) return products.value
     return products.value.filter(p => p.categoryId === categoryId)
   }

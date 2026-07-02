@@ -10,24 +10,10 @@ export interface ApiEnvelope<T> {
   message?: string
 }
 
-export interface RawProduct {
-  id: number
-  name: string
-  slug: string
-  description?: string | null
-  price: number | string
-  stock?: number
-  in_stock?: boolean
-  sku?: string | null
-  category_id?: number | null
-  features?: string[]
-  custom_fields?: { features?: string[] }
-  images?: string[]
-  image?: string | null
-}
-
 export interface Product {
   id: string
+  /** Default variant id — required by Medusa's cart line-item API (add to cart). */
+  variantId: string
   slug: string
   price: number
   image: string
@@ -36,7 +22,7 @@ export interface Product {
   shortDesc: string
   description: string
   features: string[]
-  categoryId: number | null
+  categoryId: string | null
   inStock: boolean
 }
 
@@ -62,7 +48,7 @@ export interface BlogPost {
 }
 
 export interface ProductCategory {
-  id: number
+  id: string
   slug: string
   name: Record<string, string> | string
 }
@@ -91,28 +77,8 @@ export function localText(field: unknown, locale: string): string {
   return String(field)
 }
 
-const FALLBACK_PRODUCT_IMAGE = 'https://images.unsplash.com/photo-1594631252845-29fc4cc8c011?q=80&w=800'
+export const FALLBACK_PRODUCT_IMAGE = 'https://images.unsplash.com/photo-1594631252845-29fc4cc8c011?q=80&w=800'
 const FALLBACK_POST_IMAGE = 'https://images.unsplash.com/photo-1544787219-7f47ccb7fae6?q=80&w=800'
-
-export function transformProduct(p: RawProduct, locale = 'vi'): Product {
-  const gallery = (p.images?.length ? p.images : p.image ? [p.image] : []).filter(Boolean) as string[]
-  const description = p.description ?? ''
-  const plain = stripHtml(description)
-
-  return {
-    id: String(p.id),
-    slug: p.slug,
-    price: Number(p.price) || 0,
-    image: gallery[0] ?? FALLBACK_PRODUCT_IMAGE,
-    gallery: gallery.length ? gallery : [FALLBACK_PRODUCT_IMAGE],
-    title: p.name,
-    shortDesc: plain.slice(0, 160) + (plain.length > 160 ? '…' : ''),
-    description,
-    features: p.features ?? p.custom_fields?.features ?? [],
-    categoryId: p.category_id ?? null,
-    inStock: p.in_stock ?? ((p.stock ?? 0) > 0),
-  }
-}
 
 export function parseApiError(err: unknown, fallback: string): string {
   if (err && typeof err === 'object') {
