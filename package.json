@@ -1,48 +1,39 @@
 {
-  "name": "thang-long-che-viet",
-  "private": true,
-  "packageManager": "pnpm@10.14.0",
-  "pnpm": {
-    "overrides": {
-      "strip-ansi": "6.0.1"
-    },
-    "onlyBuiltDependencies": [
-      "@parcel/watcher",
-      "@prisma/client",
-      "esbuild",
-      "prisma",
-      "sharp"
-    ]
+  "name": "my-medusa-store",
+  "private": false,
+  "packageManager": "npm@10.9.3",
+  "engines": {
+    "node": ">=20"
   },
   "scripts": {
-    "dev": "pnpm --filter web dev",
-    "build": "pnpm --filter web build",
-    "preview": "pnpm --filter web preview",
-    "lint": "pnpm --filter web lint",
-    "typecheck": "pnpm --filter web typecheck",
-    "dev:api": "pnpm --filter @thang-long/api dev",
-    "dev:admin": "pnpm --filter admin dev",
-    "build:api": "pnpm --filter @thang-long/api build",
-    "typecheck:api": "pnpm --filter @thang-long/api typecheck",
-    "prisma:generate": "pnpm --filter @thang-long/api prisma:generate",
-    "prisma:pull": "pnpm --filter @thang-long/api prisma:pull",
-    "prisma:push": "pnpm --filter @thang-long/api prisma:push",
-    "seed:admin": "pnpm --filter @thang-long/api seed:admin",
-    "seed:content": "pnpm --filter @thang-long/api seed:content",
-    "api:infra": "docker compose -f apps/api/docker-compose.yml up -d",
-    "api:infra:s3": "docker compose -f apps/api/docker-compose.yml --profile s3 up -d",
-    "api:infra:down": "docker compose -f apps/api/docker-compose.yml down",
-    "stack:up": "docker compose -f apps/api/docker-compose.yml --profile apps up",
-    "stack:up:s3": "docker compose -f apps/api/docker-compose.yml --profile apps --profile s3 up",
-    "stack:build": "docker compose -f apps/api/docker-compose.yml --profile apps up --build",
-    "stack:down": "docker compose -f apps/api/docker-compose.yml --profile apps down",
-    "admin:restart": "docker compose -f apps/api/docker-compose.yml --profile apps restart admin",
-    "admin:logs": "docker compose -f apps/api/docker-compose.yml --profile apps logs -f admin",
-    "admin:reinstall": "docker compose -f apps/api/docker-compose.yml --profile apps run --rm admin sh -c \"corepack enable && pnpm install\""
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "start": "turbo start",
+    "lint": "turbo lint",
+    "test": "turbo test",
+    "backend:seed": "turbo seed --filter=@dtc/backend",
+    "backend:dev": "turbo dev --filter=@dtc/backend",
+    "storefront:dev": "turbo dev --filter=@dtc/storefront"
   },
-  "engines": {
-    "node": ">=20.0.0",
-    "pnpm": ">=9.0.0"
+  "pnpm": {
+    "overrides": {
+      "@types/react": "19.0.5",
+      "@types/react-dom": "19.0.5"
+    }
   },
-  "dependencies": {}
+  "devDependencies": {
+    "@medusajs/eslint-plugin": "2.16.0",
+    "eslint": "^9.39.4",
+    "jiti": "^2.7.0",
+    "prettier": "^3.2.5",
+    "turbo": "^2.0.14"
+  },
+  "workspaces": [
+    "apps/**",
+    "!apps/backend/.medusa/**"
+  ],
+  "overrides": {
+    "ajv": "^8.0.0",
+    "react-router-dom": "6.30.4"
+  }
 }
