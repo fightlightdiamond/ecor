@@ -160,3 +160,12 @@ volumes:
   storefront_node_modules:
   backend_medusa:
   storefront_next:
+
+# Shared with infra/docker-compose.yml so its nginx can reach `backend` by
+# service name and front both stacks on one port. Create it once with:
+#   docker network create tlcv_shared
+# (start.dev.sh / start.prod.sh do this automatically.)
+networks:
+  default:
+    name: tlcv_shared
+    external: true
