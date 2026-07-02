@@ -33,6 +33,18 @@ module.exports = defineConfig({
   },
   admin: {
     vite: () => ({
+      server: {
+        hmr: {
+          // Without this, the HMR websocket the browser injects picks an
+          // internal port Vite chose for itself inside the container, which
+          // isn't published through infra/docker-compose.yml's nginx —
+          // the browser then fails to connect to that random port. Forcing
+          // it onto the port nginx actually publishes makes it work whether
+          // the admin is loaded through nginx or directly at :9000.
+          clientPort: Number(process.env.HTTP_PORT) || 9000,
+          protocol: "ws",
+        },
+      },
       resolve: {
         dedupe: ["react", "react-dom", "react-router-dom"],
         alias: {

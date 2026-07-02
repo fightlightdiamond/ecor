@@ -1,13 +1,13 @@
 #!/bin/bash
 set -e
 
-# Shared network so infra/docker-compose.yml's nginx can reach `backend` by
-# service name even though it's a separate compose project.
-docker network create tlcv_shared 2>/dev/null || true
+# --env-file loads `.env` from the repo root (see .env.example) without
+# touching how the compose file's own relative paths (../:/workspace,
+# ./nginx/...) resolve — those stay relative to infra/, where the file lives.
+# (Do NOT use --project-directory here: it would also rebase those paths onto
+# the repo root, turning "../" into the repo's *parent* directory.)
+COMPOSE="docker compose -f infra/docker-compose.yml --env-file .env"
 
-docker compose down
+$COMPOSE down
 export COMPOSE_PROFILES=storefront
-docker compose up -d
-
-# Nuxt web + single-port nginx entrypoint -> http://localhost
-docker compose -f infra/docker-compose.yml up -d
+$COMPOSE up -d
