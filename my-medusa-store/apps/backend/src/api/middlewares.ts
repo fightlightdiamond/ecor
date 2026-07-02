@@ -26,5 +26,15 @@ export default defineMiddlewares({
         }),
       ],
     },
+    {
+      matcher: "/admin/campaign-posts",
+      method: ["POST"],
+      bodyParser: { sizeLimit: "10mb" },
+    },
+    {
+      matcher: "/admin/campaign-posts/*",
+      method: ["PATCH"],
+      bodyParser: { sizeLimit: "10mb" },
+    },
   ],
 })

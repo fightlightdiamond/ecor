@@ -82,11 +82,13 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         disabled={disabled || isLoading}
         className={clsx(
-          "inline-flex gap-2 items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-          variant === "primary" && "bg-black text-white hover:bg-gray-800",
+          "inline-flex gap-2 items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ui-border-interactive focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+          variant === "primary" &&
+            "bg-ui-bg-interactive text-ui-fg-on-color hover:bg-brand-solid-hover",
           variant === "secondary" &&
-            "bg-white text-black border border-gray-200 hover:bg-gray-50",
-          variant === "transparent" && "bg-transparent hover:bg-gray-100",
+            "bg-ui-bg-base text-ui-fg-base border border-ui-border-base hover:bg-ui-bg-base-hover",
+          variant === "transparent" &&
+            "bg-transparent text-ui-fg-base hover:bg-ui-bg-subtle",
           size === "small" && "h-8 px-3 text-sm",
           size === "medium" && "h-10 px-4",
           size === "large" && "h-12 px-6 text-lg",
@@ -109,7 +111,7 @@ export const Container = forwardRef<HTMLDivElement, ContainerProps>(
     return (
       <div
         ref={ref}
-        className={clsx("bg-white rounded-lg p-4", className)}
+        className={clsx("bg-ui-bg-base rounded-lg p-4", className)}
         {...props}
       >
         {children}
@@ -157,7 +159,7 @@ export const IconBadge = forwardRef<HTMLSpanElement, IconBadgeProps>(
       <span
         ref={ref}
         className={clsx(
-          "inline-flex items-center justify-center rounded-full bg-gray-100 p-1",
+          "inline-flex items-center rounded-full bg-ui-bg-subtle p-1",
           className
         )}
         {...props}
@@ -178,7 +180,7 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
       <button
         ref={ref}
         className={clsx(
-          "inline-flex items-center justify-center rounded-md p-2 hover:bg-gray-100 transition-colors focus-visible:outline-none focus-visible:ring-2",
+          "inline-flex items-center justify-center rounded-md p-2 hover:bg-ui-bg-subtle transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ui-border-interactive",
           className
         )}
         {...props}
@@ -221,7 +223,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         <input
           ref={ref}
           className={clsx(
-            "flex h-10 w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+            "flex h-10 w-full rounded-md border border-ui-border-base bg-ui-bg-field px-3 py-2 text-sm text-ui-fg-base placeholder:text-ui-fg-muted focus:outline-none focus:ring-2 focus:ring-ui-border-interactive focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
             className
           )}
           {...props}
@@ -292,7 +294,7 @@ const TableRow = forwardRef<HTMLTableRowElement, TableRowProps>(
       <tr
         ref={ref}
         className={clsx(
-          "border-b transition-colors hover:bg-gray-50",
+          "border-b transition-colors hover:bg-ui-bg-subtle",
           className
         )}
         {...props}
@@ -312,7 +314,7 @@ const TableHead = forwardRef<HTMLTableCellElement, TableHeadProps>(
       <th
         ref={ref}
         className={clsx(
-          "h-12 px-4 text-left align-middle font-medium text-gray-500 [&:has([role=checkbox])]:pr-0",
+          "h-12 px-4 text-left align-middle font-medium text-ui-fg-muted [&:has([role=checkbox])]:pr-0",
           className
         )}
         {...props}
@@ -384,7 +386,7 @@ const RadioGroupItem = forwardRef<HTMLInputElement, RadioGroupItemProps>(
           type="radio"
           id={id}
           className={clsx(
-            "h-4 w-4 border-gray-300 text-gray-900 focus:ring-gray-900",
+            "h-4 w-4 border-ui-border-base text-ui-fg-interactive focus:ring-ui-border-interactive",
             className
           )}
           {...props}
@@ -414,7 +416,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
           type="checkbox"
           id={id}
           className={clsx(
-            "h-4 w-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900",
+            "h-4 w-4 rounded border-ui-border-base text-ui-fg-interactive focus:ring-ui-border-interactive",
             className
           )}
           {...props}

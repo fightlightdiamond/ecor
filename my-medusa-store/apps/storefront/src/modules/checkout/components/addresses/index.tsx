@@ -13,6 +13,8 @@ import BillingAddress from "../billing_address"
 import ErrorMessage from "../error-message"
 import ShippingAddress from "../shipping-address"
 import { SubmitButton } from "../submit-button"
+import { useTranslations } from "next-intl"
+
 
 const Addresses = ({
   cart,
@@ -24,6 +26,7 @@ const Addresses = ({
   const searchParams = useSearchParams()
   const router = useRouter()
   const pathname = usePathname()
+  const t = useTranslations("checkout")
 
   const isOpen = searchParams.get("step") === "address"
 
@@ -100,7 +103,7 @@ const Addresses = ({
                     data-testid="shipping-address-summary"
                   >
                     <Text className="txt-medium-plus text-ui-fg-base mb-1">
-                      Shipping Address
+                      {t("shippingAddress")}
                     </Text>
                     <Text className="txt-medium text-ui-fg-subtle">
                       {cart.shipping_address.first_name}{" "}
@@ -124,7 +127,7 @@ const Addresses = ({
                     data-testid="shipping-contact-summary"
                   >
                     <Text className="txt-medium-plus text-ui-fg-base mb-1">
-                      Contact
+                      {t("contactInfo")}
                     </Text>
                     <Text className="txt-medium text-ui-fg-subtle">
                       {cart.shipping_address.phone}
@@ -139,12 +142,12 @@ const Addresses = ({
                     data-testid="billing-address-summary"
                   >
                     <Text className="txt-medium-plus text-ui-fg-base mb-1">
-                      Billing Address
+                      {t("billingAddress")}
                     </Text>
 
                     {sameAsBilling ? (
                       <Text className="txt-medium text-ui-fg-subtle">
-                        Billing and delivery address are the same.
+                        {t("billingAndDeliverySame")}
                       </Text>
                     ) : (
                       <>

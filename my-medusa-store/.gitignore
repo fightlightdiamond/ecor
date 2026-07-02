@@ -55,3 +55,6 @@ yarn-error.log*
 ehthumbs.db
 Thumbs.db
 **/.DS_Store
+*storybook.log
+storybook-static
+apps/backend/static/

@@ -17,6 +17,7 @@ import {
   useNavigate,
   useParams,
 } from "react-router-dom"
+import { useTranslation } from "react-i18next"
 import CampaignPostForm from "../../../components/campaign-post-form"
 import { toDatetimeLocal, toIsoDateTime } from "../../../lib/campaign-post"
 import { sdk } from "../../../lib/sdk"
@@ -48,6 +49,7 @@ const EditCampaignPostPage = () => {
   const navigate = useNavigate()
   const prompt = usePrompt()
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
   const { campaign_post } = useLoaderData() as Awaited<ReturnType<typeof loader>>
 
   const [title, setTitle] = useState(campaign_post.title)
@@ -81,7 +83,7 @@ const EditCampaignPostPage = () => {
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["campaign-posts"] })
-      toast.success("Campaign post deleted")
+      toast.success(t("campaign-posts.messages.deleted"))
       navigate("..")
     },
   })
@@ -99,20 +101,20 @@ const EditCampaignPostPage = () => {
         unpublish_at: toIsoDateTime(unpublishAt),
       })
 
-      toast.success("Campaign post updated")
+      toast.success(t("campaign-posts.messages.updated"))
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to update post"
+        error instanceof Error ? error.message : t("campaign-posts.messages.updateFailed")
       )
     }
   }
 
   const handleDelete = async () => {
     const confirmed = await prompt({
-      title: "Delete campaign post",
-      description: `Are you sure you want to delete "${title}"?`,
-      confirmText: "Delete",
-      cancelText: "Cancel",
+      title: t("campaign-posts.messages.deleteConfirmTitle"),
+      description: t("campaign-posts.messages.deleteConfirmDesc", { title }),
+      confirmText: t("campaign-posts.messages.confirmDelete"),
+      cancelText: t("campaign-posts.messages.cancelDelete"),
     })
 
     if (!confirmed) {
@@ -123,7 +125,7 @@ const EditCampaignPostPage = () => {
       await deletePost()
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to delete post"
+        error instanceof Error ? error.message : t("campaign-posts.messages.deleteFailed")
       )
     }
   }
@@ -132,17 +134,17 @@ const EditCampaignPostPage = () => {
     <Container className="divide-y p-0">
       <div className="flex items-center justify-between px-6 py-4">
         <div>
-          <Heading level="h1">Edit Campaign Post</Heading>
+          <Heading level="h1">{t("campaign-posts.edit")}</Heading>
           <Text className="text-ui-fg-subtle" size="small">
             {title}
           </Text>
         </div>
         <div className="flex items-center gap-x-2">
           <Button variant="danger" isLoading={isDeleting} onClick={handleDelete}>
-            Delete
+            {t("campaign-posts.actions.delete")}
           </Button>
           <Button variant="secondary" onClick={() => navigate("..")}>
-            Back to list
+            {t("campaign-posts.actions.backToList")}
           </Button>
         </div>
       </div>
@@ -155,7 +157,7 @@ const EditCampaignPostPage = () => {
         unpublishAt={unpublishAt}
         content={content}
         isSubmitting={isPending}
-        submitLabel="Save changes"
+        submitLabel={t("campaign-posts.actions.save")}
         onTitleChange={setTitle}
         onSlugChange={setSlug}
         onIsActiveChange={setIsActive}

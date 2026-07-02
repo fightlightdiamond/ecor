@@ -36,5 +36,21 @@ module.exports = defineConfig({
     {
       resolve: "./src/modules/campaign",
     },
+    {
+      resolve: "@medusajs/file",
+      options: {
+        providers: [
+          {
+            resolve: "@medusajs/file-local",
+            id: "local",
+            options: {
+              upload_dir: "static",
+              backend_url: process.env.MEDUSA_BACKEND_URL || "http://localhost:9000",
+            },
+          },
+        ],
+      },
+    },
   ],
 })
+

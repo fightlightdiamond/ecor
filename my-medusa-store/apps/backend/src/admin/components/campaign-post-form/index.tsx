@@ -7,6 +7,7 @@ import {
 import type { JSONContent } from "@tiptap/core"
 import TiptapEditor from "../tiptap-editor"
 import { slugify } from "../../lib/campaign-post"
+import { useTranslation } from "react-i18next"
 
 type CampaignPostFormProps = {
   title: string
@@ -45,10 +46,12 @@ const CampaignPostForm = ({
   onContentChange,
   onSubmit,
 }: CampaignPostFormProps) => {
+  const { t } = useTranslation()
+
   return (
     <form className="flex flex-col gap-6 px-6 py-6" onSubmit={onSubmit}>
       <div className="flex flex-col gap-y-2">
-        <Label htmlFor="title">Title</Label>
+        <Label htmlFor="title">{t("campaign-posts.fields.title")}</Label>
         <Input
           id="title"
           required
@@ -58,11 +61,11 @@ const CampaignPostForm = ({
       </div>
 
       <div className="flex flex-col gap-y-2">
-        <Label htmlFor="slug">Slug</Label>
+        <Label htmlFor="slug">{t("campaign-posts.fields.slug")}</Label>
         <Input
           id="slug"
           required={!!slug}
-          placeholder={slugify(title) || "auto-generated-from-title"}
+          placeholder={slugify(title) || t("campaign-posts.fields.slugPlaceholder")}
           value={slug}
           onChange={(e) => onSlugChange(e.target.value)}
         />
@@ -70,7 +73,7 @@ const CampaignPostForm = ({
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div className="flex flex-col gap-y-2">
-          <Label htmlFor="publish_at">Publish at</Label>
+          <Label htmlFor="publish_at">{t("campaign-posts.fields.publishAt")}</Label>
           <Input
             id="publish_at"
             type="datetime-local"
@@ -79,7 +82,7 @@ const CampaignPostForm = ({
           />
         </div>
         <div className="flex flex-col gap-y-2">
-          <Label htmlFor="unpublish_at">Unpublish at</Label>
+          <Label htmlFor="unpublish_at">{t("campaign-posts.fields.unpublishAt")}</Label>
           <Input
             id="unpublish_at"
             type="datetime-local"
@@ -91,11 +94,11 @@ const CampaignPostForm = ({
 
       <div className="flex items-center gap-x-3">
         <Switch checked={isActive} onCheckedChange={onIsActiveChange} />
-        <Label>Active</Label>
+        <Label>{t("campaign-posts.fields.active")}</Label>
       </div>
 
       <div className="flex flex-col gap-y-2 overflow-visible">
-        <Label>Content</Label>
+        <Label>{t("campaign-posts.fields.content")}</Label>
         <TiptapEditor
           editorKey={editorKey}
           value={content}
