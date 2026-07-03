@@ -2,6 +2,7 @@ import { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { listProducts } from "@lib/data/products"
 import { getRegion, listRegions } from "@lib/data/regions"
+import { decodeRouteParam } from "@lib/util/decode-route-param"
 import ProductTemplate from "@modules/products/templates"
 import { HttpTypes } from "@medusajs/types"
 
@@ -71,7 +72,7 @@ function getImagesForVariant(
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const params = await props.params
-  const { handle } = params
+  const handle = decodeRouteParam(params.handle)
   const region = await getRegion(params.countryCode)
 
   if (!region) {
@@ -104,6 +105,7 @@ export default async function ProductPage(props: Props) {
   const searchParams = await props.searchParams
 
   const selectedVariantId = searchParams.v_id
+  const handle = decodeRouteParam(params.handle)
 
   if (!region) {
     notFound()
@@ -111,14 +113,14 @@ export default async function ProductPage(props: Props) {
 
   const pricedProduct = await listProducts({
     countryCode: params.countryCode,
-    queryParams: { handle: params.handle },
+    queryParams: { handle },
   }).then(({ response }) => response.products[0])
-
-  const images = getImagesForVariant(pricedProduct, selectedVariantId)
 
   if (!pricedProduct) {
     notFound()
   }
+
+  const images = getImagesForVariant(pricedProduct, selectedVariantId)
 
   return (
     <ProductTemplate

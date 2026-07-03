@@ -1,0 +1,224 @@
+---
+description: Storybook conventions for the Medusa storefront (apps/storefront). Follow when adding or changing UI components and their stories.
+alwaysApply: true
+---
+
+# Storybook — storefront only
+
+Storybook lives in **`apps/storefront`**. It documents **storefront UI components** (Next.js), not Medusa Admin (`apps/backend/src/admin`).
+
+Run:
+```bash
+npm run storefront:storybook   # from monorepo root
+cd apps/storefront && npm run storybook
+```
+
+Build static docs: `cd apps/storefront && npm run build-storybook`
+
+Official references:
+- https://storybook.js.org/docs
+- CSF3: https://storybook.js.org/docs/api/csf
+- Args: https://storybook.js.org/docs/writing-stories/args
+- Next.js + Vite: `@storybook/nextjs-vite` (configured in `.storybook/main.ts`)
+
+---
+
+# Component design for Storybook
+
+## Presentational first
+
+Components shown in Storybook must be **presentational**:
+- All visible copy, images, and links come from **props / args**
+- No `fetch`, no Medusa SDK, no React context that requires the real app
+- Data fetching and country-code routing stay in **page wrappers** or small utils (see `buildLandingHeroProps`)
+
+```tsx
+// ✅ Page (server) — connected
+<LandingHero {...buildLandingHeroProps(countryCode, DEFAULT_LANDING_HERO_CONTENT)} />
+
+// ✅ Story — presentational, args only
+export const Default: Story = {}
+```
+
+## File layout (co-location)
+
+Place stories next to the component:
+
+```
+src/modules/landing/components/hero/
+  index.tsx              # component (default export)
+  hero.types.ts          # exported prop types
+  hero-content.ts        # default copy / fixture data for prod + stories
+  hero-utils.ts          # optional: page-only helpers (country code, etc.)
+  hero.stories.tsx       # Storybook CSF file
+```
+
+Naming: **`{component-name}.stories.tsx`** beside `index.tsx`.
+
+Title hierarchy mirrors product structure: `Landing/Hero`, `Products/Thumbnail`, `Skeletons/SkeletonButton`.
+
+---
+
+# Story format — CSF3
+
+Use **Component Story Format 3** with TypeScript `satisfies`:
+
+```tsx
+import type { Meta, StoryObj } from "@storybook/nextjs-vite"
+import LandingHero from "./index"
+import { DEFAULT_LANDING_HERO_CONTENT } from "./hero-content"
+
+const meta = {
+  title: "Landing/Hero",
+  component: LandingHero,
+  tags: ["autodocs"],
+  parameters: { layout: "fullscreen" },
+  args: DEFAULT_LANDING_HERO_CONTENT,
+} satisfies Meta<typeof LandingHero>
+
+export default meta
+type Story = StoryObj<typeof meta>
+
+export const Default: Story = {}
+```
+
+Rules:
+- **Prefer `args`** over hard-coded props or custom `render` functions
+- Omit `render` when the story only spreads args into the component
+- Put **shared default args** on `meta.args` (component level), not duplicated per story
+- Name stories by **state or use case**: `Default`, `WithoutBackgroundImage`, `Mobile` — not `RedVariant`
+- Use **`...story.args` spread** to extend a sibling story when needed (CSF3 reuse)
+
+Do **not** use CSF2 `Template.bind({})` for new stories.
+
+---
+
+# Args, controls, and fixtures
+
+| Pattern | Use |
+|--------|-----|
+| `hero.types.ts` | Exported TypeScript props — drives autodocs prop table |
+| `hero-content.ts` | `DEFAULT_*` constants + **presets** (copy, images) |
+| `hero.story-args.ts` | **Flat args** for Controls + `storyArgsToHeroProps()` mapper |
+| `hero.mdx` | User-facing customization guide (optional) |
+| `meta.argTypes` | Grouped controls (`table.category`), `if` for conditional fields |
+| `meta.render` | Map flat story args → component props when Controls UX needs flattening |
+
+## Flat args pattern (complex components)
+
+When props are nested (`primaryCta: { label, href }`), object controls are hard for non-devs. Use flat story args:
+
+```tsx
+// hero.story-args.ts
+export function storyArgsToHeroProps(args: LandingHeroStoryArgs): LandingHeroProps { ... }
+
+// hero.stories.tsx
+render: (args) => <LandingHero {...storyArgsToHeroProps(args)} />,
+argTypes: {
+  primaryCtaLabel: { name: "Nhãn nút chính", table: { category: "🔘 Nút bấm" } },
+  showSecondaryCta: { control: "boolean" },
+}
+```
+
+Add **presets** in `*-content.ts` and a `contentPreset` select control for one-click switching.
+
+- Keep fixtures **deterministic** — no real network calls in stories
+- For images in stories, use stable URLs (e.g. Unsplash with fixed params, picsum seed)
+- Export default content from `*-content.ts` so production and Storybook stay in sync
+
+---
+
+# Layout, viewports, and responsive
+
+Global preview: `apps/storefront/.storybook/preview.tsx` imports `src/styles/globals.css` (Tailwind + Medusa tokens).
+
+Per-story `parameters.layout`:
+| Layout | When |
+|--------|------|
+| `fullscreen` | Hero, page sections, nav |
+| `padded` | Cards, buttons, small widgets |
+| `centered` | Icons, isolated atoms (use sparingly) |
+
+**Mobile-first:** add viewport stories for key landing components:
+
+```tsx
+export const Mobile: Story = {
+  parameters: { viewport: { defaultViewport: "mobile1" } },
+}
+```
+
+Test at 375px, 768px, 1280px for new landing/marketing components.
+
+When adding stories, update `tailwind.config.js` `content` if new paths are outside existing globs (already includes `./src/**/*.stories.*`).
+
+---
+
+# Decorators and app context
+
+Use **decorators** for context (theme, router, padding wrapper) — **not** extra props on the component API.
+
+```tsx
+// Story-level wrapper
+export const Narrow: Story = {
+  decorators: [(Story) => <div className="max-w-sm"><Story /></div>],
+}
+```
+
+- **Next.js routing / `next/link`:** handled by `@storybook/nextjs-vite` (`parameters.nextjs.appDirectory: true` in preview)
+- **Do not** pass router mocks as component props
+- For components that need `useParams()` (e.g. `LocalizedClientLink`), prefer a **presentational variant** with plain `<a href>` in the landing module, or wrap with a story decorator — avoid coupling Storybook to country-code context unless necessary
+
+Global decorators belong in `.storybook/preview.tsx` only when every story needs them.
+
+---
+
+# Args composition (pages / composites)
+
+For screens built from sub-components, reuse **fixture objects**, not imported stories:
+
+```tsx
+// ✅ Share content constants
+args: {
+  ...DEFAULT_LANDING_HERO_CONTENT,
+  title: "Custom title",
+}
+
+// ❌ Avoid importing another story file (decorators/context won't apply)
+// import { Default as HeroDefault } from "./hero.stories"
+```
+
+Reference: https://storybook.js.org/docs/writing-stories/build-pages-with-storybook
+
+---
+
+# Addons in this project
+
+Configured in `.storybook/main.ts`:
+- `@storybook/addon-docs` — autodocs from `tags: ['autodocs']`
+- `@storybook/addon-a11y` — accessibility checks in Storybook UI
+
+Run a11y on new landing components before merge.
+
+---
+
+# Checklist before adding a story
+
+1. Component is presentational; types exported in `*.types.ts`
+2. Default copy in `*-content.ts`; page uses utils for connected logic
+3. `*.stories.tsx` co-located; CSF3 + `satisfies Meta`
+4. `meta.args` set; meaningful variants (empty, mobile, edge cases)
+5. Correct `layout` + viewport stories for full-width sections
+6. `npm run build-storybook` in `apps/storefront` passes
+7. Tailwind classes work (globals.css loaded in preview)
+
+---
+
+# Mistakes to avoid
+
+1. **Story-only props** on production components — use args/fixtures, not `isStorybook`
+2. **Fetching in components** shown in Storybook — fetch in page, pass data as props
+3. **Hard-coded text** in JSX when the component should be reusable — move to `*-content.ts`
+4. **Centered layout for heroes** — use `fullscreen`
+5. **Duplicate Medusa starter demo** in `src/stories/` — co-locate under `src/modules/`
+6. **CSF2 templates** — use CSF3 object stories
+7. **Confusing Admin with Storefront** — Admin UI is not in this Storybook instance
