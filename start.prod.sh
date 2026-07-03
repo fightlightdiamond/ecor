@@ -18,17 +18,17 @@ set -euo pipefail
 
 # cd "$(dirname "$0")/../.."
 
-docker compose down --remove-orphans || true
-# docker compose rm -f || true
-# docker volume prune -f || true
-# docker network prune -f || true
-
 if [ ! -f .env.prod ]; then
   echo "Missing .env.prod — run: cp .env.example .env.prod, fill it in, then retry." >&2
   exit 1
 fi
 
 COMPOSE=(docker compose -f infra/docker-compose.prod.yml --env-file .env.prod)
+
+"${COMPOSE[@]}" down --remove-orphans || true
+# "${COMPOSE[@]}" rm -f || true
+# "${COMPOSE[@]}" volume prune -f || true
+# "${COMPOSE[@]}" network prune -f || true
 
 echo "==> Building and starting the production stack..."
 # --force-recreate re-runs the one-shot `build` service against the current
