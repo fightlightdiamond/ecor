@@ -56,5 +56,8 @@ ehthumbs.db
 Thumbs.db
 **/.DS_Store
 **/.output
+.nuxt
+*/.nuxt
 **/.nuxt
+./apps/web/.nuxt
 **/vendor

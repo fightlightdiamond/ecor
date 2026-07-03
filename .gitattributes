@@ -1,0 +1,4 @@
+# Shell scripts must always use LF — a CRLF shebang (#!/bin/bash\r) makes
+# Linux/WSL report "required file not found" because it looks for an
+# interpreter literally named "bash\r".
+*.sh    text eol=lf
