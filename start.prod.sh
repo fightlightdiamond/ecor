@@ -33,7 +33,7 @@ COMPOSE=(docker compose -f infra/docker-compose.prod.yml --env-file .env.prod)
 echo "==> Building and starting the production stack..."
 # --force-recreate re-runs the one-shot `build` service against the current
 # source; migrations run in the backend service's own start command.
-"${COMPOSE[@]}" up --force-recreate
+"${COMPOSE[@]}" up -d --force-recreate
 
 echo "==> Waiting for backend to become healthy..."
 for i in $(seq 1 45); do
