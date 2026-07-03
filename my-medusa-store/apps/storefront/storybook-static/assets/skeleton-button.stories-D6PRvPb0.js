@@ -1,0 +1,5 @@
+import{j as i}from"./iframe-ClCR02oG.js";import"./preload-helper-C1FmrZbK.js";const l=()=>i.jsx("div",{className:"w-full min-h-[50px] px-5 py-[10px] bg-gray-100"});l.__docgenInfo={description:"",methods:[],displayName:"SkeletonButton"};var t,a,r,s,d,n;const u={title:"Skeletons/SkeletonButton",component:l,tags:["autodocs"],parameters:{layout:"padded"}},e={},o={decorators:[c=>i.jsx("div",{className:"w-64",children:i.jsx(c,{})})]};e.parameters={...e.parameters,docs:{...(t=e.parameters)===null||t===void 0?void 0:t.docs,source:{originalSource:"{}",...(r=e.parameters)===null||r===void 0||(a=r.docs)===null||a===void 0?void 0:a.source}}};o.parameters={...o.parameters,docs:{...(s=o.parameters)===null||s===void 0?void 0:s.docs,source:{originalSource:`{
+  decorators: [Story => <div className="w-64">
+        <Story />
+      </div>]
+}`,...(n=o.parameters)===null||n===void 0||(d=n.docs)===null||d===void 0?void 0:d.source}}};const _=["Default","ConstrainedWidth"];export{o as ConstrainedWidth,e as Default,_ as __namedExportsOrder,u as default};
