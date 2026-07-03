@@ -10,15 +10,7 @@ import { Fragment } from "react"
 import CountrySelect from "../country-select"
 import LanguageSelect from "../language-select"
 import { Locale } from "@lib/data/locales"
-
-
-const SideMenuItems = {
-  Home: "/",
-  Store: "/store",
-  Articles: "/campaign-posts",
-  Account: "/account",
-  Cart: "/cart",
-}
+import { useTranslations } from "next-intl"
 
 type SideMenuProps = {
   regions: HttpTypes.StoreRegion[] | null
@@ -29,6 +21,15 @@ type SideMenuProps = {
 const SideMenu = ({ regions, locales, currentLocale }: SideMenuProps) => {
   const countryToggleState = useToggleState()
   const languageToggleState = useToggleState()
+  const t = useTranslations("nav")
+
+  const SideMenuItems = [
+    { label: t("home"), href: "/" },
+    { label: t("store"), href: "/store" },
+    { label: t("articles"), href: "/campaign-posts" },
+    { label: t("account"), href: "/account" },
+    { label: t("cart"), href: "/cart" },
+  ]
 
   return (
     <div className="h-full">
@@ -41,7 +42,7 @@ const SideMenu = ({ regions, locales, currentLocale }: SideMenuProps) => {
                   data-testid="nav-menu-button"
                   className="relative h-full flex items-center transition-all ease-out duration-200 focus:outline-none hover:text-ui-fg-base"
                 >
-                  Menu
+                  {t("menu")}
                 </Popover.Button>
               </div>
 
@@ -74,20 +75,18 @@ const SideMenu = ({ regions, locales, currentLocale }: SideMenuProps) => {
                       </button>
                     </div>
                     <ul className="flex flex-col gap-6 items-start justify-start">
-                      {Object.entries(SideMenuItems).map(([name, href]) => {
-                        return (
-                          <li key={name}>
-                            <LocalizedClientLink
-                              href={href}
-                              className="text-3xl leading-10 hover:text-ui-fg-disabled"
-                              onClick={close}
-                              data-testid={`${name.toLowerCase()}-link`}
-                            >
-                              {name}
-                            </LocalizedClientLink>
-                          </li>
-                        )
-                      })}
+                      {SideMenuItems.map(({ label, href }) => (
+                        <li key={href}>
+                          <LocalizedClientLink
+                            href={href}
+                            className="text-3xl leading-10 hover:text-ui-fg-disabled"
+                            onClick={close}
+                            data-testid={`${href.replace("/", "") || "home"}-link`}
+                          >
+                            {label}
+                          </LocalizedClientLink>
+                        </li>
+                      ))}
                     </ul>
                     <div className="flex flex-col gap-y-6">
                       {!!locales?.length && (
@@ -128,7 +127,7 @@ const SideMenu = ({ regions, locales, currentLocale }: SideMenuProps) => {
                         />
                       </div>
                       <Text className="flex justify-between txt-compact-small">
-                        © {new Date().getFullYear()} Medusa Store. All rights
+                        © {new Date().getFullYear()} Thăng Long Cheviet. All rights
                         reserved.
                       </Text>
                     </div>

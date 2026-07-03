@@ -12,13 +12,16 @@
     "build": "next build",
     "start": "next start -p 8000",
     "lint": "next lint",
-    "analyze": "ANALYZE=true next build"
+    "analyze": "ANALYZE=true next build",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.0",
     "@medusajs/icons": "2.17.0",
     "@medusajs/js-sdk": "2.17.0",
     "@medusajs/ui-preset": "2.17.0",
+    "@radix-ui/colors": "^3.0.0",
     "@radix-ui/react-accordion": "^1.2.3",
     "@stripe/react-stripe-js": "^5.3.0",
     "@stripe/stripe-js": "^8.2.0",
@@ -43,6 +46,7 @@
     "clsx": "^2.1.1",
     "lodash": "^4.17.21",
     "next": "15.5.18",
+    "next-intl": "^4.13.1",
     "pg": "^8.11.3",
     "qs": "^6.12.1",
     "react": "19.0.5",
@@ -54,8 +58,11 @@
   "devDependencies": {
     "@babel/core": "^7.17.5",
     "@medusajs/types": "2.17.0",
+    "@storybook/addon-a11y": "^10.4.6",
+    "@storybook/addon-docs": "^10.4.6",
+    "@storybook/nextjs-vite": "^10.4.6",
     "@types/lodash": "^4.14.195",
-    "@types/node": "17.0.21",
+    "@types/node": "^22.12.0",
     "@types/pg": "^8.11.0",
     "@types/react": "19.0.5",
     "@types/react-dom": "19.0.5",
@@ -65,10 +72,13 @@
     "babel-loader": "^8.2.3",
     "eslint": "^9.13.0",
     "eslint-config-next": "15.5.18",
+    "eslint-plugin-storybook": "^10.4.6",
     "postcss": "^8.4.8",
     "prettier": "^2.8.8",
+    "storybook": "^10.4.6",
     "tailwindcss": "^3.0.23",
-    "typescript": "^5.3.2"
+    "typescript": "^5.3.2",
+    "vite": "^8.1.2"
   },
   "packageManager": "npm@10.9.3"
 }

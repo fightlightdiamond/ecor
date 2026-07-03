@@ -11,8 +11,10 @@ import TaskList from "@tiptap/extension-task-list"
 import TextAlign from "@tiptap/extension-text-align"
 import { TextStyle } from "@tiptap/extension-text-style"
 import Underline from "@tiptap/extension-underline"
+import Youtube from "@tiptap/extension-youtube"
 import StarterKit from "@tiptap/starter-kit"
 import type { Extensions } from "@tiptap/core"
+
 
 export const getCampaignEditorExtensions = (): Extensions => [
   StarterKit.configure({
@@ -57,6 +59,11 @@ export const getCampaignEditorExtensions = (): Extensions => [
   }),
   Placeholder.configure({
     placeholder: "Write your article here...",
+  }),
+  Youtube.configure({
+    inline: false,
+    width: 640,
+    height: 480,
   }),
 ]
 

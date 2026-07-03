@@ -10,6 +10,7 @@ import { EMPTY_TIPTAP_DOC } from "../../../components/tiptap-editor/extensions"
 import { useMutation } from "@tanstack/react-query"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
+import { useTranslation } from "react-i18next"
 import CampaignPostForm from "../../../components/campaign-post-form"
 import { slugify, toIsoDateTime } from "../../../lib/campaign-post"
 import { sdk } from "../../../lib/sdk"
@@ -17,6 +18,7 @@ import type { CampaignPostResponse } from "../../../types/campaign-post"
 
 const CreateCampaignPostPage = () => {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [title, setTitle] = useState("")
   const [slug, setSlug] = useState("")
   const [isActive, setIsActive] = useState(true)
@@ -45,11 +47,11 @@ const CreateCampaignPostPage = () => {
         unpublish_at: toIsoDateTime(unpublishAt),
       }) as CampaignPostResponse
 
-      toast.success("Campaign post created")
+      toast.success(t("campaign-posts.messages.created"))
       navigate(`../${response.campaign_post.id}`)
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Failed to create post"
+        error instanceof Error ? error.message : t("campaign-posts.messages.createFailed")
       )
     }
   }
@@ -58,13 +60,13 @@ const CreateCampaignPostPage = () => {
     <Container className="divide-y p-0">
       <div className="flex items-center justify-between px-6 py-4">
         <div>
-          <Heading level="h1">Create Campaign Post</Heading>
+          <Heading level="h1">{t("campaign-posts.create")}</Heading>
           <Text className="text-ui-fg-subtle" size="small">
-            Schedule publish and unpublish times for auto-publish
+            {t("campaign-posts.scheduleHint")}
           </Text>
         </div>
         <Button variant="secondary" onClick={() => navigate("..")}>
-          Back to list
+          {t("campaign-posts.actions.backToList")}
         </Button>
       </div>
 
@@ -76,7 +78,7 @@ const CreateCampaignPostPage = () => {
         unpublishAt={unpublishAt}
         content={content}
         isSubmitting={isPending}
-        submitLabel="Create post"
+        submitLabel={t("campaign-posts.actions.create")}
         onTitleChange={setTitle}
         onSlugChange={setSlug}
         onIsActiveChange={setIsActive}
