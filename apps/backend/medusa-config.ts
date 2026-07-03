@@ -23,6 +23,17 @@ module.exports = defineConfig({
     databaseDriverOptions: {
       pool: { min: 0, max: 10, acquireTimeoutMillis: 60000 },
     },
+    // Medusa forces a `Secure` session cookie whenever NODE_ENV=production,
+    // so the admin dashboard only authenticates over HTTPS. Behind a real
+    // TLS-terminating proxy that's exactly right — leave it. But when testing
+    // the PROD stack locally over plain http://localhost:8080 the browser
+    // silently drops the Secure cookie and every /admin call comes back 401.
+    // Set COOKIE_SECURE=false in that case (LOCAL/HTTP ONLY — never on a real
+    // internet-facing deployment).
+    cookieOptions:
+      process.env.COOKIE_SECURE === "false"
+        ? { secure: false, sameSite: "lax" }
+        : undefined,
     http: {
       storeCors: process.env.STORE_CORS!,
       adminCors: process.env.ADMIN_CORS!,
@@ -34,16 +45,16 @@ module.exports = defineConfig({
   admin: {
     vite: () => ({
       server: {
-        hmr: {
-          // Without this, the HMR websocket the browser injects picks an
-          // internal port Vite chose for itself inside the container, which
-          // isn't published through infra/docker-compose.yml's nginx —
-          // the browser then fails to connect to that random port. Forcing
-          // it onto the port nginx actually publishes makes it work whether
-          // the admin is loaded through nginx or directly at :9000.
-          clientPort: Number(process.env.HTTP_PORT) || 9000,
-          protocol: "ws",
-        },
+        // hmr: {
+        //   // Without this, the HMR websocket the browser injects picks an
+        //   // internal port Vite chose for itself inside the container, which
+        //   // isn't published through infra/docker-compose.yml's nginx —
+        //   // the browser then fails to connect to that random port. Forcing
+        //   // it onto the port nginx actually publishes makes it work whether
+        //   // the admin is loaded through nginx or directly at :9000.
+        //   clientPort: Number(process.env.HTTP_PORT) || 9000,
+        //   protocol: "ws",
+        // },
       },
       resolve: {
         dedupe: ["react", "react-dom", "react-router-dom"],

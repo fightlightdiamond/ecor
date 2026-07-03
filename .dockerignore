@@ -3,6 +3,7 @@
 **/dist
 **/.nuxt
 **/.output
+**/.medusa
 **/.git
 be/vendor
 be

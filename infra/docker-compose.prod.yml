@@ -1,0 +1,186 @@
+# =============================================================================
+# Production stack — mirror of infra/docker-compose.yml (dev), but running the
+# BUILT source instead of dev servers.
+# =============================================================================
+# Structurally identical to the dev stack on purpose (same services, same
+# ports, same named-volume layout, and the SAME nginx entrypoint + routing —
+# it mounts the exact same ./nginx/conf.d/default.conf). The only difference:
+#
+#   dev                                   prod (this file)
+#   ---------------------------------     ----------------------------------
+#   install: npm install                  build: npm install + build both apps
+#   backend: medusa develop  (Vite dev)   backend: medusa start  (built admin)
+#   web:     nuxt dev        (Vite dev)   web:     node .output/server (built)
+#
+# Why this ALSO fixes the Vite "shared-port" bug: that bug only exists in dev,
+# where two Vite dev servers (Nuxt's and the one embedded in `medusa develop`)
+# each open an HMR websocket on a self-chosen internal port that isn't
+# published through nginx. `medusa start` serves the admin as pre-built static
+# assets and `node .output/server/index.mjs` serves pre-built Nuxt — NEITHER
+# runs a Vite dev server or an HMR websocket, so there is no random port to
+# collide over. The nginx config's websocket directives simply become no-ops.
+#
+# Ports/proxy are unchanged from dev: everything is reachable on one port
+# (HTTP_PORT, default 8080) via nginx, which routes /app,/admin,/store,/health
+# -> backend:9000 and everything else -> web:3000.
+#
+# Run (from the repo root):
+#   cp .env.example .env        # then edit secrets/CORS for your host
+#   ./infra/scripts/deploy.sh
+#
+# NOTE: this uses its own compose project name (tlcv-prod) and its own volumes,
+# so its Postgres data is SEPARATE from the dev stack's. Don't run dev and prod
+# on the same host at once — they'd fight over ports 8080/9000/5432.
+# =============================================================================
+
+name: tlcv-prod
+
+services:
+  # --- PostgreSQL ------------------------------------------------------------
+  postgres:
+    image: postgres:15
+    container_name: tlcv-postgres-prod
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-medusa}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-medusa}"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  # --- One-shot: install deps + build both apps ------------------------------
+  # Mirrors dev's `install` service, but also compiles the apps. Runs with the
+  # default NODE_ENV (NOT production) so devDependencies needed to BUILD
+  # (medusa build -> vite/typescript, nuxt build) are installed. The runtime
+  # services below set NODE_ENV=production.
+  build:
+    image: node:20
+    container_name: tlcv_build_prod
+    working_dir: /workspace
+    # `medusa build` produces a self-contained app at apps/backend/.medusa/server
+    # that ships a package.json but NO node_modules — so we install its runtime
+    # deps right after building. `nuxt build` produces a self-contained
+    # apps/web/.output (deps already bundled), so it needs no extra install.
+    command: >
+      sh -c "(npm install --no-audit --no-fund ||
+              npm install --no-audit --no-fund --legacy-peer-deps) &&
+             npm run build --workspace=apps/backend &&
+             (cd apps/backend/.medusa/server &&
+              (npm install --omit=dev --no-audit --no-fund ||
+               npm install --omit=dev --no-audit --no-fund --legacy-peer-deps)) &&
+             npm run build --workspace=apps/web"
+    volumes:
+      - ../:/workspace
+      # node_modules AND the Medusa build output live on named volumes (fast
+      # ext4, off the 9p bind mount). `.medusa` CAN be a volume: `medusa build`
+      # only wipes its SUBDIR .medusa/server (an ordinary rmdir inside the
+      # volume), never the mount point itself. Nuxt's `.output` can NOT —
+      # `nuxt build` wipes .output itself, and rmdir of a Docker mount point is
+      # EBUSY — so .output stays on the bind mount (no volume for it).
+      - root_node_modules:/workspace/node_modules
+      - backend_node_modules:/workspace/apps/backend/node_modules
+      - web_node_modules:/workspace/apps/web/node_modules
+      - backend_medusa:/workspace/apps/backend/.medusa
+    restart: "no"
+
+  # --- Medusa backend (built admin + API, `medusa start`, no Vite/HMR) -------
+  # Runs from the self-contained build output at .medusa/server (populated with
+  # its own node_modules by the build service), NOT from the source root —
+  # `medusa start` from the source root can't find the built admin (index.html)
+  # and exits. This mirrors what apps/backend/Dockerfile does for image builds.
+  backend:
+    image: node:20
+    container_name: tlcv_backend_prod
+    working_dir: /workspace/apps/backend/.medusa/server
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      build:
+        condition: service_completed_successfully
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-medusa}
+      STORE_CORS: ${STORE_CORS:-http://localhost:${HTTP_PORT:-8080}}
+      ADMIN_CORS: ${ADMIN_CORS:-http://localhost:${HTTP_PORT:-8080}}
+      AUTH_CORS: ${AUTH_CORS:-http://localhost:${HTTP_PORT:-8080}}
+      JWT_SECRET: ${JWT_SECRET:-supersecret}
+      COOKIE_SECRET: ${COOKIE_SECRET:-supersecret}
+      # LOCAL/HTTP ONLY: let the admin session cookie work over plain http
+      # (NODE_ENV=production otherwise forces a Secure/HTTPS-only cookie, which
+      # the browser drops → every /admin call is 401). Leave unset on a real
+      # HTTPS deployment.
+      COOKIE_SECURE: ${COOKIE_SECURE:-}
+    ports:
+      - "9000:9000"
+    volumes:
+      - ../:/workspace
+      - root_node_modules:/workspace/node_modules
+      - backend_node_modules:/workspace/apps/backend/node_modules
+      - backend_medusa:/workspace/apps/backend/.medusa
+    command: >
+      sh -c "npx medusa db:migrate &&
+             (npx medusa user -e ${ADMIN_EMAIL:-admin@medusa.local} -p ${ADMIN_PASSWORD:-supersecret123} || true) &&
+             npm run start"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:9000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 60s
+
+  # --- Nuxt web (built, served by Nitro node server, no Vite/HMR) ------------
+  # Reads the .output that the `build` service produced on the shared bind
+  # mount. Nitro's .output is self-contained (bundles its own deps), so the
+  # node_modules volumes below aren't strictly needed at runtime — they're
+  # mounted only to keep the layout identical to the build service and stop the
+  # host's 9p node_modules from showing through.
+  web:
+    image: node:20
+    container_name: tlcv_web_prod
+    working_dir: /workspace/apps/web
+    restart: unless-stopped
+    depends_on:
+      build:
+        condition: service_completed_successfully
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: "3000"
+      NUXT_PUBLIC_SITE_URL: ${NUXT_PUBLIC_SITE_URL:-http://localhost:${HTTP_PORT:-8080}}
+    volumes:
+      - ../:/workspace
+      - root_node_modules:/workspace/node_modules
+      - web_node_modules:/workspace/apps/web/node_modules
+    command: sh -c "node .output/server/index.mjs"
+
+  # --- nginx (single entrypoint) — SAME image, port, and config as dev -------
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: tlcv_nginx_prod
+    restart: unless-stopped
+    depends_on:
+      web:
+        condition: service_started
+      backend:
+        condition: service_healthy
+    ports:
+      - "${HTTP_PORT:-80}:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      # The exact same routing as dev — one port, same proxy rules.
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+
+volumes:
+  postgres_data:
+  root_node_modules:
+  backend_node_modules:
+  web_node_modules:
+  backend_medusa:

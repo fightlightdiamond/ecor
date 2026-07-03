@@ -8,8 +8,9 @@
 # directly against the running backend container, unmasked.
 #
 # Usage (from the repo root, INSIDE WSL where Docker lives):
-#   ./infra/scripts/create-admin.sh
+#   ./infra/scripts/create-admin.sh                    # dev stack
 #   ./infra/scripts/create-admin.sh other@email.com someOtherPassword
+#   ./infra/scripts/create-admin.sh --prod              # prod stack (VPS)
 set -euo pipefail
 
 cd "$(dirname "$0")/../.."
@@ -20,10 +21,24 @@ set -a
 [ -f .env ] && source .env
 set +a
 
-EMAIL="${1:-${ADMIN_EMAIL:-admin@medusa.local}}"
-PASSWORD="${2:-${ADMIN_PASSWORD:-supersecret123}}"
+prod=0
+args=()
+for arg in "$@"; do
+  if [ "$arg" = "--prod" ]; then
+    prod=1
+  else
+    args+=("$arg")
+  fi
+done
 
-COMPOSE=(docker compose -f infra/docker-compose.yml --env-file .env)
+EMAIL="${args[0]:-${ADMIN_EMAIL:-admin@medusa.local}}"
+PASSWORD="${args[1]:-${ADMIN_PASSWORD:-supersecret123}}"
+
+if [ "$prod" -eq 1 ]; then
+  COMPOSE=(docker compose -f infra/docker-compose.prod.yml --env-file .env)
+else
+  COMPOSE=(docker compose -f infra/docker-compose.yml --env-file .env)
+fi
 
 echo "Ensuring postgres + backend are up..."
 "${COMPOSE[@]}" up -d postgres backend
@@ -38,5 +53,9 @@ done
 echo "Creating admin user: $EMAIL"
 "${COMPOSE[@]}" exec backend npx medusa user -e "$EMAIL" -p "$PASSWORD"
 
-echo "Done. Login at http://localhost:${HTTP_PORT:-8080}/app (or http://localhost:9000/app directly) with:"
+if [ "$prod" -eq 1 ]; then
+  echo "Done. Login at https://${DOMAIN:-your-domain}/app with:"
+else
+  echo "Done. Login at http://localhost:${HTTP_PORT:-8080}/app (or http://localhost:9000/app directly) with:"
+fi
 echo "  $EMAIL / $PASSWORD"
