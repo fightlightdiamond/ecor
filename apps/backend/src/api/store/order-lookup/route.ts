@@ -46,7 +46,7 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
       "items.unit_price",
       "payment_collections.status",
     ],
-    filters: { display_id: Number(number) },
+    filters: { display_id: number },
   })
 
   const order = orders.find((o: any) =>

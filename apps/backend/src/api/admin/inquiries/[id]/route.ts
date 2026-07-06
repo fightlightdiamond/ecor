@@ -28,6 +28,9 @@ export async function PATCH(
     throw new MedusaError(MedusaError.Types.NOT_FOUND, "Inquiry not found")
   }
 
-  const updated = await inquiryService.updateInquiries({ id, status })
+  const updated = await inquiryService.updateInquiries({
+    id,
+    status: status as (typeof STATUSES)[number],
+  })
   res.json({ inquiry: updated })
 }
