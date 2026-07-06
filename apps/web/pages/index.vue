@@ -66,7 +66,10 @@ onMounted(() => {
       <HomeMobileTopBanner :base-blur="0" :left-blur="0" />
       <div class="container text-center home-pillars-wrap">
         <div class="row">
-          <div class="col-md-8 col-md-offset-4 col-sm-12 col-sm-offset-0">
+          <div class="col-sm-2 col-sm-offset-2">
+          
+          </div>
+          <div class="col-sm-8 col-sm-offset-0">
             <HomePillarList />
           </div>
         </div>
