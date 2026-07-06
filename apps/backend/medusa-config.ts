@@ -69,6 +69,12 @@ module.exports = defineConfig({
       resolve: "./src/modules/campaign",
     },
     {
+      resolve: "./src/modules/inquiry",
+    },
+    {
+      resolve: "./src/modules/card",
+    },
+    {
       resolve: "@medusajs/file",
       options: {
         providers: [
@@ -77,7 +83,12 @@ module.exports = defineConfig({
             id: "local",
             options: {
               upload_dir: "static",
-              backend_url: process.env.MEDUSA_BACKEND_URL || "http://localhost:9000",
+              // LocalFileService serves uploads from the "static" dir under a
+              // "/static" URL path (its own default is
+              // "http://localhost:9000/static") — this was missing the
+              // "/static" segment, so every uploaded file's returned url
+              // 404'd instead of resolving to the file it just wrote.
+              backend_url: `${process.env.MEDUSA_BACKEND_URL || "http://localhost:9000"}/static`,
             },
           },
         ],

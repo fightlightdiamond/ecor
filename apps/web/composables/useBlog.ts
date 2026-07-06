@@ -1,62 +1,87 @@
-import type { ApiEnvelope, BlogPost, RawPost } from '~/utils/storefront'
-import { transformPost } from '~/utils/storefront'
+import type { BlogPost } from '~/utils/storefront'
+import { FALLBACK_POST_IMAGE } from '~/utils/storefront'
+import { tiptapFirstImage, tiptapToHtml, tiptapToText } from '~/utils/tiptap'
+import fallbackPosts from '~/content/blog.json'
 
 export type { BlogPost } from '~/utils/storefront'
 
-async function fetchAllPosts(fetchApi: ReturnType<typeof useApi>['fetchApi']) {
-  const first = await fetchApi<ApiEnvelope<RawPost[]>>('/posts?per_page=50')
-  const all = [...(first.data ?? [])]
-  const lastPage = first.meta?.last_page ?? 1
-
-  if (lastPage > 1) {
-    const pages = await Promise.all(
-      Array.from({ length: lastPage - 1 }, (_, i) =>
-        fetchApi<ApiEnvelope<RawPost[]>>(`/posts?per_page=50&page=${i + 2}`),
-      ),
-    )
-    for (const page of pages) {
-      all.push(...(page.data ?? []))
-    }
-  }
-
-  return { success: true, data: all, meta: first.meta }
+interface CampaignPost {
+  id: string
+  title: string
+  slug: string
+  content: unknown
+  publish_at: string | null
+  created_at?: string
 }
 
+function transformCampaignPost(p: CampaignPost): BlogPost {
+  const content = tiptapToHtml(p.content)
+  const plain = tiptapToText(p.content)
+  return {
+    slug: p.slug,
+    title: p.title,
+    excerpt: plain.slice(0, 200) + (plain.length > 200 ? '…' : ''),
+    content,
+    image: tiptapFirstImage(p.content) || FALLBACK_POST_IMAGE,
+    date: p.publish_at || p.created_at || '',
+    author: 'Thăng Long Chè Việt',
+  }
+}
+
+/**
+ * Blog posts come from the Medusa backend's campaign-posts module
+ * (GET /store/campaign-posts, content authored with TipTap in the admin).
+ * Falls back to the bundled ~/content/blog.json when the API is unreachable
+ * or has no published posts yet.
+ */
 export function useBlog() {
-  const { fetchApi } = useApi()
+  const { fetchMedusa } = useMedusaApi()
   const { locale } = useI18n()
 
+  const localFallback = computed<BlogPost[]>(() =>
+    (fallbackPosts as any[]).map(p => ({
+      slug: p.slug,
+      title: p.title?.[locale.value] ?? p.title?.vi ?? '',
+      excerpt: p.excerpt?.[locale.value] ?? p.excerpt?.vi ?? '',
+      content: '',
+      image: FALLBACK_POST_IMAGE,
+      date: p.date ?? '',
+      author: 'Thăng Long Chè Việt',
+    })),
+  )
+
   const { data: postsData, pending } = useAsyncData(
-    () => `posts-${locale.value}`,
-    () => fetchAllPosts(fetchApi),
-    { default: () => ({ success: true, data: [] as RawPost[] }) },
+    'campaign-posts',
+    async () => {
+      try {
+        const res = await fetchMedusa<{ campaign_posts: CampaignPost[] }>(
+          '/store/campaign-posts?limit=50',
+        )
+        return res.campaign_posts ?? []
+      } catch (e) {
+        console.warn('Campaign posts API unavailable, using local fallback', e)
+        return [] as CampaignPost[]
+      }
+    },
+    { default: () => [] as CampaignPost[] },
   )
 
   const posts = computed<BlogPost[]>(() => {
-    const raw = postsData.value?.data ?? []
-    return (Array.isArray(raw) ? raw : []).map(p => transformPost(p, locale.value))
+    const fromApi = (postsData.value ?? []).map(transformCampaignPost)
+    return fromApi.length ? fromApi : localFallback.value
   })
 
-  const { data: latestData } = useAsyncData(
-    () => `latest-posts-${locale.value}`,
-    () => fetchApi<ApiEnvelope<RawPost[]>>('/posts/latest'),
-    { default: () => ({ success: true, data: [] as RawPost[] }) },
-  )
+  const latestPosts = computed<BlogPost[]>(() => posts.value.slice(0, 4))
 
-  const latestPosts = computed<BlogPost[]>(() => {
-    const raw = latestData.value?.data ?? []
-    return (Array.isArray(raw) ? raw : []).map(p => transformPost(p, locale.value))
-  })
-
-  const getBySlug = async (slug: string) => {
+  const getBySlug = async (slug: string): Promise<BlogPost | null> => {
     const found = posts.value.find(p => p.slug === slug)
     if (found) return found
 
     try {
-      const res = await fetchApi<ApiEnvelope<RawPost>>(`/posts/${slug}`)
-      if (res.success && res.data) {
-        return transformPost(res.data, locale.value)
-      }
+      const res = await fetchMedusa<{ campaign_post: CampaignPost }>(
+        `/store/campaign-posts/${encodeURIComponent(slug)}`,
+      )
+      if (res.campaign_post) return transformCampaignPost(res.campaign_post)
     } catch (e) {
       console.error(e)
     }

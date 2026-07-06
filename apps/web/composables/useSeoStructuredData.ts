@@ -23,7 +23,7 @@ export function useProductStructuredData(product: Ref<Product | null>) {
           offers: {
             '@type': 'Offer',
             price: product.value.price,
-            priceCurrency: 'VND',
+            priceCurrency: (product.value.currencyCode || 'VND').toUpperCase(),
             availability: product.value.inStock
               ? 'https://schema.org/InStock'
               : 'https://schema.org/OutOfStock',

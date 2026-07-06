@@ -6,11 +6,25 @@
   "nav": {
     "home": "Home",
     "products": "Products",
+    "productsMenu": {
+      "teaViet": "Thang Long Che Viet",
+      "anQuangCaffe": "An Quang Coffee",
+      "corporateGifts": "Corporate gifts"
+    },
     "craftVillage": "Craft Village",
+    "projectsPartners": "Projects & Partners",
+    "events": "Events",
     "services": "Services",
     "gallery": "Gallery",
     "team": "Our Team",
     "blog": "News",
+    "blogMenu": {
+      "vietTea": "Vietnamese tea heritage",
+      "tradition": "Vietnamese culture & traditional craft villages",
+      "teaHeritage": "Ancient tea heritage",
+      "anQuangGarden": "An Quang Garden"
+    },
+    "library": "Vietnamese Culture Library",
     "contact": "Contact",
     "bookNow": "Book Now"
   },
@@ -86,7 +100,7 @@
     "title": "Order tracking",
     "eyebrow": "Orders",
     "subtitle": "Enter your order number and phone number to check status.",
-    "numberPlaceholder": "Order ID (e.g. ORD-20260625-ABC123)",
+    "numberPlaceholder": "Order ID (e.g. 1024)",
     "orderNumber": "Order number",
     "status": "Status",
     "date": "Order date",
@@ -133,7 +147,26 @@
     "descTitle": "Product description",
     "featuresTitle": "Highlights",
     "related": "Related products",
-    "notFound": "Product not found"
+    "notFound": "Product not found",
+    "viewDetail": "View details",
+    "filterAll": "All",
+    "empty": "No products in this category yet.",
+    "storyEyebrow": "Stories",
+    "storyTitle": "Tea Culture Stories",
+    "storySubtitle": "Articles about the flavor and philosophy of Vietnamese tea",
+    "ctaMessage": "Contact us now for a special offer!",
+    "ctaButton": "Order now",
+    "buyNow": "Buy now",
+    "chooseOption": "Please select {option}",
+    "outOfStock": "Out of stock",
+    "trustQuality": "Pure, carefully selected tea",
+    "trustShipping": "Nationwide delivery",
+    "trustReturn": "7-day returns",
+    "specs": {
+      "category": "Category",
+      "material": "Material",
+      "weight": "Weight"
+    }
   },
   "cart": {
     "title": "Cart",
@@ -164,7 +197,8 @@
     "couponInvalid": "Invalid coupon",
     "couponError": "Could not validate coupon.",
     "discount": "Discount",
-    "subtotal": "Subtotal"
+    "subtotal": "Subtotal",
+    "shipping": "Shipping"
   },
   "booking": {
     "preferredDate": "Preferred date",
@@ -202,11 +236,8 @@
     }
   },
   "connect": {
-    "open": "Connect",
-    "title": "Connect with us",
-    "subtitle": "Pick a channel or leave your info",
     "leaveInfo": "Leave your info",
-    "back": "Channels"
+    "leaveInfoSubtitle": "Send us your info and we'll get back to you shortly"
   },
   "footer": {
     "followUs": "Follow Us",

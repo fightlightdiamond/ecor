@@ -180,6 +180,9 @@ services:
       HOST: 0.0.0.0
       PORT: "3000"
       NUXT_PUBLIC_SITE_URL: ${NUXT_PUBLIC_SITE_URL:-http://localhost}
+      # SSR must reach Medusa via compose DNS; the browser uses the public URL
+      # (localhost:9000 published port) from apps/web/.env.
+      NUXT_MEDUSA_BACKEND_URL_SERVER: http://backend:9000
       # Bind mount over 9p (WSL/Windows) doesn't emit inotify events.
       CHOKIDAR_USEPOLLING: "true"
       CHOKIDAR_INTERVAL: "1000"

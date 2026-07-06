@@ -43,5 +43,78 @@
       "confirmDelete": "Xóa",
       "cancelDelete": "Hủy"
     }
+  },
+  "cards": {
+    "title": "Card trang chủ",
+    "create": "Thêm card",
+    "edit": "Chỉnh sửa card",
+    "backToList": "Quay lại danh sách",
+    "hint": "Card hiển thị trên trang chủ. Kéo thả để đổi thứ tự — 3 card cố định (Ưu đãi, Liên hệ, Bản đồ) không thể xóa hoặc đổi nội dung.",
+    "columns": {
+      "title": "Tiêu đề",
+      "type": "Loại",
+      "status": "Trạng thái",
+      "order": "Thứ tự"
+    },
+    "type": {
+      "link": "Card liên kết",
+      "contact": "Thông tin liên hệ (cố định)",
+      "map": "Bản đồ (cố định)",
+      "promotions": "Ưu đãi trong tháng (cố định)"
+    },
+    "status": {
+      "active": "Đang hiển thị",
+      "inactive": "Đã ẩn"
+    },
+    "fields": {
+      "titleVi": "Tiêu đề (Tiếng Việt)",
+      "titleEn": "Tiêu đề (English)",
+      "image": "Ảnh thumbnail",
+      "path": "Đường dẫn liên kết",
+      "pathPlaceholder": "vd: /san-pham-list",
+      "active": "Hiển thị trên trang chủ"
+    },
+    "lockedNotice": "Đây là card cố định — chỉ đổi được thứ tự hiển thị và ẩn/hiện, không đổi được nội dung hay loại card.",
+    "media": {
+      "title": "Chọn ảnh thumbnail",
+      "library": "Thư viện ảnh",
+      "upload": "Tải ảnh mới",
+      "uploading": "Đang tải lên...",
+      "empty": "Chưa có ảnh nào trong thư viện — tải ảnh mới ở tab bên cạnh.",
+      "select": "Chọn ảnh này",
+      "close": "Đóng",
+      "uploadFailed": "Tải ảnh lên thất bại",
+      "dropHint": "Kéo thả ảnh vào đây hoặc bấm để chọn file",
+      "orPasteUrl": "hoặc dán URL ảnh có sẵn",
+      "urlPlaceholder": "https://...",
+      "useUrl": "Dùng URL này"
+    },
+    "actions": {
+      "create": "Thêm card",
+      "save": "Lưu thay đổi",
+      "delete": "Xóa",
+      "backToList": "Quay lại danh sách",
+      "moveUp": "Đưa lên",
+      "moveDown": "Đưa xuống",
+      "drag": "Kéo để sắp xếp",
+      "chooseImage": "Chọn ảnh",
+      "changeImage": "Đổi ảnh",
+      "removeImage": "Bỏ ảnh"
+    },
+    "messages": {
+      "created": "Thêm card thành công",
+      "updated": "Cập nhật card thành công",
+      "deleted": "Xóa card thành công",
+      "reordered": "Đã lưu thứ tự mới",
+      "createFailed": "Thêm card thất bại",
+      "updateFailed": "Cập nhật card thất bại",
+      "deleteFailed": "Xóa card thất bại",
+      "reorderFailed": "Lưu thứ tự thất bại",
+      "deleteConfirmTitle": "Xóa card",
+      "deleteConfirmDesc": "Bạn có chắc muốn xóa \"{{title}}\" không?",
+      "confirmDelete": "Xóa",
+      "cancelDelete": "Hủy",
+      "cannotDeleteLocked": "Card cố định không thể xóa"
+    }
   }
 }

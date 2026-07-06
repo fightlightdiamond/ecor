@@ -87,6 +87,11 @@ export default defineNuxtConfig({
   // Runtime config
   runtimeConfig: {
     apiProxyTarget: process.env.NUXT_API_PROXY_TARGET || 'http://127.0.0.1:8000',
+    // SSR-only Medusa URL override. In docker the browser reaches the backend
+    // at localhost:9000 (published port) but the web container itself must use
+    // the compose service DNS (http://backend:9000) — set
+    // NUXT_MEDUSA_BACKEND_URL_SERVER there. Empty = use the public URL.
+    medusaBackendUrlServer: process.env.NUXT_MEDUSA_BACKEND_URL_SERVER || '',
     public: {
       siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'https://thanglongcheviet.vn',
       siteName: 'Thăng Long Chè Việt',

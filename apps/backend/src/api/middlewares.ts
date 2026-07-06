@@ -1,4 +1,5 @@
 import {
+  authenticate,
   defineMiddlewares,
   validateAndTransformQuery,
 } from "@medusajs/framework/http"
@@ -8,6 +9,10 @@ export const GetCampaignPostsSchema = createFindParams()
 
 export default defineMiddlewares({
   routes: [
+    {
+      matcher: "/store/my-bookings*",
+      middlewares: [authenticate("customer", ["bearer", "session"])],
+    },
     {
       matcher: "/admin/campaign-posts",
       method: "GET",

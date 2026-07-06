@@ -1,12 +1,12 @@
 <script setup lang="ts">
-// Nút "Kết nối" cố định góc dưới bên trái.
-// Bấm -> mở panel: các kênh liên hệ (Zalo, Facebook, ...) + form để lại thông tin.
+// Cột icon kênh liên lạc (Zalo, Facebook, Instagram) hiện thường trực, cố định
+// góc dưới bên trái — không cần bấm gì để thấy. Nút FAB bên dưới chỉ dùng để
+// mở form "Để lại thông tin".
 const { t } = useI18n()
-const { social, contact } = useSettings()
+const { social } = useSettings()
 const { setOpen, closeEpoch } = useUiOverlay()
 
 const open = ref(false)
-const showForm = ref(false)
 const root = ref<HTMLElement | null>(null)
 
 // đóng khi bấm ra ngoài / nhấn Esc
@@ -14,23 +14,15 @@ onClickOutside(root, () => { open.value = false })
 onKeyStroke('Escape', () => { open.value = false })
 
 // đồng bộ backdrop làm mờ toàn trang
-watch(open, (v) => {
-  if (!v) showForm.value = false
-  setOpen('connect', v)
-})
+watch(open, (v) => setOpen('connect', v))
 watch(closeEpoch, () => { open.value = false })
 onUnmounted(() => setOpen('connect', false))
-
-const tel = computed(() => `tel:${(contact.value.mobile || contact.value.phone).replace(/\s+/g, '')}`)
 
 interface Channel { key: string; label: string; href: string; color: string }
 const channels = computed<Channel[]>(() => [
   { key: 'zalo', label: 'Zalo', href: social.value.zalo, color: '#0068FF' },
   { key: 'facebook', label: 'Facebook', href: social.value.facebook, color: '#1877F2' },
   { key: 'instagram', label: 'Instagram', href: social.value.instagram, color: '#E4405F' },
-  { key: 'youtube', label: 'YouTube', href: social.value.youtube, color: '#FF0000' },
-  { key: 'phone', label: t('contact.phone'), href: tel.value, color: '#16a34a' },
-  { key: 'email', label: 'Email', href: `mailto:${contact.value.email}`, color: '#c9a86c' },
 ])
 
 // Icon SVG nội tuyến (tự chứa, không phụ thuộc thư viện icon)
@@ -45,10 +37,6 @@ const icons: Record<string, string> = {
 <path d="M29.4562 29.0944H30.5747V19.957H28.6221V28.2793C28.6221 28.7153 29.0012 29.0944 29.4562 29.0944Z" fill="#0068FF"/></svg>`,
   facebook: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5 3.66 9.15 8.44 9.94v-7.03H7.9v-2.9h2.54V9.85c0-2.52 1.49-3.92 3.78-3.92 1.1 0 2.24.2 2.24.2v2.47h-1.26c-1.24 0-1.63.78-1.63 1.57v1.89h2.78l-.44 2.9h-2.34V22c4.78-.79 8.44-4.94 8.44-9.94z"/></svg>',
   instagram: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.7 3.7 0 0 1-1.38-.9 3.7 3.7 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16zm0 3.24A6.6 6.6 0 1 0 18.6 12 6.6 6.6 0 0 0 12 5.4zm0 10.89A4.29 4.29 0 1 1 16.29 12 4.29 4.29 0 0 1 12 16.29zm6.85-11.15a1.54 1.54 0 1 1-1.54-1.54 1.54 1.54 0 0 1 1.54 1.54z"/></svg>',
-  youtube: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.5a3 3 0 0 0-2.1-2.13C19.5 3.85 12 3.85 12 3.85s-7.5 0-9.4.52A3 3 0 0 0 .5 6.5 31.3 31.3 0 0 0 0 12a31.3 31.3 0 0 0 .5 5.5 3 3 0 0 0 2.1 2.13c1.9.52 9.4.52 9.4.52s7.5 0 9.4-.52a3 3 0 0 0 2.1-2.13A31.3 31.3 0 0 0 24 12a31.3 31.3 0 0 0-.5-5.5zM9.6 15.6V8.4l6.2 3.6z"/></svg>',
-  phone: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8a15.5 15.5 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.24 11.4 11.4 0 0 0 3.6.58 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1 11.4 11.4 0 0 0 .58 3.6 1 1 0 0 1-.25 1z"/></svg>',
-  email: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm0 2v.4l8 5 8-5V6H4zm16 2.3-7.47 4.67a1 1 0 0 1-1.06 0L4 8.3V18h16V8.3z"/></svg>',
-  form: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H7l-4 4V5zm4 3v2h10V8H7zm0 4v2h7v-2H7z"/></svg>',
 }
 
 const { submitContact } = useContact()
@@ -72,7 +60,7 @@ async function submit() {
     setTimeout(() => {
       status.value = 'idle'
       form.name = form.phone = form.email = form.message = ''
-      showForm.value = false
+      open.value = false
     }, 4000)
   }
 }
@@ -80,35 +68,18 @@ async function submit() {
 
 <template>
   <div ref="root" class="connect">
-    <!-- Panel -->
+    <!-- Panel: chỉ còn form "Để lại thông tin" -->
     <Transition name="cpop">
-      <div v-if="open" class="panel" role="dialog" aria-label="Kết nối">
+      <div v-if="open" class="panel" role="dialog" :aria-label="t('connect.leaveInfo')">
         <div class="panel-head">
           <div>
-            <p class="panel-title">{{ t('connect.title') }}</p>
-            <p class="panel-sub">{{ t('connect.subtitle') }}</p>
+            <p class="panel-title">{{ t('connect.leaveInfo') }}</p>
+            <p class="panel-sub">{{ t('connect.leaveInfoSubtitle') }}</p>
           </div>
           <button type="button" class="x" :aria-label="t('common.close')" @click="open = false">✕</button>
         </div>
 
-        <!-- Danh sách kênh -->
-        <div v-show="!showForm" class="channels">
-          <a v-for="c in channels" :key="c.key" :href="c.href" target="_blank" rel="noopener" class="chan">
-            <span class="chan-ic" :style="{ background: c.color }" v-html="icons[c.key]" />
-            <span class="chan-label">{{ c.label }}</span>
-          </a>
-
-          <button type="button" class="chan chan-form" @click="showForm = true">
-            <span class="chan-ic" style="background:#c9a86c" v-html="icons.form" />
-            <span class="chan-label">{{ t('connect.leaveInfo') }}</span>
-            <span class="chev">›</span>
-          </button>
-        </div>
-
-        <!-- Form -->
-        <form v-show="showForm" class="cform" @submit.prevent="submit">
-          <button type="button" class="back" @click="showForm = false">‹ {{ t('connect.back') }}</button>
-
+        <form class="cform" @submit.prevent="submit">
           <template v-if="status === 'success'">
             <p class="ok">{{ t('contact.form.success') }}</p>
           </template>
@@ -125,21 +96,35 @@ async function submit() {
       </div>
     </Transition>
 
-    <!-- Nút bật/tắt -->
-    <button type="button" class="fab" :class="{ on: open }" :aria-expanded="open" :aria-label="t('connect.open')"
-      @click="open = !open">
-      <!-- Icon điện thoại (đóng = dấu X) -->
-      <svg v-if="!open" viewBox="0 0 24 24" fill="currentColor" class="fab-ic">
-        <path
-          d="M6.6 10.8a15.5 15.5 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.24 11.4 11.4 0 0 0 3.6.58 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1 11.4 11.4 0 0 0 .58 3.6 1 1 0 0 1-.25 1z" />
-      </svg>
-      <svg v-else viewBox="0 0 24 24" fill="currentColor" class="fab-ic">
-        <path
-          d="M18.3 5.71 12 12l6.3 6.29-1.41 1.42L10.59 13.4 4.3 19.7 2.89 18.3 9.18 12 2.89 5.71 4.3 4.29l6.29 6.3 6.3-6.3z" />
-      </svg>
-      <!-- Tooltip hiện khi hover (ẩn khi panel mở) -->
-      <span class="tip" role="tooltip">{{ t('connect.open') }}</span>
-    </button>
+    <!-- Hàng ngang: FAB (ngoài cùng bên trái) + icon kênh liên lạc (luôn hiện) -->
+    <div class="dock">
+      <WidgetsTooltip :text="t('connect.leaveInfo')" placement="top">
+        <button type="button" class="fab" :class="{ on: open }" :aria-expanded="open" :aria-label="t('connect.leaveInfo')"
+          @click="open = !open">
+          <svg v-if="!open" viewBox="0 0 24 24" fill="currentColor" class="fab-ic">
+            <path
+              d="M6.6 10.8a15.5 15.5 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.24 11.4 11.4 0 0 0 3.6.58 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1 11.4 11.4 0 0 0 .58 3.6 1 1 0 0 1-.25 1z" />
+          </svg>
+          <svg v-else viewBox="0 0 24 24" fill="currentColor" class="fab-ic">
+            <path
+              d="M18.3 5.71 12 12l6.3 6.29-1.41 1.42L10.59 13.4 4.3 19.7 2.89 18.3 9.18 12 2.89 5.71 4.3 4.29l6.29 6.3 6.3-6.3z" />
+          </svg>
+        </button>
+      </WidgetsTooltip>
+
+      <WidgetsTooltip v-for="c in channels" :key="c.key" :text="c.label" placement="top">
+        <a
+          :href="c.href"
+          target="_blank"
+          rel="noopener"
+          class="chan-icon"
+          :style="{ background: c.color }"
+          :aria-label="c.label"
+        >
+          <span v-html="icons[c.key]" />
+        </a>
+      </WidgetsTooltip>
+    </div>
   </div>
 </template>
 
@@ -149,11 +134,41 @@ async function submit() {
   left: 20px;
   bottom: 20px;
   z-index: 1000;
-  /* border: 1px solid #eee; */
-  /* border-radius: 50%; */
 }
 
-/* ── FAB: chỉ icon, tròn ── */
+/* ── Hàng ngang: FAB ngoài cùng bên trái + icon kênh liên lạc luôn hiện ── */
+.dock {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.chan-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  color: #fff;
+  flex-shrink: 0;
+  text-decoration: none;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, .3);
+  transition: transform .2s cubic-bezier(.22, .61, .36, 1), box-shadow .2s ease;
+}
+
+.chan-icon :deep(svg) {
+  width: 21px;
+  height: 21px;
+}
+
+.chan-icon:hover,
+.chan-icon:focus-visible {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, .4);
+}
+
+/* ── FAB: chỉ icon, tròn — mở form "Để lại thông tin" ── */
 .fab {
   position: relative;
   display: inline-flex;
@@ -167,8 +182,8 @@ async function submit() {
   background: #a01f25;
   color: #fff;
   cursor: pointer;
-  box-shadow: 
-    0 8px 22px rgba(0, 0, 0, .35), 
+  box-shadow:
+    0 8px 22px rgba(0, 0, 0, .35),
     0 0 0 1px rgba(255, 255, 255, .08) inset,
     0 0 0 0 rgba(196, 30, 58, 0),
     0 0 0 0 rgba(77, 124, 58, 0);
@@ -181,20 +196,20 @@ async function submit() {
 @keyframes fab-heartbeat {
   0% {
     transform: rotate(0deg) scale(1);
-    box-shadow: 
+    box-shadow:
       0 8px 22px rgba(0, 0, 0, .35),
       0 0 0 1px rgba(255, 255, 255, .08) inset,
       0 0 0 0 rgba(196, 30, 58, 0),
       0 0 0 0 rgba(77, 124, 58, 0);
   }
-  
+
   /* Nhịp 1: lắc mạnh */
   8% {
     transform: rotate(-10deg) scale(1.04);
   }
   12% {
     transform: rotate(10deg) scale(1.06);
-    box-shadow: 
+    box-shadow:
       0 10px 26px rgba(0, 0, 0, .42),
       0 0 0 1px rgba(255, 255, 255, .15) inset,
       0 0 22px 4px rgba(196, 30, 58, .75),
@@ -203,7 +218,7 @@ async function submit() {
   16% {
     transform: rotate(-8deg) scale(1.05);
   }
-  
+
   /* Nhịp 2: lắc nhẹ hơn */
   20% {
     transform: rotate(6deg) scale(1.03);
@@ -213,26 +228,26 @@ async function submit() {
   }
   28% {
     transform: rotate(0deg) scale(1.01);
-    box-shadow: 
+    box-shadow:
       0 12px 28px rgba(0, 0, 0, .45),
       0 0 0 1px rgba(255, 255, 255, .18) inset,
       0 0 26px 5px rgba(196, 30, 58, .85),
       0 0 38px 8px rgba(77, 124, 58, .65);
   }
-  
+
   /* Fade out ánh sáng */
   35% {
     transform: rotate(0deg) scale(1);
-    box-shadow: 
+    box-shadow:
       0 10px 24px rgba(0, 0, 0, .38),
       0 0 0 1px rgba(255, 255, 255, .1) inset,
       0 0 14px 2px rgba(196, 30, 58, .4),
       0 0 20px 3px rgba(77, 124, 58, .3);
   }
-  
+
   45%, 100% {
     transform: rotate(0deg) scale(1);
-    box-shadow: 
+    box-shadow:
       0 8px 22px rgba(0, 0, 0, .35),
       0 0 0 1px rgba(255, 255, 255, .08) inset,
       0 0 0 0 rgba(196, 30, 58, 0),
@@ -243,7 +258,7 @@ async function submit() {
 .fab:hover {
   animation-play-state: paused;
   transform: translateY(-2px) scale(1.05);
-  box-shadow: 
+  box-shadow:
     0 12px 28px rgba(0, 0, 0, .45),
     0 0 0 1px rgba(255, 255, 255, .15) inset,
     0 0 20px 4px rgba(196, 30, 58, .7),
@@ -261,53 +276,12 @@ async function submit() {
   flex-shrink: 0;
 }
 
-/* Tooltip — hiện bên phải khi hover, ẩn khi panel đang mở */
-.tip {
-  position: absolute;
-  left: calc(100% + 12px);
-  top: 50%;
-  transform: translateY(-50%) translateX(-6px);
-  white-space: nowrap;
-  background: #1f1f1f;
-  color: #fff;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: .02em;
-  padding: 7px 11px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, .1);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, .4);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity .22s ease, transform .22s ease;
-}
-
-/* mũi tên tooltip */
-.tip::before {
-  content: "";
-  position: absolute;
-  right: 100%;
-  top: 50%;
-  transform: translateY(-50%);
-  border: 5px solid transparent;
-  border-right-color: #1f1f1f;
-}
-
-.fab:hover .tip {
-  opacity: 1;
-  transform: translateY(-50%) translateX(0);
-}
-
-.fab.on .tip {
-  display: none;
-}
-
-/* ── Panel ── */
+/* ── Panel (form) ── */
 .panel {
   position: absolute;
   left: 0;
-  bottom: 64px;
-  width: 300px;
+  bottom: calc(100% + 14px);
+  width: 280px;
   max-width: calc(100vw - 40px);
   background: #1f1f1f;
   border: 1px solid rgba(255, 255, 255, .1);
@@ -352,81 +326,12 @@ async function submit() {
   color: #fff;
 }
 
-/* ── Channels ── */
-.channels {
-  display: flex;
-  flex-direction: column;
-  padding: 8px;
-}
-
-.chan {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 9px 10px;
-  border: 0;
-  background: transparent;
-  border-radius: 10px;
-  color: #eee;
-  font-size: 14px;
-  text-decoration: none;
-  cursor: pointer;
-  transition: background .2s ease;
-}
-
-.chan:hover {
-  background: rgba(255, 255, 255, .06);
-}
-
-.chan-ic {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  color: #fff;
-  flex-shrink: 0;
-}
-
-.chan-ic :deep(svg) {
-  width: 19px;
-  height: 19px;
-}
-
-.chan-label {
-  flex: 1;
-  text-align: left;
-}
-
-.chan-form {
-  border-top: 1px solid rgba(255, 255, 255, .07);
-  margin-top: 4px;
-  padding-top: 12px;
-}
-
-.chev {
-  color: rgba(255, 255, 255, .4);
-  font-size: 18px;
-}
-
 /* ── Form ── */
 .cform {
   display: flex;
   flex-direction: column;
   gap: 8px;
   padding: 12px;
-}
-
-.back {
-  align-self: flex-start;
-  border: 0;
-  background: transparent;
-  color: #c9a86c;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 2px 0 4px;
 }
 
 .fin {
@@ -501,7 +406,6 @@ async function submit() {
 }
 
 @media (prefers-reduced-motion: reduce) {
-
   .fab,
   .cpop-enter-active,
   .cpop-leave-active {

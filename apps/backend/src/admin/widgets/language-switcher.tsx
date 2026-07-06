@@ -67,7 +67,7 @@ const LanguageSwitcher = () => {
     LANGUAGES.find((l) => l.code === i18n.language) ?? LANGUAGES[0]
 
   const control = (
-    <div className="fixed right-4 top-3 z-50">
+    <div className="fixed right-4 top-3 z-0">
       <DropdownMenu>
         <DropdownMenu.Trigger asChild>
           <button

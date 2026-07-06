@@ -3,14 +3,13 @@ import type { OrderLookup } from '~/composables/useOrder'
 
 const { t } = useI18n()
 const { site } = useSettings()
-const { lookupOrder, retryPayment } = useOrder()
+const { lookupOrder } = useOrder()
 const { orderStatusLabel, paymentStatusLabel, paymentMethodLabel } = useOrderLabels()
 
 const form = reactive({ number: '', phone: '' })
 const error = ref('')
 const order = ref<OrderLookup | null>(null)
 const loading = ref(false)
-const retrying = ref(false)
 
 const formatPrice = (price: number | string) =>
   `${Number(price).toLocaleString('vi-VN')} ${t('common.currency')}`
@@ -28,18 +27,6 @@ const handleLookup = async () => {
     order.value = res.data
   } else {
     error.value = res.message || t('cart.lookupError')
-  }
-}
-
-const handleRetryPayment = async () => {
-  if (!order.value || !form.number || !form.phone) return
-  retrying.value = true
-  const res = await retryPayment(form.number.trim(), form.phone.trim())
-  retrying.value = false
-  if (res.success && res.paymentUrl) {
-    window.location.href = res.paymentUrl
-  } else if (!res.success) {
-    error.value = res.message || t('orderLookup.retryError')
   }
 }
 
@@ -109,15 +96,6 @@ useSeoMeta({
               <span>{{ formatPrice(item.price) }}</span>
             </li>
           </ul>
-          <button
-            v-if="order.can_retry_payment"
-            type="button"
-            class="btn-primary w-full min-h-[44px] mt-4"
-            :disabled="retrying"
-            @click="handleRetryPayment"
-          >
-            {{ retrying ? t('orderLookup.retrying') : t('orderLookup.retryPayment') }}
-          </button>
         </div>
       </div>
     </section>

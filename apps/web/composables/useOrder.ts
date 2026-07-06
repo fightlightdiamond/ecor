@@ -1,4 +1,3 @@
-import type { ApiEnvelope } from '~/utils/storefront'
 import { parseApiError } from '~/utils/storefront'
 
 export interface OrderLookupItem {
@@ -20,17 +19,21 @@ export interface OrderLookup {
   items: OrderLookupItem[]
 }
 
+/**
+ * Guest order tracking against the Medusa backend
+ * (custom route: GET /store/order-lookup, apps/backend/src/api/store/order-lookup).
+ */
 export function useOrder() {
-  const { fetchApi } = useApi()
+  const { fetchMedusa } = useMedusaApi()
   const { t } = useAppI18n()
 
   const lookupOrder = async (number: string, phone: string) => {
     try {
-      const res = await fetchApi<ApiEnvelope<OrderLookup>>(
-        `/orders/lookup?number=${encodeURIComponent(number)}&phone=${encodeURIComponent(phone)}`,
+      const res = await fetchMedusa<{ order: OrderLookup }>(
+        `/store/order-lookup?number=${encodeURIComponent(number)}&phone=${encodeURIComponent(phone)}`,
       )
-      if (res.success) {
-        return { success: true as const, data: res.data }
+      if (res.order) {
+        return { success: true as const, data: res.order }
       }
     } catch (err) {
       return {
@@ -42,24 +45,5 @@ export function useOrder() {
     return { success: false as const, message: t('cart.lookupError') }
   }
 
-  const retryPayment = async (number: string, phone: string) => {
-    try {
-      const res = await fetchApi<ApiEnvelope<{ payment_url: string }>>('/orders/retry-payment', {
-        method: 'POST',
-        body: { number, phone },
-      })
-      if (res.success && res.data?.payment_url) {
-        return { success: true as const, paymentUrl: res.data.payment_url }
-      }
-    } catch (err) {
-      return {
-        success: false as const,
-        message: parseApiError(err, t('orderLookup.retryError')),
-      }
-    }
-
-    return { success: false as const, message: t('orderLookup.retryError') }
-  }
-
-  return { lookupOrder, retryPayment }
+  return { lookupOrder }
 }

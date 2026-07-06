@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import type { CardItem } from '~/composables/useCards'
+
 const { t, locale } = useI18n()
 const localePath = useLocalePath()
 const { hours, contact } = useSettings()
+const { cards } = useCards()
 
 const imgModules = import.meta.glob('~/assets/images/*.jpg', {
   eager: true,
@@ -10,19 +13,17 @@ const imgModules = import.meta.glob('~/assets/images/*.jpg', {
 const imgUrl = (name: string) =>
   Object.entries(imgModules).find(([k]) => k.endsWith(`/${name}`))?.[1] ?? ''
 
-const pillars = computed(() => [
-  { key: 'home.pillars.vietTea', path: '/nep-tra-viet', img: 'tlcv_nep_che_viet.jpg' },
-  { key: 'home.pillars.tradition', path: '/van-hoa-viet', img: 'tlcv_van_hoa_truyen_thong_001.jpg' },
-  { key: 'home.pillars.teaProducts', path: '/san-pham-list', img: 'tlcv_san_pham.jpg' },
-  { key: 'home.pillars.teaHeritage', path: '/di-san-tra-cu', img: 'tlcv_can_tinh_viet_001.jpg' },
-  { key: 'home.pillars.corporateGifts', path: '/qua-tang-doanh-nghiep', img: 'kp_thang_long_che_viet.jpg' },
-  { key: 'home.pillars.anQuangGarden', path: '/vuon-an-quang', img: 'tlcv_van_hoa_truyen_thong_001.jpg' },
-  { key: 'home.pillars.anQuangCaffe', path: '/an-quang-caffe', img: 'tlcv_nep_che_viet.jpg' },
-  { key: 'home.pillars.experiences', path: '/trai-nghiem', img: 'tlcv_can_tinh_viet_001.jpg' },
-  { key: 'home.pillars.library', path: '/thu-vien-van-hoa', img: 'tlcv_san_pham.jpg' },
-  { key: 'home.pillars.projects', path: '/du-an-doi-tac', img: 'kp_thang_long_che_viet.jpg' },
-  // { key: 'home.pillars.promotions', path: '/uu-dai', img: 'tlcv_nep_che_viet.jpg' },
-])
+// Card ảnh có thể là tên file trong assets/images (card mặc định/seed) hoặc
+// một URL tuyệt đối (admin dán link ảnh ngoài) — thử URL trước, rồi mới
+// glob-lookup theo tên file.
+const resolveCardImage = (image: string | null) => {
+  if (!image) return ''
+  if (/^https?:\/\//.test(image)) return image
+  return imgUrl(image)
+}
+
+const cardTitle = (card: CardItem) =>
+  card.title?.[locale.value] ?? card.title?.vi ?? ''
 
 // Pillar "Giờ mở cửa + Liên hệ & Đặt lịch": các dòng liên hệ tự cuộn dưới->trên.
 const contactRows = computed(() => {
@@ -46,78 +47,73 @@ const directionsUrl = computed(() => {
 <template>
   <div class="home-pillars">
     <div class="row">
-      <template v-for="(item, i) in pillars" :key="item.key">
+      <template v-for="(card, i) in cards" :key="card.id">
         <div class="col-md-6 mb30 col-sm-12 col-sm-offset-0">
-          <NuxtLink :to="localePath(item.path)" class="preview-link">
+          <!-- Card liên kết thường — quản lý trong Admin > Cards -->
+          <NuxtLink v-if="card.type === 'link'" :to="localePath(card.path || '/')" class="preview-link">
             <span class="preview-media">
-              <img :src="imgUrl(item.img)" class="img-responsive" :alt="t(item.key)">
+              <img :src="resolveCardImage(card.image)" class="img-responsive" :alt="cardTitle(card)">
             </span>
-            <span class="pillar-title">{{ t(item.key) }}</span>
+            <span class="pillar-title">{{ cardTitle(card) }}</span>
           </NuxtLink>
-        </div>
-        <div v-if="i % 2 === 1" class="clearfix" />
-      </template>
 
-      <!-- Pillar ưu đãi trong tháng: danh sách sản phẩm scroll từ dưới lên -->
-      <div class="col-md-6 mb30 col-sm-12 col-sm-offset-0">
-        <HomePromotionsList />
-      </div>
+          <!-- Card ưu đãi trong tháng (cố định): danh sách sản phẩm scroll từ dưới lên -->
+          <HomePromotionsList v-else-if="card.type === 'promotions'" />
 
-      <!-- Pillar thông tin: Giờ mở cửa + Liên hệ & Đặt lịch, tự cuộn dưới -> trên -->
-      <div class="col-md-6 mb30 col-sm-12 col-sm-offset-0">
-        <div class="info-card" role="group" :aria-label="`${t('contact.hours')} · ${t('contact.title')}`">
-          <div class="info-viewport">
-            <!-- Hai bản giống nhau xếp chồng để vòng lặp liền mạch (CSS-only) -->
-            <div class="info-track">
-              <div v-for="n in 2" :key="n" class="info-set" :aria-hidden="n === 2 ? 'true' : undefined">
-                <section class="info-block">
-                  <h3 class="info-heading"><span class="info-ic" aria-hidden="true">🕒</span>{{ t('contact.hours') }}</h3>
-                  <ul class="info-rows">
-                    <li v-for="h in hours" :key="h.days" class="info-row">
-                      <span class="info-day">{{ h.days }}</span>
-                      <span class="info-time">{{ h.time }}</span>
-                    </li>
-                  </ul>
-                </section>
+          <!-- Card thông tin (cố định): Giờ mở cửa + Liên hệ & Đặt lịch, tự cuộn dưới -> trên -->
+          <div v-else-if="card.type === 'contact'" class="info-card" role="group" :aria-label="`${t('contact.hours')} · ${t('contact.title')}`">
+            <div class="info-viewport">
+              <!-- Hai bản giống nhau xếp chồng để vòng lặp liền mạch (CSS-only) -->
+              <div class="info-track">
+                <div v-for="n in 2" :key="n" class="info-set" :aria-hidden="n === 2 ? 'true' : undefined">
+                  <section class="info-block">
+                    <h3 class="info-heading"><span class="info-ic" aria-hidden="true">🕒</span>{{ t('contact.hours') }}</h3>
+                    <ul class="info-rows">
+                      <li v-for="h in hours" :key="h.days" class="info-row">
+                        <span class="info-day">{{ h.days }}</span>
+                        <span class="info-time">{{ h.time }}</span>
+                      </li>
+                    </ul>
+                  </section>
 
-                <section class="info-block">
-                  <h3 class="info-heading"><span class="info-ic" aria-hidden="true">📞</span>{{ t('contact.title') }}</h3>
-                  <ul class="info-rows">
-                    <li v-for="r in contactRows" :key="r.key" class="info-row info-row--stack">
-                      <span class="info-label">{{ r.label }}</span>
-                      <component :is="r.href ? 'a' : 'span'" :href="r.href || undefined" class="info-val">{{ r.value }}</component>
-                    </li>
-                  </ul>
-                </section>
+                  <section class="info-block">
+                    <h3 class="info-heading"><span class="info-ic" aria-hidden="true">📞</span>{{ t('contact.title') }}</h3>
+                    <ul class="info-rows">
+                      <li v-for="r in contactRows" :key="r.key" class="info-row info-row--stack">
+                        <span class="info-label">{{ r.label }}</span>
+                        <component :is="r.href ? 'a' : 'span'" :href="r.href || undefined" class="info-val">{{ r.value }}</component>
+                      </li>
+                    </ul>
+                  </section>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      <!-- Pillar bản đồ: vị trí công ty trên Google Maps + nút chỉ đường -->
-      <div class="col-md-6 mb30 col-sm-12 col-sm-offset-0">
-        <div class="map-card">
-          <iframe
-            v-if="mapEmbed"
-            :src="mapEmbed"
-            class="map-frame"
-            :title="t('contact.map')"
-            loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade"
-            allowfullscreen
-          />
-          <a
-            :href="directionsUrl"
-            target="_blank"
-            rel="noopener"
-            class="map-overlay"
-          >
-            <span class="map-title"><span class="map-ic" aria-hidden="true">📍</span>{{ t('contact.map') }}</span>
-            <span class="map-cta">{{ t('contact.directions') }} ›</span>
-          </a>
+          <!-- Card bản đồ (cố định): vị trí công ty trên Google Maps + nút chỉ đường -->
+          <div v-else-if="card.type === 'map'" class="map-card">
+            <iframe
+              v-if="mapEmbed"
+              :src="mapEmbed"
+              class="map-frame"
+              :title="t('contact.map')"
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+              allowfullscreen
+            />
+            <a
+              :href="directionsUrl"
+              target="_blank"
+              rel="noopener"
+              class="map-overlay"
+            >
+              <span class="map-title"><span class="map-ic" aria-hidden="true">📍</span>{{ t('contact.map') }}</span>
+              <span class="map-cta">{{ t('contact.directions') }} ›</span>
+            </a>
+          </div>
         </div>
-      </div>
+        <div v-if="i % 2 === 1" class="clearfix" />
+      </template>
     </div>
   </div>
 </template>

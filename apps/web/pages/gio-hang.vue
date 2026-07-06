@@ -5,12 +5,14 @@ const { site } = useSettings()
 const {
   items,
   loading,
-  totalPrice,
+  totals,
+  promoCodes,
   updateCart,
   removeFromCart,
+  applyPromoCode,
+  removePromoCode,
   checkout,
 } = useCart()
-const { applied, validateCoupon, clearCoupon } = useCoupon()
 const { customer, isLoggedIn, fetchProfile } = useCustomerAuth()
 const { methods: paymentMethods, fetchPaymentMethods } = usePayment()
 
@@ -19,7 +21,7 @@ const form = reactive({
   phone: '',
   email: '',
   address: '',
-  paymentMethod: 'cod',
+  paymentMethod: 'pp_system_default',
 })
 
 onMounted(async () => {
@@ -36,11 +38,9 @@ onMounted(async () => {
 
 const couponCode = ref('')
 const couponMessage = ref('')
+const couponOk = ref(false)
 const message = ref('')
 const error = ref('')
-
-const discount = computed(() => applied.value?.discount ?? 0)
-const payableTotal = computed(() => Math.max(0, totalPrice.value - discount.value))
 
 const formatPrice = (price: number) =>
   `${price.toLocaleString('vi-VN')} ${t('common.currency')}`
@@ -48,13 +48,20 @@ const formatPrice = (price: number) =>
 const handleApplyCoupon = async () => {
   couponMessage.value = ''
   if (!couponCode.value.trim()) return
-  const res = await validateCoupon(couponCode.value.trim(), totalPrice.value)
-  if (res.success && res.data?.valid) {
-    couponMessage.value = t('cart.couponApplied', { amount: formatPrice(res.data.discount ?? 0) })
+  const res = await applyPromoCode(couponCode.value.trim())
+  couponOk.value = res.success
+  if (res.success) {
+    couponMessage.value = t('cart.couponApplied', { amount: formatPrice(res.discount ?? 0) })
+    couponCode.value = ''
   } else {
-    clearCoupon()
-    couponMessage.value = res.data?.message || res.message || t('cart.couponInvalid')
+    couponMessage.value = res.message || t('cart.couponInvalid')
   }
+}
+
+const handleRemoveCoupon = async (code: string) => {
+  couponMessage.value = ''
+  couponOk.value = false
+  await removePromoCode(code)
 }
 
 const handleCheckout = async () => {
@@ -66,10 +73,11 @@ const handleCheckout = async () => {
     return
   }
   const res = await checkout({
-    ...form,
+    name: form.name,
+    phone: form.phone,
+    address: form.address,
     email: form.email.trim() || undefined,
-    payment_method: form.paymentMethod,
-    coupon_code: applied.value?.code ?? (couponCode.value.trim() || undefined),
+    payment_provider_id: form.paymentMethod,
   })
   if (res.success) {
     if (res.paymentUrl) {
@@ -84,7 +92,6 @@ const handleCheckout = async () => {
     form.email = ''
     form.address = ''
     couponCode.value = ''
-    clearCoupon()
   } else {
     error.value = res.message
   }
@@ -141,9 +148,12 @@ useSeoMeta({
                   <input
                     :value="item.quantity"
                     type="number"
-                    min="0"
+                    min="1"
                     class="w-20 px-2 py-1 rounded bg-dark text-white border border-white/20 min-h-[44px]"
-                    @change="updateCart(item.id, Number(($event.target as HTMLInputElement).value))"
+                    @change="(e) => {
+                      const qty = Number((e.target as HTMLInputElement).value)
+                      qty > 0 ? updateCart(item.id, qty) : removeFromCart(item.id)
+                    }"
                   >
                   <button
                     type="button"
@@ -160,24 +170,29 @@ useSeoMeta({
           <div class="border-t border-white/10 pt-6 mb-6 space-y-2 max-w-lg">
             <div class="flex justify-between items-center text-white/70">
               <span>{{ t('cart.subtotal') }}</span>
-              <span>{{ formatPrice(totalPrice) }}</span>
+              <span>{{ formatPrice(totals.subtotal) }}</span>
             </div>
-            <div v-if="discount > 0" class="flex justify-between items-center text-green-400">
+            <div v-if="totals.discount > 0" class="flex justify-between items-center text-green-400">
               <span>{{ t('cart.discount') }}</span>
-              <span>-{{ formatPrice(discount) }}</span>
+              <span>-{{ formatPrice(totals.discount) }}</span>
+            </div>
+            <div v-if="totals.shipping > 0" class="flex justify-between items-center text-white/70">
+              <span>{{ t('cart.shipping') }}</span>
+              <span>{{ formatPrice(totals.shipping) }}</span>
             </div>
             <div class="flex justify-between items-center pt-2">
               <span class="text-lg font-semibold">{{ t('cart.total') }}</span>
-              <span class="text-xl text-primary-400 font-bold">{{ formatPrice(payableTotal) }}</span>
+              <span class="text-xl text-primary-400 font-bold">{{ formatPrice(totals.total) }}</span>
             </div>
           </div>
 
-          <div class="flex flex-col sm:flex-row gap-3 mb-10 max-w-lg">
+          <div class="flex flex-col sm:flex-row gap-3 mb-3 max-w-lg">
             <input
               v-model="couponCode"
               type="text"
               :placeholder="t('cart.couponPlaceholder')"
               class="flex-1 px-4 py-3 rounded bg-dark border border-white/20 min-h-[44px] uppercase"
+              @keyup.enter="handleApplyCoupon"
             >
             <button
               type="button"
@@ -188,9 +203,28 @@ useSeoMeta({
               {{ t('cart.couponApply') }}
             </button>
           </div>
-          <p v-if="couponMessage" class="text-sm mb-6 -mt-6" :class="applied ? 'text-green-400' : 'text-red-400'">
+          <div v-if="promoCodes.length" class="flex flex-wrap gap-2 mb-3 max-w-lg">
+            <span
+              v-for="code in promoCodes"
+              :key="code"
+              class="inline-flex items-center gap-2 bg-primary-500/15 border border-primary-500/40
+                     text-primary-300 text-xs uppercase tracking-wider px-3 py-1.5"
+            >
+              {{ code }}
+              <button
+                type="button"
+                class="text-primary-300/70 hover:text-white leading-none"
+                :aria-label="`${t('cart.remove')} ${code}`"
+                @click="handleRemoveCoupon(code)"
+              >
+                ✕
+              </button>
+            </span>
+          </div>
+          <p v-if="couponMessage" class="text-sm mb-6" :class="couponOk ? 'text-green-400' : 'text-red-400'">
             {{ couponMessage }}
           </p>
+          <div v-else class="mb-6" />
 
           <form class="space-y-4 max-w-lg" @submit.prevent="handleCheckout">
             <h2 class="text-xl font-semibold mb-2">{{ t('cart.checkoutTitle') }}</h2>

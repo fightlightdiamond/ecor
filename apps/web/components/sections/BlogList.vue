@@ -1,4 +1,10 @@
 <script setup lang="ts">
+const props = defineProps<{
+  eyebrow?: string
+  title?: string
+  subtitle?: string
+}>()
+
 const { t, locale } = useI18n()
 const localePath = useLocalePath()
 const { posts: rawPosts } = useBlog()
@@ -22,7 +28,13 @@ const posts = computed(() =>
 <template>
   <section class="section-py bg-dark-800 text-white" aria-labelledby="blog-list-heading">
     <div class="container-page">
-      <h2 id="blog-list-heading" class="sr-only">{{ t('blog.title') }}</h2>
+      <div v-if="props.title" class="text-center mb-10 md:mb-14 animate-on-scroll">
+        <p v-if="props.eyebrow" class="modis-eyebrow mb-3">{{ props.eyebrow }}</p>
+        <h2 id="blog-list-heading" class="section-heading text-white mb-4">{{ props.title }}</h2>
+        <div class="divider-gold" />
+        <p v-if="props.subtitle" class="section-subheading mt-4 max-w-2xl mx-auto">{{ props.subtitle }}</p>
+      </div>
+      <h2 v-else id="blog-list-heading" class="sr-only">{{ t('blog.title') }}</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
         <article
           v-for="post in posts"

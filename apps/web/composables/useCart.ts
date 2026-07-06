@@ -13,6 +13,13 @@ export interface Cart {
   region_id: string
 }
 
+export interface CartTotals {
+  subtotal: number
+  discount: number
+  shipping: number
+  total: number
+}
+
 interface MedusaLineItem {
   id: string
   product_id: string
@@ -27,9 +34,15 @@ interface MedusaCart {
   id: string
   region_id: string
   email: string | null
+  item_subtotal: number
+  discount_total: number
+  shipping_total: number
   total: number
   items: MedusaLineItem[]
+  promotions?: { id: string, code: string }[]
 }
+
+const CART_FIELDS = '*items,*promotions'
 
 function mapLineItem(item: MedusaLineItem): CartItem {
   return {
@@ -41,14 +54,19 @@ function mapLineItem(item: MedusaLineItem): CartItem {
       variantId: '',
       slug: item.product_handle,
       price: item.unit_price,
+      currencyCode: 'vnd',
       image: item.thumbnail ?? '',
       gallery: item.thumbnail ? [item.thumbnail] : [],
       title: item.product_title,
       shortDesc: '',
       description: '',
-      features: [],
       categoryId: null,
+      categoryName: '',
       inStock: true,
+      variants: [],
+      options: [],
+      material: null,
+      weight: null,
     },
   }
 }
@@ -60,17 +78,26 @@ export function useCart() {
   const cartId = useCookie<string | null>('medusa_cart_id', { maxAge: 60 * 60 * 24 * 30 })
   const cart = useState<Cart | null>('cart', () => null)
   const items = useState<CartItem[]>('cart_items', () => [])
+  const totals = useState<CartTotals>('cart_totals', () => ({ subtotal: 0, discount: 0, shipping: 0, total: 0 }))
+  const promoCodes = useState<string[]>('cart_promo_codes', () => [])
   const loading = ref(false)
   const toast = useState<string | null>('cart_toast', () => null)
 
   const applyCart = (medusaCart: MedusaCart) => {
     cart.value = { id: medusaCart.id, region_id: medusaCart.region_id }
     items.value = (medusaCart.items ?? []).map(mapLineItem)
+    totals.value = {
+      subtotal: medusaCart.item_subtotal ?? 0,
+      discount: medusaCart.discount_total ?? 0,
+      shipping: medusaCart.shipping_total ?? 0,
+      total: medusaCart.total ?? 0,
+    }
+    promoCodes.value = (medusaCart.promotions ?? []).map(p => p.code).filter(Boolean)
     cartId.value = medusaCart.id
   }
 
   const createCart = async () => {
-    const res = await fetchMedusa<{ cart: MedusaCart }>('/store/carts', {
+    const res = await fetchMedusa<{ cart: MedusaCart }>(`/store/carts?fields=${CART_FIELDS}`, {
       method: 'POST',
       body: { region_id: regionId },
     })
@@ -86,7 +113,7 @@ export function useCart() {
         return
       }
       try {
-        const res = await fetchMedusa<{ cart: MedusaCart }>(`/store/carts/${cartId.value}`)
+        const res = await fetchMedusa<{ cart: MedusaCart }>(`/store/carts/${cartId.value}?fields=${CART_FIELDS}`)
         applyCart(res.cart)
       } catch {
         // Cart likely completed/expired — start a fresh one.
@@ -108,7 +135,7 @@ export function useCart() {
     loading.value = true
     try {
       const current = await ensureCart()
-      const res = await fetchMedusa<{ cart: MedusaCart }>(`/store/carts/${current.id}/line-items`, {
+      const res = await fetchMedusa<{ cart: MedusaCart }>(`/store/carts/${current.id}/line-items?fields=${CART_FIELDS}`, {
         method: 'POST',
         body: { variant_id: variantId, quantity },
       })
@@ -128,7 +155,7 @@ export function useCart() {
     if (!cart.value) return
     loading.value = true
     try {
-      const res = await fetchMedusa<{ cart: MedusaCart }>(`/store/carts/${cart.value.id}/line-items/${itemId}`, {
+      const res = await fetchMedusa<{ cart: MedusaCart }>(`/store/carts/${cart.value.id}/line-items/${itemId}?fields=${CART_FIELDS}`, {
         method: 'POST',
         body: { quantity },
       })
@@ -144,10 +171,13 @@ export function useCart() {
     if (!cart.value) return
     loading.value = true
     try {
-      const res = await fetchMedusa<{ parent: MedusaCart }>(`/store/carts/${cart.value.id}/line-items/${itemId}`, {
+      await fetchMedusa(`/store/carts/${cart.value.id}/line-items/${itemId}`, {
         method: 'DELETE',
       })
-      applyCart(res.parent)
+      // DELETE returns the parent cart without computed totals — refetch to
+      // keep totals/promotions consistent.
+      const res = await fetchMedusa<{ cart: MedusaCart }>(`/store/carts/${cart.value.id}?fields=${CART_FIELDS}`)
+      applyCart(res.cart)
     } catch (err) {
       console.error('Failed to remove from cart', err)
     } finally {
@@ -156,28 +186,73 @@ export function useCart() {
   }
 
   /**
+   * Applies a Medusa promotion code to the cart. Totals/discount come back on
+   * the cart itself, so the discount automatically carries into checkout.
+   */
+  const applyPromoCode = async (code: string) => {
+    loading.value = true
+    try {
+      const current = await ensureCart()
+      const codes = [...new Set([...promoCodes.value, code.trim().toUpperCase()])]
+      const res = await fetchMedusa<{ cart: MedusaCart }>(`/store/carts/${current.id}?fields=${CART_FIELDS}`, {
+        method: 'POST',
+        body: { promo_codes: codes },
+      })
+      applyCart(res.cart)
+      const appliedNow = promoCodes.value.includes(code.trim().toUpperCase())
+      return appliedNow
+        ? { success: true as const, discount: totals.value.discount }
+        : { success: false as const, message: t('cart.couponInvalid') }
+    } catch (err) {
+      return { success: false as const, message: parseApiError(err, t('cart.couponInvalid')) }
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const removePromoCode = async (code: string) => {
+    if (!cart.value) return
+    loading.value = true
+    try {
+      const codes = promoCodes.value.filter(c => c !== code)
+      const res = await fetchMedusa<{ cart: MedusaCart }>(`/store/carts/${cart.value.id}?fields=${CART_FIELDS}`, {
+        method: 'POST',
+        body: { promo_codes: codes },
+      })
+      applyCart(res.cart)
+    } catch (err) {
+      console.error('Failed to remove promo code', err)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  /**
    * Runs Medusa's full guest checkout sequence: set contact/shipping info,
-   * pick the (single, Vietnam) shipping option, open a manual/system payment
-   * session, then complete the cart into an order.
-   *
-   * NOT wired up here (kept out of scope for this integration pass):
-   *  - Coupon codes (useCoupon.ts) are validated against the old NestJS API
-   *    only — they are NOT applied to the Medusa order.
-   *  - Order tracking (useOrder.ts) looks up orders in the old NestJS system
-   *    and will not find orders placed through this Medusa checkout.
+   * pick the (single) shipping option, open a payment session with the chosen
+   * provider, then complete the cart into an order. Any promotion applied via
+   * applyPromoCode is already on the cart and discounts the final order.
    */
   const checkout = async (data: {
     name: string
     phone: string
     address: string
     email?: string
-    coupon_code?: string
-    payment_method?: string
+    payment_provider_id?: string
   }) => {
     loading.value = true
     try {
       const current = await ensureCart()
       const [firstName, ...rest] = data.name.trim().split(/\s+/)
+
+      // Use a country that actually belongs to the cart's region ('vn' once
+      // the Vietnam region is seeded; the demo seed only has EU countries).
+      const { region } = await fetchMedusa<{ region: { countries: { iso_2: string }[] } }>(
+        `/store/regions/${current.region_id}`,
+      )
+      const countryCode = region.countries.find(c => c.iso_2 === 'vn')?.iso_2
+        ?? region.countries[0]?.iso_2
+        ?? 'vn'
 
       await fetchMedusa(`/store/carts/${current.id}`, {
         method: 'POST',
@@ -188,7 +263,7 @@ export function useCart() {
             last_name: rest.join(' ') || data.name,
             address_1: data.address,
             city: 'Hà Nội',
-            country_code: 'vn',
+            country_code: countryCode,
             phone: data.phone,
           },
         },
@@ -210,7 +285,7 @@ export function useCart() {
       )
       await fetchMedusa(`/store/payment-collections/${payment_collection.id}/payment-sessions`, {
         method: 'POST',
-        body: { provider_id: 'pp_system_default' },
+        body: { provider_id: data.payment_provider_id || 'pp_system_default' },
       })
 
       const result = await fetchMedusa<{ type: string, order?: { display_id: number }, error?: { message: string } }>(
@@ -225,6 +300,8 @@ export function useCart() {
       cartId.value = null
       cart.value = null
       items.value = []
+      totals.value = { subtotal: 0, discount: 0, shipping: 0, total: 0 }
+      promoCodes.value = []
 
       return {
         success: true,
@@ -251,6 +328,8 @@ export function useCart() {
   return {
     cart,
     items,
+    totals,
+    promoCodes,
     loading,
     toast,
     totalItems,
@@ -259,6 +338,8 @@ export function useCart() {
     addToCart,
     updateCart,
     removeFromCart,
+    applyPromoCode,
+    removePromoCode,
     checkout,
   }
 }

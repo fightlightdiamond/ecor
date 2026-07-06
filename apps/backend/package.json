@@ -24,6 +24,9 @@
     "seed:campaign-posts": "medusa exec ./src/scripts/seed-campaign-posts.ts"
   },
   "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
     "@medusajs/admin-sdk": "2.17.0",
     "@medusajs/admin-shared": "2.17.0",
     "@medusajs/caching": "2.17.0",

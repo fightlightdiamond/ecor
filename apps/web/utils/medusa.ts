@@ -1,9 +1,26 @@
-import type { Product, ProductCategory } from '~/utils/storefront'
+import type { Product, ProductCategory, ProductOption, ProductVariant } from '~/utils/storefront'
 import { FALLBACK_PRODUCT_IMAGE, stripHtml } from '~/utils/storefront'
+
+export interface MedusaOptionValue {
+  value: string
+}
+
+export interface MedusaOption {
+  id: string
+  title: string
+  values?: MedusaOptionValue[]
+}
+
+export interface MedusaVariantOptionValue {
+  value: string
+  option?: { title: string }
+}
 
 export interface MedusaVariant {
   id: string
-  calculated_price?: { calculated_amount: number | null; currency_code: string } | null
+  title: string
+  calculated_price?: { calculated_amount: number | null, currency_code: string } | null
+  options?: MedusaVariantOptionValue[]
 }
 
 export interface MedusaCategory {
@@ -18,8 +35,11 @@ export interface MedusaProduct {
   handle: string
   description?: string | null
   thumbnail?: string | null
+  material?: string | null
+  weight?: number | null
   images?: { url: string }[]
   categories?: MedusaCategory[]
+  options?: MedusaOption[]
   variants?: MedusaVariant[]
 }
 
@@ -31,23 +51,45 @@ export function transformMedusaProduct(p: MedusaProduct): Product {
   const gallery = (p.images?.map(i => i.url) ?? []).filter(Boolean)
   const description = p.description ?? ''
   const plain = stripHtml(description)
-  const variant = p.variants?.[0]
+
+  const variants: ProductVariant[] = (p.variants ?? []).map(v => ({
+    id: v.id,
+    title: v.title,
+    price: v.calculated_price?.calculated_amount ?? 0,
+    optionValues: Object.fromEntries(
+      (v.options ?? [])
+        .filter(o => o.option?.title)
+        .map(o => [o.option!.title, o.value]),
+    ),
+    // Medusa v2 stock levels require a separate inventory-location query —
+    // out of scope here, so every listed variant is treated as orderable.
+    inStock: true,
+  }))
+  const firstVariant = variants[0]
+
+  const options: ProductOption[] = (p.options ?? []).map(o => ({
+    id: o.id,
+    title: o.title,
+    values: (o.values ?? []).map(v => v.value),
+  }))
 
   return {
     id: p.id,
-    variantId: variant?.id ?? '',
+    variantId: firstVariant?.id ?? '',
     slug: p.handle,
-    price: variant?.calculated_price?.calculated_amount ?? 0,
+    price: firstVariant?.price ?? 0,
+    currencyCode: p.variants?.[0]?.calculated_price?.currency_code ?? 'vnd',
     image: p.thumbnail || gallery[0] || FALLBACK_PRODUCT_IMAGE,
     gallery: gallery.length ? gallery : [p.thumbnail || FALLBACK_PRODUCT_IMAGE],
     title: p.title,
     shortDesc: plain.slice(0, 160) + (plain.length > 160 ? '…' : ''),
     description,
-    features: [],
     categoryId: p.categories?.[0]?.id ?? null,
-    // Medusa v2's real stock level requires resolving inventory reservations
-    // per location — out of scope here; treat all listed products as
-    // available and let checkout surface any genuine backorder error.
+    categoryName: p.categories?.[0]?.name ?? '',
     inStock: true,
+    variants,
+    options,
+    material: p.material ?? null,
+    weight: p.weight ?? null,
   }
 }

@@ -73,7 +73,7 @@ const handleLogout = async () => {
   message.value = ''
 }
 
-const handleCancel = async (id: number) => {
+const handleCancel = async (id: string) => {
   const res = await cancelAppointment(id)
   if (res.success) {
     appointments.value = await fetchAppointments()

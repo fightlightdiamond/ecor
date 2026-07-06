@@ -4,22 +4,59 @@ const localePath = useLocalePath()
 const route = useRoute()
 
 const isMenuOpen = ref(false)
+const openDropdown = ref<string | null>(null)
+const openMobileGroup = ref<string | null>(null)
 
-watch(() => route.path, () => { isMenuOpen.value = false })
+watch(() => route.path, () => {
+  isMenuOpen.value = false
+  openDropdown.value = null
+  openMobileGroup.value = null
+})
 
 const { y: scrollY } = useWindowScroll()
 const isSolid = computed(() => scrollY.value > 50 || isMenuOpen.value)
 
 const { totalItems } = useCart()
 
-const navLinks = computed(() => [
+interface NavLink {
+  key: string
+  path: string
+  children?: { key: string, path: string }[]
+}
+
+const navLinks = computed<NavLink[]>(() => [
   { key: 'nav.home', path: '/' },
-  { key: 'nav.products', path: '/san-pham-list' },
-  { key: 'nav.craftVillage', path: '/lang-nghe' },
-  { key: 'nav.team', path: '/doi-ngu' },
-  { key: 'nav.blog', path: '/tin-tuc' },
+  {
+    key: 'nav.products',
+    path: '/san-pham-list',
+    children: [
+      { key: 'nav.productsMenu.teaViet', path: '/san-pham-list' },
+      { key: 'nav.productsMenu.anQuangCaffe', path: '/an-quang-caffe' },
+      { key: 'nav.productsMenu.corporateGifts', path: '/qua-tang-doanh-nghiep' },
+    ],
+  },
+  { key: 'nav.projectsPartners', path: '/du-an-doi-tac' },
+  { key: 'nav.events', path: '/trai-nghiem' },
+  {
+    key: 'nav.blog',
+    path: '/tin-tuc',
+    children: [
+      { key: 'nav.blogMenu.vietTea', path: '/nep-tra-viet' },
+      { key: 'nav.blogMenu.tradition', path: '/van-hoa-viet' },
+      { key: 'nav.blogMenu.teaHeritage', path: '/di-san-tra-cu' },
+      { key: 'nav.blogMenu.anQuangGarden', path: '/vuon-an-quang' },
+    ],
+  },
+  { key: 'nav.library', path: '/thu-vien-van-hoa' },
   { key: 'nav.contact', path: '/lien-he' },
 ])
+
+const toggleMobileGroup = (key: string) => {
+  openMobileGroup.value = openMobileGroup.value === key ? null : key
+}
+
+const desktopNavEl = ref<HTMLElement | null>(null)
+onClickOutside(desktopNavEl, () => { openDropdown.value = null })
 </script>
 
 <template>
@@ -31,16 +68,54 @@ const navLinks = computed(() => [
     <div class="site-header-inner container-page">
       <LayoutSiteLogo variant="header" class="site-header-logo" />
 
-      <nav class="max-lg:hidden lg:flex items-center gap-0 flex-1 justify-center min-w-0" aria-label="Main navigation">
-        <NuxtLink
+      <nav ref="desktopNavEl" class="max-lg:hidden lg:flex items-center gap-0 flex-1 justify-center min-w-0" aria-label="Main navigation">
+        <div
           v-for="link in navLinks"
           :key="link.key"
-          :to="localePath(link.path)"
-          class="site-nav-link"
-          active-class="site-nav-active"
+          class="site-nav-item"
+          @mouseenter="link.children && (openDropdown = link.key)"
+          @mouseleave="link.children && (openDropdown = null)"
         >
-          {{ t(link.key) }}
-        </NuxtLink>
+          <div class="flex items-center">
+            <NuxtLink
+              :to="localePath(link.path)"
+              class="site-nav-link"
+              active-class="site-nav-active"
+            >
+              {{ t(link.key) }}
+            </NuxtLink>
+            <button
+              v-if="link.children"
+              type="button"
+              class="site-nav-caret"
+              :aria-expanded="openDropdown === link.key"
+              :aria-label="`${t(link.key)} submenu`"
+              @click="openDropdown = link.key"
+            >
+              <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </button>
+          </div>
+
+          <Transition
+            enter-active-class="transition-all duration-150"
+            enter-from-class="opacity-0 -translate-y-1"
+            leave-active-class="transition-all duration-100"
+            leave-to-class="opacity-0 -translate-y-1"
+          >
+            <div v-if="link.children && openDropdown === link.key" class="site-dropdown">
+              <NuxtLink
+                v-for="child in link.children"
+                :key="child.key"
+                :to="localePath(child.path)"
+                class="site-dropdown-link"
+              >
+                {{ t(child.key) }}
+              </NuxtLink>
+            </div>
+          </Transition>
+        </div>
       </nav>
 
       <div class="max-lg:hidden lg:flex items-center gap-3">
@@ -86,16 +161,45 @@ const navLinks = computed(() => [
     >
       <div v-if="isMenuOpen" class="lg:hidden site-header-mobile">
         <nav class="container-page py-4 flex flex-col" aria-label="Mobile navigation">
-          <NuxtLink
-            v-for="link in navLinks"
-            :key="link.key"
-            :to="localePath(link.path)"
-            class="site-mobile-link"
-            active-class="text-[#e8d5a8]"
-            @click="isMenuOpen = false"
-          >
-            {{ t(link.key) }}
-          </NuxtLink>
+          <div v-for="link in navLinks" :key="link.key">
+            <div class="flex items-stretch">
+              <NuxtLink
+                :to="localePath(link.path)"
+                class="site-mobile-link flex-1"
+                active-class="text-[#e8d5a8]"
+                @click="isMenuOpen = false"
+              >
+                {{ t(link.key) }}
+              </NuxtLink>
+              <button
+                v-if="link.children"
+                type="button"
+                class="site-mobile-caret"
+                :aria-expanded="openMobileGroup === link.key"
+                :aria-label="`${t(link.key)} submenu`"
+                @click="toggleMobileGroup(link.key)"
+              >
+                <svg
+                  class="w-4 h-4 transition-transform duration-200"
+                  :class="openMobileGroup === link.key ? 'rotate-180' : ''"
+                  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+                >
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
+              </button>
+            </div>
+            <div v-if="link.children && openMobileGroup === link.key" class="site-mobile-submenu">
+              <NuxtLink
+                v-for="child in link.children"
+                :key="child.key"
+                :to="localePath(child.path)"
+                class="site-mobile-sublink"
+                @click="isMenuOpen = false"
+              >
+                {{ t(child.key) }}
+              </NuxtLink>
+            </div>
+          </div>
           <NuxtLink
             :to="localePath('/gio-hang')"
             class="site-mobile-link"
@@ -175,6 +279,89 @@ const navLinks = computed(() => [
 
 .site-nav-active {
   color: #e8d5a8 !important;
+}
+
+.site-nav-item {
+  position: relative;
+}
+
+.site-nav-caret {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  min-height: 28px;
+  margin-left: -4px;
+  color: rgba(245, 240, 230, .6);
+  transition: color .2s ease;
+}
+
+.site-nav-caret:hover {
+  color: #e8d5a8;
+}
+
+.site-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 240px;
+  padding: .4rem 0;
+  background: #1c2a1a;
+  border: 1px solid rgba(201, 168, 108, .2);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, .35);
+  z-index: 10;
+}
+
+.site-dropdown-link {
+  display: block;
+  padding: .65rem 1.1rem;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: rgba(245, 240, 230, .82);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background .15s ease, color .15s ease;
+}
+
+.site-dropdown-link:hover {
+  background: rgba(201, 168, 108, .12);
+  color: #e8d5a8;
+}
+
+.site-mobile-caret {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  color: rgba(245, 240, 230, .7);
+  border-bottom: 1px solid rgba(255, 255, 255, .06);
+}
+
+.site-mobile-submenu {
+  display: flex;
+  flex-direction: column;
+  padding-left: 1rem;
+  background: rgba(0, 0, 0, .15);
+}
+
+.site-mobile-sublink {
+  color: rgba(245, 240, 230, .72);
+  padding: .7rem .75rem;
+  font-size: .8125rem;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  border-bottom: 1px solid rgba(255, 255, 255, .06);
+  text-decoration: none;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  transition: color .2s ease;
+}
+
+.site-mobile-sublink:hover {
+  color: #e8d5a8;
 }
 
 .site-cart-link {

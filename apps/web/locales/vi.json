@@ -6,11 +6,25 @@
   "nav": {
     "home": "Trang chủ",
     "products": "Sản phẩm",
+    "productsMenu": {
+      "teaViet": "Thăng Long Chè Việt",
+      "anQuangCaffe": "Ân Quang cà phê",
+      "corporateGifts": "Quà tặng doanh nghiệp"
+    },
     "craftVillage": "Làng nghề",
+    "projectsPartners": "Dự án & Đối tác",
+    "events": "Sự kiện",
     "services": "Dịch vụ",
     "gallery": "Bộ sưu tập",
     "team": "Đội ngũ",
     "blog": "Tin tức",
+    "blogMenu": {
+      "vietTea": "Nếp trà Việt",
+      "tradition": "Văn hóa Việt & làng nghề truyền thống",
+      "teaHeritage": "Di sản trà cụ",
+      "anQuangGarden": "Vườn Ân Quang"
+    },
+    "library": "Thư viện văn hóa Việt",
     "contact": "Liên hệ",
     "bookNow": "Đặt lịch ngay"
   },
@@ -86,7 +100,7 @@
     "title": "Tra cứu đơn hàng",
     "eyebrow": "Đơn hàng",
     "subtitle": "Nhập mã đơn và số điện thoại đặt hàng để xem trạng thái.",
-    "numberPlaceholder": "Mã đơn (VD: ORD-20260625-ABC123)",
+    "numberPlaceholder": "Mã đơn (VD: 1024)",
     "orderNumber": "Mã đơn",
     "status": "Trạng thái",
     "date": "Ngày đặt",
@@ -133,7 +147,26 @@
     "descTitle": "Mô tả sản phẩm",
     "featuresTitle": "Đặc điểm nổi bật",
     "related": "Sản phẩm liên quan",
-    "notFound": "Không tìm thấy sản phẩm"
+    "notFound": "Không tìm thấy sản phẩm",
+    "viewDetail": "Xem chi tiết",
+    "filterAll": "Tất cả",
+    "empty": "Chưa có sản phẩm trong danh mục này.",
+    "storyEyebrow": "Câu chuyện",
+    "storyTitle": "Câu chuyện văn hóa trà",
+    "storySubtitle": "Những bài viết về hương vị và triết lý trà Việt",
+    "ctaMessage": "Liên hệ ngay để nhận ưu đãi đặc biệt!",
+    "ctaButton": "Đặt mua ngay",
+    "buyNow": "Mua ngay",
+    "chooseOption": "Vui lòng chọn {option}",
+    "outOfStock": "Tạm hết hàng",
+    "trustQuality": "Trà nguyên chất, tuyển chọn kỹ càng",
+    "trustShipping": "Giao hàng toàn quốc",
+    "trustReturn": "Đổi trả trong 7 ngày",
+    "specs": {
+      "category": "Danh mục",
+      "material": "Chất liệu",
+      "weight": "Khối lượng"
+    }
   },
   "cart": {
     "title": "Giỏ hàng",
@@ -164,7 +197,8 @@
     "couponInvalid": "Mã không hợp lệ",
     "couponError": "Không thể kiểm tra mã giảm giá.",
     "discount": "Giảm giá",
-    "subtotal": "Tạm tính"
+    "subtotal": "Tạm tính",
+    "shipping": "Phí vận chuyển"
   },
   "booking": {
     "preferredDate": "Ngày hẹn",
@@ -202,11 +236,8 @@
     }
   },
   "connect": {
-    "open": "Kết nối",
-    "title": "Kết nối với chúng tôi",
-    "subtitle": "Chọn kênh liên hệ hoặc để lại thông tin",
     "leaveInfo": "Để lại thông tin",
-    "back": "Kênh liên hệ"
+    "leaveInfoSubtitle": "Gửi thông tin, chúng tôi sẽ liên hệ lại sớm nhất"
   },
   "footer": {
     "followUs": "Theo dõi chúng tôi",

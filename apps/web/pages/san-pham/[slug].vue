@@ -1,6 +1,7 @@
 <script setup lang="ts">
-const { t } = useI18n()
-const { site } = useSettings()
+import { formatMoney } from '~/utils/storefront'
+
+const { t, locale } = useI18n()
 const { getBySlug } = useProducts()
 const { addToCart, loading: cartLoading } = useCart()
 const localePath = useLocalePath()
@@ -10,7 +11,17 @@ useScrollAnimation()
 
 const listUrl = computed(() => localePath('/san-pham-list'))
 const slug = computed(() => String(route.params.slug))
+
 const added = ref(false)
+const quantity = ref(1)
+const selectedImage = ref<string | null>(null)
+// null = no manual pick yet; the computed below falls back to the first
+// variant's option combo. Kept separate from a "resolved" ref so the very
+// first render (SSR included) can derive the default purely from `product`
+// with no watcher-timing race (a plain ref set inside a watch/watchEffect
+// isn't guaranteed to run before Nuxt's SSR render pass captures markup,
+// which previously caused hydration mismatches on both the image and here).
+const manualOptions = ref<Record<string, string> | null>(null)
 
 const { data: productData, pending } = useAsyncData(
   () => `product-${slug.value}`,
@@ -26,25 +37,95 @@ watchEffect(() => {
   }
 })
 
-const activeImage = ref('')
-watchEffect(() => {
-  if (product.value) {
-    activeImage.value = product.value.gallery[0] ?? product.value.image
-  }
+// Nuxt reuses this component instance across client-side slug navigation —
+// reset local UI state when the product actually changes.
+watch(() => product.value?.id, () => {
+  added.value = false
+  quantity.value = 1
+  selectedImage.value = null
+  manualOptions.value = null
 })
 
-const priceText = computed(() =>
-  `${product.value?.price.toLocaleString('vi-VN')} ${t('common.currency')}`,
+const activeImage = computed(() =>
+  selectedImage.value ?? product.value?.gallery[0] ?? product.value?.image ?? '',
 )
 
-const handleAddToCart = async () => {
-  if (!product.value) return
-  const res = await addToCart(product.value.variantId)
-  if (res.success) added.value = true
+const selectedOptions = computed<Record<string, string>>(() =>
+  manualOptions.value ?? { ...(product.value?.variants[0]?.optionValues ?? {}) },
+)
+
+const selectedVariant = computed(() => {
+  if (!product.value) return null
+  if (!product.value.options.length) return product.value.variants[0] ?? null
+  return product.value.variants.find(v =>
+    product.value!.options.every(o => v.optionValues[o.title] === selectedOptions.value[o.title]),
+  ) ?? null
+})
+
+function isValueAvailable(optionTitle: string, value: string) {
+  if (!product.value) return false
+  const candidate = { ...selectedOptions.value, [optionTitle]: value }
+  return product.value.variants.some(v =>
+    product.value!.options.every(o => v.optionValues[o.title] === candidate[o.title]),
+  )
 }
 
+function chooseOption(optionTitle: string, value: string) {
+  manualOptions.value = { ...selectedOptions.value, [optionTitle]: value }
+  added.value = false
+}
+
+const displayPrice = computed(() => selectedVariant.value?.price ?? product.value?.price ?? 0)
+const priceText = computed(() =>
+  formatMoney(displayPrice.value, product.value?.currencyCode ?? 'vnd', locale.value === 'en' ? 'en-US' : 'vi-VN'),
+)
+
+const missingOption = computed(() => {
+  if (!product.value || selectedVariant.value) return null
+  return product.value.options.find(o => !selectedOptions.value[o.title]) ?? product.value.options[0] ?? null
+})
+
+const canAddToCart = computed(() => Boolean(selectedVariant.value) && !cartLoading.value)
+
+const incrementQty = () => { quantity.value++ }
+const decrementQty = () => { if (quantity.value > 1) quantity.value-- }
+
+const handleAddToCart = async () => {
+  if (!selectedVariant.value) return
+  const res = await addToCart(selectedVariant.value.id, quantity.value)
+  if (res.success) added.value = true
+  return res.success
+}
+
+const buyNowLoading = ref(false)
+const handleBuyNow = async () => {
+  buyNowLoading.value = true
+  const ok = await handleAddToCart()
+  buyNowLoading.value = false
+  if (ok) await navigateTo(localePath('/gio-hang'))
+}
+
+const specs = computed(() => {
+  if (!product.value) return []
+  const rows: { label: string, value: string }[] = []
+  if (product.value.categoryName) {
+    rows.push({ label: t('products.specs.category'), value: product.value.categoryName })
+  }
+  if (product.value.material) {
+    rows.push({ label: t('products.specs.material'), value: product.value.material })
+  }
+  if (product.value.weight) {
+    const kg = product.value.weight / 1000
+    rows.push({
+      label: t('products.specs.weight'),
+      value: kg >= 1 ? `${kg.toLocaleString('vi-VN')} kg` : `${product.value.weight} g`,
+    })
+  }
+  return rows
+})
+
 useSeoMeta({
-  title: () => `${product.value?.title} | ${site.value.name}`,
+  title: () => product.value?.title,
   description: () => product.value?.shortDesc,
   ogImage: () => product.value?.image,
 })
@@ -53,71 +134,186 @@ useProductStructuredData(product)
 </script>
 
 <template>
-  <div v-if="product" class="bg-dark text-white">
-    <section class="section-py">
+  <div class="bg-dark text-white min-h-[70vh]">
+    <!-- Loading skeleton — shown while useAsyncData is pending (initial load
+         and client-side navigation to a different product both go through
+         this), so the page never looks empty while the API responds. -->
+    <section v-if="!product" class="section-py" aria-busy="true" :aria-label="t('common.loading')">
       <div class="container-page">
-        <nav class="mb-8 text-xs uppercase tracking-[0.12em] text-white/50 d-none!" aria-label="Breadcrumb">
-          <NuxtLink :to="localePath('/')" class="hover:text-primary-400">{{ t('nav.home') }}</NuxtLink>
-          <span class="mx-2">/</span>
-          <NuxtLink :to="listUrl" class="hover:text-primary-400">{{ t('products.label') }}</NuxtLink>
-          <span class="mx-2">/</span>
-          <span class="text-white/80">{{ product.title }}</span>
+        <div class="mb-6 h-4 w-56 bg-white/5 rounded animate-pulse" />
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
+          <div class="aspect-square rounded-2xl bg-white/5 animate-pulse" />
+          <div class="space-y-4">
+            <div class="h-3 w-24 bg-white/5 rounded animate-pulse" />
+            <div class="h-9 w-3/4 bg-white/5 rounded animate-pulse" />
+            <div class="h-7 w-32 bg-white/5 rounded animate-pulse" />
+            <div class="h-4 w-full bg-white/5 rounded animate-pulse" />
+            <div class="h-4 w-5/6 bg-white/5 rounded animate-pulse" />
+            <div class="h-11 w-full bg-white/5 rounded mt-6 animate-pulse" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section v-else class="section-py">
+      <div class="container-page">
+        <nav class="mb-6 flex items-center gap-2 text-xs uppercase tracking-[0.1em] text-white/45" aria-label="Breadcrumb">
+          <NuxtLink :to="localePath('/')" class="hover:text-primary-400 transition-colors">{{ t('nav.home') }}</NuxtLink>
+          <span aria-hidden="true">/</span>
+          <NuxtLink :to="listUrl" class="hover:text-primary-400 transition-colors">{{ t('products.label') }}</NuxtLink>
+          <span aria-hidden="true">/</span>
+          <span class="text-white/75 truncate">{{ product.title }}</span>
         </nav>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-14">
-          <div class="animate-on-scroll">
-            <div class="relative aspect-[16/9] overflow-hidden rounded-lg bg-[#2a3326] shadow-2xl">
-              <img :src="activeImage" :alt="product.title" class="w-full h-full object-cover">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
+          <!-- Gallery -->
+          <div class="animate-on-scroll lg:sticky lg:top-24 lg:self-start">
+            <div class="relative aspect-square overflow-hidden rounded-2xl bg-[#2a3326] shadow-2xl group">
+              <img
+                :src="activeImage"
+                :alt="product.title"
+                class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              >
             </div>
             <div v-if="product.gallery.length > 1" class="mt-4 flex gap-3">
               <button
                 v-for="(img, i) in product.gallery"
                 :key="i"
                 type="button"
-                class="relative aspect-[16/9] w-24 overflow-hidden rounded-md border-2 transition-colors"
-                :class="img === activeImage ? 'border-primary-500' : 'border-transparent opacity-70 hover:opacity-100'"
-                @click="activeImage = img"
+                class="relative aspect-square w-20 overflow-hidden rounded-lg border-2 transition-colors"
+                :class="img === activeImage ? 'border-primary-500' : 'border-transparent opacity-60 hover:opacity-100'"
+                @click="selectedImage = img"
               >
                 <img :src="img" :alt="`${product.title} ${i + 1}`" class="w-full h-full object-cover">
               </button>
             </div>
           </div>
 
+          <!-- Info -->
           <div class="animate-on-scroll">
-            <p class="modis-eyebrow mb-3">{{ t('products.label') }}</p>
-            <h1 class="font-heading text-3xl md:text-4xl font-bold mb-3">{{ product.title }}</h1>
+            <p class="modis-eyebrow mb-3">{{ product.categoryName || t('products.label') }}</p>
+            <h1 class="font-heading text-3xl md:text-4xl font-bold mb-3 leading-tight">{{ product.title }}</h1>
             <p class="text-2xl font-semibold text-primary-400 mb-5">{{ priceText }}</p>
             <p class="text-white/70 leading-relaxed mb-6">{{ product.shortDesc }}</p>
 
-            <ul v-if="product.features.length" class="space-y-2.5 mb-8">
-              <li
-                v-for="(f, i) in product.features"
-                :key="i"
-                class="flex items-start gap-3 text-sm text-white/80"
-              >
-                <svg class="mt-0.5 w-4 h-4 flex-shrink-0 text-primary-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M20 6 9 17l-5-5" />
-                </svg>
-                <span>{{ f }}</span>
-              </li>
-            </ul>
+            <!-- Variant / option selectors -->
+            <div v-if="product.options.length" class="space-y-5 mb-6">
+              <div v-for="opt in product.options" :key="opt.id">
+                <p class="text-xs uppercase tracking-widest text-white/50 mb-2">
+                  {{ opt.title }}
+                  <span v-if="selectedOptions[opt.title]" class="text-white/80">— {{ selectedOptions[opt.title] }}</span>
+                </p>
+                <div class="flex flex-wrap gap-2">
+                  <button
+                    v-for="val in opt.values"
+                    :key="val"
+                    type="button"
+                    class="min-h-[40px] px-4 border text-sm transition-colors"
+                    :class="[
+                      selectedOptions[opt.title] === val
+                        ? 'border-primary-500 bg-primary-500/15 text-primary-300'
+                        : 'border-white/20 text-white/70 hover:border-white/40',
+                      !isValueAvailable(opt.title, val) ? 'opacity-30 cursor-not-allowed line-through' : '',
+                    ]"
+                    :disabled="!isValueAvailable(opt.title, val)"
+                    @click="chooseOption(opt.title, val)"
+                  >
+                    {{ val }}
+                  </button>
+                </div>
+              </div>
+              <p v-if="missingOption" class="text-xs text-amber-400/90">
+                {{ t('products.chooseOption', { option: missingOption.title }) }}
+              </p>
+            </div>
 
-            <div class="flex flex-wrap gap-3">
+            <!-- Quantity + CTA -->
+            <div class="flex flex-wrap items-stretch gap-3 mb-4">
+              <div class="flex items-center border border-white/20">
+                <button
+                  type="button"
+                  class="w-11 min-h-[44px] flex items-center justify-center text-white/70 hover:text-white disabled:opacity-30"
+                  :disabled="quantity <= 1"
+                  :aria-label="t('cart.quantity')"
+                  @click="decrementQty"
+                >
+                  −
+                </button>
+                <span class="w-10 text-center text-sm tabular-nums">{{ quantity }}</span>
+                <button
+                  type="button"
+                  class="w-11 min-h-[44px] flex items-center justify-center text-white/70 hover:text-white"
+                  :aria-label="t('cart.quantity')"
+                  @click="incrementQty"
+                >
+                  +
+                </button>
+              </div>
+
               <button
                 type="button"
-                class="btn-primary min-h-[44px] disabled:opacity-60"
-                :disabled="cartLoading"
+                class="btn-primary min-h-[44px] flex-1 disabled:opacity-60"
+                :disabled="!canAddToCart"
                 @click="handleAddToCart"
               >
                 {{ added ? t('cart.added') : t('cart.add') }}
               </button>
-              <NuxtLink :to="localePath('/gio-hang')" class="btn-ghost">
+
+              <button
+                type="button"
+                class="min-h-[44px] flex-1 px-6 border-2 border-primary-500 text-primary-400 font-condensed text-xs uppercase tracking-[0.15em]
+                       hover:bg-primary-500 hover:text-white transition-colors disabled:opacity-60"
+                :disabled="!canAddToCart || buyNowLoading"
+                @click="handleBuyNow"
+              >
+                {{ t('products.buyNow') }}
+              </button>
+            </div>
+
+            <div class="flex flex-wrap gap-x-5 gap-y-2 mb-8 text-xs">
+              <NuxtLink :to="localePath('/gio-hang')" class="text-white/60 hover:text-primary-400 transition-colors underline">
                 {{ t('cart.view') }}
               </NuxtLink>
-              <NuxtLink :to="listUrl" class="btn-ghost">
+              <NuxtLink :to="listUrl" class="text-white/60 hover:text-primary-400 transition-colors underline">
                 {{ t('products.backToList') }}
               </NuxtLink>
             </div>
+
+            <!-- Trust badges -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8 border-t border-white/10 pt-6">
+              <div class="flex items-center gap-2.5 text-xs text-white/65">
+                <svg class="w-5 h-5 flex-shrink-0 text-primary-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+                  <path d="M12 21c-4.5-2.5-7-6-7-10a7 7 0 0 1 14 0c0 4-2.5 7.5-7 10Z" stroke-linecap="round" stroke-linejoin="round" />
+                  <path d="M12 12v5" stroke-linecap="round" />
+                </svg>
+                <span>{{ t('products.trustQuality') }}</span>
+              </div>
+              <div class="flex items-center gap-2.5 text-xs text-white/65">
+                <svg class="w-5 h-5 flex-shrink-0 text-primary-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+                  <path d="M3 7h11v10H3z" stroke-linecap="round" stroke-linejoin="round" />
+                  <path d="M14 10h4l3 3v4h-7z" stroke-linecap="round" stroke-linejoin="round" />
+                  <circle cx="7" cy="18" r="1.6" />
+                  <circle cx="17.5" cy="18" r="1.6" />
+                </svg>
+                <span>{{ t('products.trustShipping') }}</span>
+              </div>
+              <div class="flex items-center gap-2.5 text-xs text-white/65">
+                <svg class="w-5 h-5 flex-shrink-0 text-primary-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+                  <path d="M12 3l7 3v5c0 5-3 8.5-7 10-4-1.5-7-5-7-10V6z" stroke-linecap="round" stroke-linejoin="round" />
+                  <path d="m9 12 2 2 4-4" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <span>{{ t('products.trustReturn') }}</span>
+              </div>
+            </div>
+
+            <!-- Specs -->
+            <dl v-if="specs.length" class="space-y-2 border-t border-white/10 pt-6">
+              <h2 class="text-sm font-semibold text-white/80 mb-3">{{ t('products.featuresTitle') }}</h2>
+              <div v-for="row in specs" :key="row.label" class="flex justify-between text-sm py-1.5 border-b border-white/5">
+                <dt class="text-white/50">{{ row.label }}</dt>
+                <dd class="text-white/85 text-right">{{ row.value }}</dd>
+              </div>
+            </dl>
           </div>
         </div>
 
@@ -147,7 +343,9 @@ useProductStructuredData(product)
               <img :src="p.image" :alt="p.title" loading="lazy" class="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105">
             </div>
             <h3 class="mt-3 text-center text-white/75 text-sm uppercase tracking-[0.12em] transition-colors group-hover:text-primary-400">{{ p.title }}</h3>
-            <p class="mt-1 text-center text-primary-400 text-sm font-semibold">{{ p.price.toLocaleString('vi-VN') }} {{ t('common.currency') }}</p>
+            <p class="mt-1 text-center text-primary-400 text-sm font-semibold">
+              {{ formatMoney(p.price, p.currencyCode, locale === 'en' ? 'en-US' : 'vi-VN') }}
+            </p>
           </NuxtLink>
         </div>
       </div>

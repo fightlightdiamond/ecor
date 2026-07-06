@@ -5,7 +5,8 @@ import { categoryLabel } from '~/utils/storefront'
 
 export type { Product } from '~/utils/storefront'
 
-const PRODUCT_FIELDS = 'id,title,handle,description,thumbnail,*images,*categories,*variants.calculated_price'
+const PRODUCT_FIELDS = 'id,title,handle,description,thumbnail,material,weight,*images,*categories,'
+  + '*options,*options.values,*variants,*variants.options,*variants.calculated_price'
 
 export function useProducts() {
   const { locale } = useI18n()

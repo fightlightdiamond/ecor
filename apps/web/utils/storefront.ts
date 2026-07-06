@@ -10,20 +10,58 @@ export interface ApiEnvelope<T> {
   message?: string
 }
 
+export interface ProductVariant {
+  id: string
+  title: string
+  price: number
+  /** Option title -> selected value for this variant, e.g. { Size: 'M' }. */
+  optionValues: Record<string, string>
+  inStock: boolean
+}
+
+export interface ProductOption {
+  id: string
+  title: string
+  values: string[]
+}
+
 export interface Product {
   id: string
   /** Default variant id — required by Medusa's cart line-item API (add to cart). */
   variantId: string
   slug: string
   price: number
+  currencyCode: string
   image: string
   gallery: string[]
   title: string
   shortDesc: string
   description: string
-  features: string[]
   categoryId: string | null
+  categoryName: string
   inStock: boolean
+  variants: ProductVariant[]
+  options: ProductOption[]
+  material: string | null
+  weight: number | null
+}
+
+/**
+ * Locale/currency-aware money formatting — VND has no decimals, most others
+ * use 2. Falls back to a plain "<amount> <CODE>" string if Intl rejects the
+ * currency code (e.g. an unrecognized/test code from seed data).
+ */
+export function formatMoney(amount: number, currencyCode: string, locale = 'vi-VN'): string {
+  const code = (currencyCode || 'VND').toUpperCase()
+  try {
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: code,
+      maximumFractionDigits: code === 'VND' ? 0 : 2,
+    }).format(amount)
+  } catch {
+    return `${amount.toLocaleString(locale)} ${code}`
+  }
 }
 
 export interface RawPost {
@@ -78,7 +116,7 @@ export function localText(field: unknown, locale: string): string {
 }
 
 export const FALLBACK_PRODUCT_IMAGE = 'https://images.unsplash.com/photo-1594631252845-29fc4cc8c011?q=80&w=800'
-const FALLBACK_POST_IMAGE = 'https://images.unsplash.com/photo-1544787219-7f47ccb7fae6?q=80&w=800'
+export const FALLBACK_POST_IMAGE = 'https://images.unsplash.com/photo-1544787219-7f47ccb7fae6?q=80&w=800'
 
 export function parseApiError(err: unknown, fallback: string): string {
   if (err && typeof err === 'object') {
