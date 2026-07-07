@@ -114,7 +114,29 @@
       "deleteConfirmDesc": "Bạn có chắc muốn xóa \"{{title}}\" không?",
       "confirmDelete": "Xóa",
       "cancelDelete": "Hủy",
-      "cannotDeleteLocked": "Card cố định không thể xóa"
+      "cannotDeleteLocked": "Card cố định không thể xóa",
+      "importDone": "Nhập xong: {{created}} thêm mới, {{updated}} cập nhật, {{skipped}} bỏ qua",
+      "importFailed": "Nhập danh sách card thất bại",
+      "importEmpty": "File không có dữ liệu để nhập",
+      "importParseFailed": "Không đọc được file — kiểm tra lại định dạng"
+    },
+    "io": {
+      "export": "Xuất file",
+      "exportJson": "Xuất JSON",
+      "exportCsv": "Xuất CSV",
+      "exportTxt": "Xuất Text",
+      "import": "Nhập file"
+    },
+    "bulk": {
+      "selectAll": "Chọn tất cả",
+      "selectedCount": "Đã chọn {{count}} card",
+      "deleteSelected": "Xóa card đã chọn",
+      "deleteDone": "Đã xóa {{count}} card",
+      "deleteSkipped": "Bỏ qua {{count}} card cố định, không thể xóa",
+      "deleteFailed": "Xóa card đã chọn thất bại",
+      "confirmTitle": "Xóa card đã chọn",
+      "confirmDesc": "Bạn có chắc muốn xóa {{count}} card đã chọn không? Hành động này không thể hoàn tác.",
+      "lockedNotSelectable": "Card cố định không thể chọn để xóa đồng loạt"
     }
   }
 }

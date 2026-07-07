@@ -6,7 +6,11 @@ set -e
 # ./nginx/...) resolve — those stay relative to infra/, where the file lives.
 # (Do NOT use --project-directory here: it would also rebase those paths onto
 # the repo root, turning "../" into the repo's *parent* directory.)
-COMPOSE="docker compose -f infra/docker-compose.yml --env-file .env"
+
+# stop all running containers and remove any orphaned ones, then clear volumes/networks in prod environment
+docker compose -f infra/docker-compose.prod.yml down --remove-orphans || true
+
+COMPOSE="docker compose -f infra/docker-compose.yml --env-file .env.dev"
 
 $COMPOSE down
 # # docker remove all images

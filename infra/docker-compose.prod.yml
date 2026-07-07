@@ -127,6 +127,7 @@ services:
       - backend_medusa:/workspace/apps/backend/.medusa
     command: >
       sh -c "npx medusa db:migrate &&
+             (npx medusa exec ./src/scripts/seed-cards.js || true) &&
              (npx medusa user -e ${ADMIN_EMAIL:-admin@medusa.local} -p ${ADMIN_PASSWORD:-supersecret123} || true) &&
              npm run start"
     healthcheck:

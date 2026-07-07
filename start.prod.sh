@@ -16,6 +16,11 @@
 #   ./infra/scripts/deploy.sh
 set -euo pipefail
 
+# stop all running containers and remove any orphaned ones, then clear volumes/networks in dev environment
+docker compose -f infra/docker-compose.yml down --remove-orphans || true
+
+./clear.sh
+
 # cd "$(dirname "$0")/../.."
 
 if [ ! -f .env.prod ]; then
@@ -23,12 +28,26 @@ if [ ! -f .env.prod ]; then
   exit 1
 fi
 
+# get REBUILD_ALL from .env.prod (default false) so you can force a full rebuild/clean of the prod stack
+set -a
+. .env.prod
+set +a
+REBUILD_ALL=${REBUILD_ALL:-false}
+
 COMPOSE=(docker compose -f infra/docker-compose.prod.yml --env-file .env.prod)
 
 "${COMPOSE[@]}" down --remove-orphans || true
-# "${COMPOSE[@]}" rm -f || true
-# "${COMPOSE[@]}" volume prune -f || true
-# "${COMPOSE[@]}" network prune -f || true
+echo "==> Cleared running containers and orphaned ones."
+echo "REBUILD_ALL: $REBUILD_ALL"
+if [ "$REBUILD_ALL" = "true" ]; then
+  echo "==> Rebuilding all images..."
+  # clear all volumes and networks (orphaned ones are already gone from the down above)
+  "${COMPOSE[@]}" rm || true
+  docker volume rm $("${COMPOSE[@]}" volumes -q) || true
+  # docker network rm $("${COMPOSE[@]}" network ls -q) || true
+  "${COMPOSE[@]}" build
+  echo "==> Rebuilding all images done."
+fi
 
 echo "==> Building and starting the production stack..."
 # --force-recreate re-runs the one-shot `build` service against the current

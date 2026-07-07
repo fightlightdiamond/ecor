@@ -1,8 +1,8 @@
 import { defineRouteConfig } from "@medusajs/admin-sdk"
-import { DotsSix, GridLayout } from "@medusajs/icons"
-import { Badge, Button, Container, Heading, Switch, Text, Tooltip, toast } from "@medusajs/ui"
+import { ArrowDownTray, ArrowUpTray, DotsSix, GridLayout } from "@medusajs/icons"
+import { Badge, Button, Checkbox, Container, DropdownMenu, Heading, Switch, Text, Tooltip, toast, usePrompt } from "@medusajs/ui"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import {
@@ -23,17 +23,28 @@ import {
 } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { cardTitle } from "../../lib/card"
+import { cardsToDelimited, cardsToJson, downloadFile, parseImportFile, type ImportRow } from "../../lib/card-io"
 import { sdk } from "../../lib/sdk"
 import type { Card, CardsResponse } from "../../types/card"
+
+type ImportResult = {
+  created: number
+  updated: number
+  skipped: number
+  errors: string[]
+  cards: Card[]
+}
 
 type RowProps = {
   card: Card
   onNavigate: (id: string) => void
   onToggleActive: (card: Card) => void
   togglingId: string | null
+  selected: boolean
+  onToggleSelect: (id: string) => void
 }
 
-const CardRow = ({ card, onNavigate, onToggleActive, togglingId }: RowProps) => {
+const CardRow = ({ card, onNavigate, onToggleActive, togglingId, selected, onToggleSelect }: RowProps) => {
   const { t } = useTranslation()
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: card.id,
@@ -52,6 +63,18 @@ const CardRow = ({ card, onNavigate, onToggleActive, togglingId }: RowProps) => 
       style={style}
       className="flex items-center gap-x-4 px-6 py-3 hover:bg-ui-bg-subtle-hover bg-ui-bg-base"
     >
+      {card.locked ? (
+        <Tooltip content={t("cards.bulk.lockedNotSelectable")}>
+          <Checkbox checked={false} disabled />
+        </Tooltip>
+      ) : (
+        <Checkbox
+          checked={selected}
+          onCheckedChange={() => onToggleSelect(card.id)}
+          onClick={(e: React.MouseEvent) => e.stopPropagation()}
+        />
+      )}
+
       <button
         type="button"
         className="cursor-grab active:cursor-grabbing text-ui-fg-muted touch-none"
@@ -122,6 +145,7 @@ const CardsPage = () => {
   const navigate = useNavigate()
   const { t } = useTranslation()
   const queryClient = useQueryClient()
+  const prompt = usePrompt()
 
   const { data, isLoading } = useQuery<CardsResponse>({
     queryFn: () => sdk.client.fetch(`/admin/cards`),
@@ -167,6 +191,100 @@ const CardsPage = () => {
     toggleActive(card)
   }
 
+  const handleExport = (format: "json" | "csv" | "txt") => {
+    if (format === "json") {
+      downloadFile("cards.json", cardsToJson(items), "application/json")
+    } else if (format === "csv") {
+      downloadFile("cards.csv", cardsToDelimited(items, ","), "text/csv")
+    } else {
+      downloadFile("cards.txt", cardsToDelimited(items, "\t"), "text/plain")
+    }
+  }
+
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const { mutate: importCards, isPending: isImporting } = useMutation({
+    mutationFn: (rows: ImportRow[]) =>
+      sdk.client.fetch<ImportResult>("/admin/cards/import", { method: "POST", body: { items: rows } }),
+    onSuccess: (result) => {
+      setItems(result.cards)
+      queryClient.setQueryData([["cards"]], { cards: result.cards, count: result.cards.length })
+      toast.success(
+        t("cards.messages.importDone", {
+          created: result.created,
+          updated: result.updated,
+          skipped: result.skipped,
+        }),
+      )
+      result.errors.forEach((err) => toast.warning(err))
+    },
+    onError: () => toast.error(t("cards.messages.importFailed")),
+  })
+
+  const handleImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    e.target.value = ""
+    if (!file) return
+
+    try {
+      const rows = await parseImportFile(file)
+      if (!rows.length) {
+        toast.error(t("cards.messages.importEmpty"))
+        return
+      }
+      importCards(rows)
+    } catch {
+      toast.error(t("cards.messages.importParseFailed"))
+    }
+  }
+
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const selectableIds = items.filter((c) => !c.locked).map((c) => c.id)
+  const allSelected = selectableIds.length > 0 && selectableIds.every((id) => selectedIds.has(id))
+
+  const handleToggleSelect = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  const handleToggleSelectAll = () => {
+    setSelectedIds(allSelected ? new Set() : new Set(selectableIds))
+  }
+
+  const { mutate: bulkDelete, isPending: isBulkDeleting } = useMutation({
+    mutationFn: (ids: string[]) =>
+      sdk.client.fetch<{ deleted: number, skipped: number, cards: Card[] }>("/admin/cards/bulk-delete", {
+        method: "POST",
+        body: { ids },
+      }),
+    onSuccess: (result) => {
+      setItems(result.cards)
+      queryClient.setQueryData([["cards"]], { cards: result.cards, count: result.cards.length })
+      setSelectedIds(new Set())
+      toast.success(t("cards.bulk.deleteDone", { count: result.deleted }))
+      if (result.skipped > 0) toast.warning(t("cards.bulk.deleteSkipped", { count: result.skipped }))
+    },
+    onError: () => toast.error(t("cards.bulk.deleteFailed")),
+  })
+
+  const handleBulkDelete = async () => {
+    const ids = Array.from(selectedIds)
+    if (!ids.length) return
+
+    const confirmed = await prompt({
+      title: t("cards.bulk.confirmTitle"),
+      description: t("cards.bulk.confirmDesc", { count: ids.length }),
+      confirmText: t("cards.messages.confirmDelete"),
+      cancelText: t("cards.messages.cancelDelete"),
+    })
+    if (!confirmed) return
+
+    bulkDelete(ids)
+  }
+
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
@@ -190,13 +308,77 @@ const CardsPage = () => {
       <div className="flex flex-col gap-y-1 px-6 py-4">
         <div className="flex items-center justify-between">
           <Heading>{t("cards.title")}</Heading>
-          <Button size="small" variant="secondary" onClick={() => navigate("create")}>
-            {t("cards.create")}
-          </Button>
+          <div className="flex items-center gap-x-2">
+            <DropdownMenu>
+              <DropdownMenu.Trigger asChild>
+                <Button size="small" variant="secondary">
+                  <ArrowDownTray />
+                  {t("cards.io.export")}
+                </Button>
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Content align="end">
+                <DropdownMenu.Item onClick={() => handleExport("json")}>
+                  {t("cards.io.exportJson")}
+                </DropdownMenu.Item>
+                <DropdownMenu.Item onClick={() => handleExport("csv")}>
+                  {t("cards.io.exportCsv")}
+                </DropdownMenu.Item>
+                <DropdownMenu.Item onClick={() => handleExport("txt")}>
+                  {t("cards.io.exportTxt")}
+                </DropdownMenu.Item>
+              </DropdownMenu.Content>
+            </DropdownMenu>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".json,.csv,.txt"
+              className="hidden"
+              onChange={handleImportFile}
+            />
+            <Button
+              size="small"
+              variant="secondary"
+              isLoading={isImporting}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <ArrowUpTray />
+              {t("cards.io.import")}
+            </Button>
+
+            <Button size="small" variant="secondary" onClick={() => navigate("create")}>
+              {t("cards.create")}
+            </Button>
+          </div>
         </div>
         <Text className="text-ui-fg-subtle" size="small">
           {t("cards.hint")}
         </Text>
+      </div>
+
+      <div className="flex items-center gap-x-4 px-6 py-2 bg-ui-bg-subtle">
+        <Checkbox
+          checked={allSelected}
+          disabled={selectableIds.length === 0}
+          onCheckedChange={handleToggleSelectAll}
+        />
+        {selectedIds.size > 0 ? (
+          <div className="flex flex-1 items-center justify-between">
+            <Text size="small">{t("cards.bulk.selectedCount", { count: selectedIds.size })}</Text>
+            <Button
+              size="small"
+              variant="danger"
+              isLoading={isBulkDeleting}
+              onClick={handleBulkDelete}
+            >
+              {t("cards.bulk.deleteSelected")}
+            </Button>
+          </div>
+        ) : (
+          <Text size="small" className="text-ui-fg-subtle">
+            {t("cards.bulk.selectAll")}
+          </Text>
+        )}
       </div>
 
       <div className="flex flex-col divide-y divide-ui-border-base">
@@ -215,6 +397,8 @@ const CardsPage = () => {
                 onNavigate={navigate}
                 onToggleActive={handleToggleActive}
                 togglingId={togglingId}
+                selected={selectedIds.has(card.id)}
+                onToggleSelect={handleToggleSelect}
               />
             ))}
           </SortableContext>
