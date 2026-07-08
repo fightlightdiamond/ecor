@@ -22,7 +22,8 @@ COPY package.json package-lock.json ./
 COPY apps/backend/package.json ./apps/backend/
 COPY apps/storefront/package.json ./apps/storefront/
 COPY apps/web/package.json ./apps/web/
-RUN npm install --no-audit --no-fund
+RUN npm install --no-audit --no-fund \
+    || npm install --no-audit --no-fund --legacy-peer-deps
 
 # --- build: compile the server + build the admin dashboard ------------------
 FROM node:20-slim AS build
@@ -39,7 +40,8 @@ FROM node:20-slim AS production
 WORKDIR /app
 ENV NODE_ENV=production
 COPY --from=build /workspace/apps/backend/.medusa/server ./
-RUN npm install --omit=dev --no-audit --no-fund
+RUN npm install --omit=dev --no-audit --no-fund \
+    || npm install --omit=dev --no-audit --no-fund --legacy-peer-deps
 
 EXPOSE 9000
 
