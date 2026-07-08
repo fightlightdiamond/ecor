@@ -33,13 +33,17 @@
 #   DEPLOY_DIR=/path        override the default remote directory
 #   DEPLOY_SSH_PORT=22      SSH port
 #   PUSH_ENV=1              overwrite the server's .env.prod with the local one
-#                           (DOMAIN is rewritten to the server IP automatically)
+#   DEPLOY_DOMAIN=domain    when pushing .env.prod, set its DOMAIN to this
+#                           (e.g. thanglongcheviet.ddnsfree.com)
 #   SKIP_BUILD=1            redeploy the existing local build output as-is
 #   SKIP_INSTALL=1          build, but skip the root `npm install`
 #
-# .env.prod handling: the server keeps its OWN copy (its DOMAIN is the server
-# IP, and it may hold real secrets). It is only pushed on the FIRST deploy —
-# or when you explicitly pass PUSH_ENV=1 — never silently overwritten.
+# .env.prod handling: the server keeps its OWN copy (it may hold real secrets).
+# It is only pushed on the FIRST deploy — or when you explicitly pass
+# PUSH_ENV=1 — never silently overwritten. On push, DOMAIN is resolved as:
+#   DEPLOY_DOMAIN set          -> use it
+#   local DOMAIN=localhost     -> rewrite to the server IP (LAN fallback)
+#   local DOMAIN=<real domain> -> keep as-is (never clobbered by the IP)
 # =============================================================================
 set -euo pipefail
 
@@ -52,6 +56,7 @@ SERVER="${1:-$DEPLOY_SERVER}"
 REMOTE_DIR="${2:-$DEPLOY_DIR}"
 SSH_PORT="${DEPLOY_SSH_PORT:-22}"
 PUSH_ENV="${PUSH_ENV:-0}"
+DEPLOY_DOMAIN="${DEPLOY_DOMAIN:-}"
 
 # SKIP_BUILD=0
 # if [ "${SKIP_INSTALL:-0}" = "1" ]; then
@@ -61,7 +66,7 @@ PUSH_ENV="${PUSH_ENV:-0}"
 
 if [ -z "$SERVER" ]; then
   echo "Usage: ./deploy.sh <user@server-ip> [remote_dir]" >&2
-  echo "Env options: DEPLOY_SERVER, DEPLOY_DIR, DEPLOY_SSH_PORT, PUSH_ENV=1, SKIP_BUILD=1" >&2
+  echo "Env options: DEPLOY_SERVER, DEPLOY_DIR, DEPLOY_SSH_PORT, PUSH_ENV=1, DEPLOY_DOMAIN=<domain>, SKIP_BUILD=1" >&2
   exit 1
 fi
 
@@ -103,9 +108,20 @@ if [ "$PUSH_ENV" = "1" ] || ! "${SSH[@]}" "[ -f '$REMOTE_DIR/.env.prod' ]"; then
     # case (not \${ans,,}): macOS ships bash 3.2 without lowercase expansion.
     case "$ans" in y|Y) ;; *) exit 1 ;; esac
   fi
-  echo "==> Pushing .env.prod (DOMAIN will be set to $HOST_IP)..."
+  echo "==> Pushing .env.prod..."
   scp -P "$SSH_PORT" -q .env.prod "$SERVER:$REMOTE_DIR/.env.prod"
-  "${SSH[@]}" "sed -i 's/^DOMAIN=.*/DOMAIN=$HOST_IP/' '$REMOTE_DIR/.env.prod'"
+  # DOMAIN on the server: an explicit DEPLOY_DOMAIN wins; otherwise only the
+  # localhost placeholder is rewritten to the server IP — a real domain in the
+  # local .env.prod is kept as-is (never clobbered back to the IP).
+  if [ -n "$DEPLOY_DOMAIN" ]; then
+    echo "==> Setting DOMAIN=$DEPLOY_DOMAIN in the server's .env.prod..."
+    "${SSH[@]}" "sed -i 's/^DOMAIN=.*/DOMAIN=$DEPLOY_DOMAIN/' '$REMOTE_DIR/.env.prod'"
+  elif grep -q '^DOMAIN=localhost[[:space:]]*$' .env.prod; then
+    echo "==> Local DOMAIN=localhost — rewriting to server IP $HOST_IP (set DEPLOY_DOMAIN=<domain> to use a real domain)..."
+    "${SSH[@]}" "sed -i 's/^DOMAIN=.*/DOMAIN=$HOST_IP/' '$REMOTE_DIR/.env.prod'"
+  else
+    echo "==> Keeping DOMAIN from the local .env.prod."
+  fi
 else
   echo "==> Server already has .env.prod — keeping it (PUSH_ENV=1 to overwrite)."
 fi
