@@ -61,8 +61,8 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       POSTGRES_DB: ${POSTGRES_DB:-medusa}
-    ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+    # ports:
+    #   - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -108,21 +108,32 @@ services:
       AUTH_CORS: ${AUTH_CORS:-http://localhost:9000,http://localhost:8080,http://localhost:5173,http://localhost}
       JWT_SECRET: ${JWT_SECRET:-supersecret}
       COOKIE_SECRET: ${COOKIE_SECRET:-supersecret}
+      # Public origin for uploaded-file URLs (file-local provider appends
+      # /static). Must be the nginx entrypoint — the backend's own :9000 is no
+      # longer published, so URLs built from it would be unreachable.
+      MEDUSA_BACKEND_URL: ${MEDUSA_BACKEND_URL:-http://${DOMAIN:-localhost}:${HTTP_PORT:-8080}}
+      # Lets medusa-config.ts whitelist the public domain in Vite's dev-server
+      # host check (only matters when DOMAIN != localhost).
+      DOMAIN: ${DOMAIN:-localhost}
       # Poll the filesystem so hot-reload works over the WSL/Windows bind mount.
       CHOKIDAR_USEPOLLING: "true"
       CHOKIDAR_INTERVAL: "1000"
-    ports:
+    # ports:
       # Backend API + admin. Storefront's port is published here too because the
       # storefront shares this container's network namespace (see below).
-      - "9000:9000"
+      # - "9000:9000"
       # - "${STOREFRONT_PORT:-8000}:8000"
     volumes:
       - ../:/workspace
       - root_node_modules:/workspace/node_modules
       - backend_node_modules:/workspace/apps/backend/node_modules
       - backend_medusa:/workspace/apps/backend/.medusa
+    # seed-base runs BEFORE seed-cards: on an empty database it creates the
+    # base commerce data (sales channel, VND currency, Vietnam region, stock
+    # location + shipping, publishable key) that every /store request needs.
     command: >
       sh -c "npx medusa db:migrate &&
+             (npx medusa exec ./src/scripts/seed-base.ts || true) &&
              (npx medusa exec ./src/scripts/seed-cards.ts || true) &&
              (npx medusa user -e ${ADMIN_EMAIL:-admin@medusa.local} -p ${ADMIN_PASSWORD:-supersecret123} || true) &&
              npx medusa develop"
@@ -180,10 +191,16 @@ services:
       NODE_ENV: development
       HOST: 0.0.0.0
       PORT: "3000"
-      NUXT_PUBLIC_SITE_URL: ${NUXT_PUBLIC_SITE_URL:-http://localhost}
-      # SSR must reach Medusa via compose DNS; the browser uses the public URL
-      # (localhost:9000 published port) from apps/web/.env.
+      NUXT_PUBLIC_SITE_URL: ${NUXT_PUBLIC_SITE_URL:-http://${DOMAIN:-localhost}:${HTTP_PORT:-8080}}
+      # Browser-side Medusa URL — the nginx entrypoint (single origin), since
+      # the backend's :9000 is no longer published to the host.
+      NUXT_PUBLIC_MEDUSA_BACKEND_URL: ${NUXT_PUBLIC_MEDUSA_BACKEND_URL:-http://${DOMAIN:-localhost}:${HTTP_PORT:-8080}}
+      # SSR-side override: reach Medusa via compose DNS, no round-trip out
+      # through nginx.
       NUXT_MEDUSA_BACKEND_URL_SERVER: http://backend:9000
+      # Store API credentials (provision via scripts/setup-web-integration.mjs)
+      NUXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: ${NUXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY:-}
+      NUXT_PUBLIC_MEDUSA_REGION_ID: ${NUXT_PUBLIC_MEDUSA_REGION_ID:-}
       # Bind mount over 9p (WSL/Windows) doesn't emit inotify events.
       CHOKIDAR_USEPOLLING: "true"
       CHOKIDAR_INTERVAL: "1000"

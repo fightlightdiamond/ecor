@@ -87,11 +87,17 @@ const CardRow = ({ card, onNavigate, onToggleActive, togglingId, selected, onTog
 
       <div className="h-12 w-16 flex-shrink-0 overflow-hidden rounded bg-ui-bg-subtle flex items-center justify-center">
         {card.image ? (
+          // key={card.image} forces a fresh <img> mount whenever the URL
+          // changes, so a stale load-error's inline `display: none` never
+          // carries over onto a newly-picked (valid) image.
           // eslint-disable-next-line @next/next/no-img-element
           <img
+            key={card.image}
             src={card.image}
             alt=""
             className="h-full w-full object-cover"
+            loading="lazy"
+            referrerPolicy="no-referrer"
             onError={(e) => {
               (e.target as HTMLImageElement).style.display = "none"
             }}

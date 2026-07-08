@@ -8,18 +8,12 @@
 # directly against the running backend container, unmasked.
 #
 # Usage (from the repo root, INSIDE WSL where Docker lives):
-#   ./infra/scripts/create-admin.sh                    # dev stack
-#   ./infra/scripts/create-admin.sh other@email.com someOtherPassword
-#   ./infra/scripts/create-admin.sh --prod              # prod stack (VPS)
+#   ./create-admin.sh                    # dev stack (.env.dev)
+#   ./create-admin.sh other@email.com someOtherPassword
+#   ./create-admin.sh --prod             # prod stack (.env.prod)
 set -euo pipefail
 
-cd "$(dirname "$0")/../.."
-
-# Load ADMIN_EMAIL / ADMIN_PASSWORD (and everything else) from the repo-root
-# .env, same file docker compose itself reads via --env-file.
-set -a
-[ -f .env ] && source .env
-set +a
+cd "$(dirname "$0")"
 
 prod=0
 args=()
@@ -31,13 +25,24 @@ for arg in "$@"; do
   fi
 done
 
+# Load ADMIN_EMAIL / ADMIN_PASSWORD (and everything else) from the same env
+# file the matching start script passes to docker compose.
+if [ "$prod" -eq 1 ]; then
+  ENV_FILE=.env.prod
+else
+  ENV_FILE=.env.dev
+fi
+set -a
+[ -f "$ENV_FILE" ] && source "$ENV_FILE"
+set +a
+
 EMAIL="${args[0]:-${ADMIN_EMAIL:-admin@medusa.local}}"
 PASSWORD="${args[1]:-${ADMIN_PASSWORD:-supersecret123}}"
 
 if [ "$prod" -eq 1 ]; then
-  COMPOSE=(docker compose -f infra/docker-compose.prod.yml --env-file .env)
+  COMPOSE=(docker compose -f infra/docker-compose.prod.yml --env-file "$ENV_FILE")
 else
-  COMPOSE=(docker compose -f infra/docker-compose.yml --env-file .env)
+  COMPOSE=(docker compose -f infra/docker-compose.yml --env-file "$ENV_FILE")
 fi
 
 echo "Ensuring postgres + backend are up..."
@@ -56,6 +61,6 @@ echo "Creating admin user: $EMAIL"
 if [ "$prod" -eq 1 ]; then
   echo "Done. Login at https://${DOMAIN:-your-domain}/app with:"
 else
-  echo "Done. Login at http://localhost:${HTTP_PORT:-8080}/app (or http://localhost:9000/app directly) with:"
+  echo "Done. Login at http://${DOMAIN:-localhost}:${HTTP_PORT:-8080}/app with:"
 fi
 echo "  $EMAIL / $PASSWORD"

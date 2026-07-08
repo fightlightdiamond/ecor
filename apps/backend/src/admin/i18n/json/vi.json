@@ -138,5 +138,43 @@
       "confirmDesc": "Bạn có chắc muốn xóa {{count}} card đã chọn không? Hành động này không thể hoàn tác.",
       "lockedNotSelectable": "Card cố định không thể chọn để xóa đồng loạt"
     }
+  },
+  "mediaLib": {
+    "title": "Thư viện ảnh",
+    "hint": "Quản lý toàn bộ ảnh đã tải lên: sắp xếp vào thư mục, tải ảnh mới hoặc xóa ảnh không dùng. Trước khi xóa, hệ thống luôn kiểm tra ảnh có đang được sử dụng ở đâu không.",
+    "upload": "Tải ảnh lên",
+    "allImages": "Tất cả",
+    "rootFolder": "Chưa phân loại",
+    "newFolderPlaceholder": "Tên thư mục mới...",
+    "createFolder": "Tạo thư mục",
+    "deleteFolder": "Xóa thư mục",
+    "folderDeleteConfirmTitle": "Xóa thư mục",
+    "folderDeleteConfirmDesc": "Xóa thư mục \"{{name}}\"? Ảnh bên trong sẽ được chuyển về \"Chưa phân loại\", không bị xóa.",
+    "moveTo": "Di chuyển tới",
+    "empty": "Chưa có ảnh nào trong mục này.",
+    "messages": {
+      "uploadDone": "Đã tải lên {{count}} ảnh",
+      "uploadFailed": "Tải ảnh thất bại ({{done}}/{{total}} ảnh đã tải xong)",
+      "folderCreateFailed": "Tạo thư mục thất bại",
+      "folderDeleted": "Đã xóa thư mục, ảnh bên trong được chuyển về Chưa phân loại",
+      "folderDeleteFailed": "Xóa thư mục thất bại",
+      "moved": "Đã di chuyển ảnh",
+      "moveFailed": "Di chuyển ảnh thất bại"
+    },
+    "delete": {
+      "title": "Xóa ảnh",
+      "checking": "Đang kiểm tra ảnh có được sử dụng ở đâu không...",
+      "usedBy": "Ảnh đang được sử dụng ở {{count}} nơi:",
+      "usedWarning": "Nếu xóa, các nơi trên sẽ hiển thị ảnh lỗi. Hãy thay ảnh khác cho chúng trước khi xóa.",
+      "notUsed": "Ảnh chưa được sử dụng ở đâu — có thể xóa an toàn.",
+      "kind": {
+        "card": "Card",
+        "campaign_post": "Bài viết"
+      },
+      "confirm": "Xóa",
+      "cancel": "Hủy",
+      "done": "Đã xóa ảnh",
+      "failed": "Xóa ảnh thất bại"
+    }
   }
 }

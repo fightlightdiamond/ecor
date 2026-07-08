@@ -108,9 +108,14 @@ services:
     environment:
       NODE_ENV: production
       DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-medusa}
-      STORE_CORS: ${STORE_CORS:-http://localhost:${HTTP_PORT:-8080}}
-      ADMIN_CORS: ${ADMIN_CORS:-http://localhost:${HTTP_PORT:-8080}}
-      AUTH_CORS: ${AUTH_CORS:-http://localhost:${HTTP_PORT:-8080}}
+      # All public-facing origins derive from DOMAIN + HTTP_PORT (.env.prod) —
+      # localhost only ever appears as the fallback when DOMAIN is unset.
+      STORE_CORS: ${STORE_CORS:-http://${DOMAIN:-localhost}:${HTTP_PORT:-8080}}
+      ADMIN_CORS: ${ADMIN_CORS:-http://${DOMAIN:-localhost}:${HTTP_PORT:-8080}}
+      AUTH_CORS: ${AUTH_CORS:-http://${DOMAIN:-localhost}:${HTTP_PORT:-8080}}
+      # Public origin for uploaded-file URLs (file-local provider appends
+      # /static; nginx proxies /static/ back to this backend).
+      MEDUSA_BACKEND_URL: ${MEDUSA_BACKEND_URL:-http://${DOMAIN:-localhost}:${HTTP_PORT:-8080}}
       JWT_SECRET: ${JWT_SECRET:-supersecret}
       COOKIE_SECRET: ${COOKIE_SECRET:-supersecret}
       # LOCAL/HTTP ONLY: let the admin session cookie work over plain http
@@ -118,15 +123,19 @@ services:
       # the browser drops → every /admin call is 401). Leave unset on a real
       # HTTPS deployment.
       COOKIE_SECURE: ${COOKIE_SECURE:-}
-    ports:
-      - "9000:9000"
+    # ports:
+    #   - "9000:9000"
     volumes:
       - ../:/workspace
       - root_node_modules:/workspace/node_modules
       - backend_node_modules:/workspace/apps/backend/node_modules
       - backend_medusa:/workspace/apps/backend/.medusa
+    # seed-base runs BEFORE seed-cards: on an empty database it creates the
+    # base commerce data (sales channel, VND currency, Vietnam region, stock
+    # location + shipping, publishable key) that every /store request needs.
     command: >
       sh -c "npx medusa db:migrate &&
+             (npx medusa exec ./src/scripts/seed-base.js || true) &&
              (npx medusa exec ./src/scripts/seed-cards.js || true) &&
              (npx medusa user -e ${ADMIN_EMAIL:-admin@medusa.local} -p ${ADMIN_PASSWORD:-supersecret123} || true) &&
              npm run start"
@@ -155,7 +164,16 @@ services:
       NODE_ENV: production
       HOST: 0.0.0.0
       PORT: "3000"
-      NUXT_PUBLIC_SITE_URL: ${NUXT_PUBLIC_SITE_URL:-http://localhost:${HTTP_PORT:-8080}}
+      NUXT_PUBLIC_SITE_URL: ${NUXT_PUBLIC_SITE_URL:-http://${DOMAIN:-localhost}:${HTTP_PORT:-8080}}
+      # Browser-side Medusa URL — the public origin (nginx). The backend's
+      # :9000 is internal-only in prod.
+      NUXT_PUBLIC_MEDUSA_BACKEND_URL: ${NUXT_PUBLIC_MEDUSA_BACKEND_URL:-http://${DOMAIN:-localhost}:${HTTP_PORT:-8080}}
+      # SSR-side override: compose DNS, no round-trip out through nginx.
+      NUXT_MEDUSA_BACKEND_URL_SERVER: http://backend:9000
+      # Store API credentials for the PROD database (.env.prod). Read at
+      # runtime by Nitro — no rebuild needed when they change.
+      NUXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: ${NUXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY:-}
+      NUXT_PUBLIC_MEDUSA_REGION_ID: ${NUXT_PUBLIC_MEDUSA_REGION_ID:-}
     volumes:
       - ../:/workspace
       - root_node_modules:/workspace/node_modules

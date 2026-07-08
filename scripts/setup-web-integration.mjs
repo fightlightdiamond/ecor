@@ -1,25 +1,35 @@
 #!/usr/bin/env node
 /**
  * Idempotent one-shot setup that lets apps/web (Nuxt) talk to this Medusa
- * backend's Store API without any manual dashboard clicking:
+ * backend's Store API without any manual dashboard clicking. Works against a
+ * COMPLETELY EMPTY database (fresh `medusa db:migrate`) as well as an
+ * already-provisioned one — anything missing is created, anything present is
+ * left alone:
  *
  *   1. Waits for the backend to be healthy.
  *   2. Logs in as the admin user created by run-dev.sh/ps1 or docker-compose.
- *   3. Ensures a "Vietnam" region exists (VND, country vn, manual/system
- *      payment provider) — the seeded starter data only ships a Europe/EUR
- *      region, which is useless for a Vietnamese storefront.
- *   4. Ensures a VN shipping option exists on that region's fulfillment
- *      network (reuses the existing default warehouse's fulfillment set).
- *   5. Backfills a VND price (derived from the existing EUR price) onto
- *      every product variant that doesn't have one yet, so the demo catalog
- *      actually prices in VND. This does NOT replace real product data —
- *      it just makes the seeded demo products checkout-able in VND so the
- *      integration can be verified end-to-end.
- *   6. Fetches the (already-seeded) default publishable API key.
- *   7. Writes/updates apps/web/.env with the backend URL, publishable key,
- *      and Vietnam region id.
+ *   3. Ensures VND is a supported store currency (a VND region can't be
+ *      created otherwise) and a default sales channel exists.
+ *   4. Ensures a "Vietnam" region exists (VND, country vn, system payment).
+ *   5. Ensures a stock location exists (created on an empty DB) with the
+ *      manual fulfillment provider + sales-channel link, a fulfillment set
+ *      with a "Vietnam" service zone, a shipping profile, and a flat VN
+ *      shipping option.
+ *   6. Backfills a VND price (derived from the existing EUR price) onto
+ *      every product variant that doesn't have one yet — a no-op when the
+ *      catalog is empty.
+ *   7. Ensures a publishable API key exists AND is linked to the default
+ *      sales channel (the Store API rejects unlinked keys), then reads it.
+ *   8. Writes/updates the repo-root compose env file (.env.dev by default,
+ *      override with ENV_FILE=.env.prod) with NUXT_PUBLIC_MEDUSA_* values —
+ *      docker compose passes them through to the `web` service.
+ *
+ * apps/backend/src/scripts/seed-base.ts seeds the same base data at backend
+ * boot; this script is the API-side counterpart so it also works standalone
+ * against a remote backend.
  *
  * Usage:  node scripts/setup-web-integration.mjs
+ *         ENV_FILE=.env.prod MEDUSA_BACKEND_URL=http://<domain>:<port> node scripts/setup-web-integration.mjs
  * Safe to re-run — every step checks for existing state first.
  */
 
@@ -28,10 +38,15 @@ import path from "node:path"
 import { fileURLToPath } from "node:url"
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const BACKEND_URL = process.env.MEDUSA_BACKEND_URL || "http://localhost:9000"
+// Default to the nginx entrypoint — the backend's own :9000 is not published.
+const BACKEND_URL =
+  process.env.MEDUSA_BACKEND_URL ||
+  `http://${process.env.DOMAIN || "localhost"}:${process.env.HTTP_PORT || "8080"}`
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@medusa.local"
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "supersecret123"
-const WEB_ENV_PATH = path.join(__dirname, "..", "..", "web", ".env")
+// Repo-root compose env file — the single source of truth the start scripts
+// pass to docker compose (apps/web no longer keeps its own .env).
+const ENV_FILE_PATH = path.resolve(__dirname, "..", process.env.ENV_FILE || ".env.dev")
 const VND_PER_EUR = 27000 // rough demo conversion, not a live FX rate
 
 function log(msg) {
@@ -77,6 +92,45 @@ async function adminFetch(token, path, options = {}) {
   return res.json()
 }
 
+async function ensureStoreDefaults(token) {
+  // vnd must be in the store's supported currencies BEFORE a VND region can
+  // be created — on an empty DB it never is.
+  const { stores } = await adminFetch(token, "/admin/stores?limit=1&fields=id,*supported_currencies")
+  const store = stores[0]
+  if (!store) throw new Error("No store found — did `medusa db:migrate` run?")
+  const supported = store.supported_currencies || []
+  if (supported.some((c) => c.currency_code === "vnd")) {
+    log("Store already supports VND.")
+    return store
+  }
+  // Preserve whatever currencies/default the store already has; vnd only
+  // becomes the default when nothing else is.
+  const merged = [
+    ...supported.map((c) => ({ currency_code: c.currency_code, is_default: !!c.is_default })),
+    { currency_code: "vnd", is_default: !supported.some((c) => c.is_default) },
+  ]
+  await adminFetch(token, `/admin/stores/${store.id}`, {
+    method: "POST",
+    body: JSON.stringify({ supported_currencies: merged }),
+  })
+  log("Added VND to the store's supported currencies.")
+  return store
+}
+
+async function ensureDefaultSalesChannel(token) {
+  const { sales_channels } = await adminFetch(token, "/admin/sales-channels?limit=1")
+  if (sales_channels.length) {
+    log(`Sales channel already exists (${sales_channels[0].id}).`)
+    return sales_channels[0]
+  }
+  const { sales_channel } = await adminFetch(token, "/admin/sales-channels", {
+    method: "POST",
+    body: JSON.stringify({ name: "Default Sales Channel" }),
+  })
+  log(`Created Default Sales Channel (${sales_channel.id}).`)
+  return sales_channel
+}
+
 async function ensureVietnamRegion(token) {
   log("Ensuring Vietnam region (VND) exists...")
   const { regions } = await adminFetch(token, "/admin/regions?limit=100")
@@ -98,21 +152,63 @@ async function ensureVietnamRegion(token) {
   return region
 }
 
-async function ensureVietnamShipping(token) {
-  log("Ensuring Vietnam shipping option exists...")
+async function ensureVietnamShipping(token, salesChannel) {
+  log("Ensuring stock location + Vietnam shipping option exist...")
   // There's no GET /admin/fulfillment-sets/:id route — fetch the nested
   // fulfillment set + service zones through the stock location instead.
+  const LOCATION_FIELDS =
+    "fields=id,name,*fulfillment_providers,*sales_channels,*fulfillment_sets.service_zones"
   const { stock_locations } = await adminFetch(
     token,
-    "/admin/stock-locations?limit=1&fields=*fulfillment_sets.service_zones",
+    `/admin/stock-locations?limit=1&${LOCATION_FIELDS}`,
   )
-  const location = stock_locations[0]
-  if (!location) throw new Error("No stock location found — cannot set up shipping.")
+  let location = stock_locations[0]
+  if (!location) {
+    // Empty DB: no seeded warehouse exists. Create one so shipping has a home.
+    const created = await adminFetch(token, "/admin/stock-locations", {
+      method: "POST",
+      body: JSON.stringify({
+        name: "Kho mặc định",
+        address: { city: "Hà Nội", country_code: "VN", address_1: "" },
+      }),
+    })
+    location = created.stock_location
+    log(`Created stock location (${location.id}).`)
+  }
 
-  const fulfillmentSet = location.fulfillment_sets?.[0]
-  if (!fulfillmentSet) throw new Error("Stock location has no fulfillment set.")
+  if (!location.fulfillment_providers?.length) {
+    await adminFetch(token, `/admin/stock-locations/${location.id}/fulfillment-providers`, {
+      method: "POST",
+      body: JSON.stringify({ add: ["manual_manual"] }),
+    })
+    log("Enabled manual fulfillment provider on the stock location.")
+  }
 
-  let serviceZone = fulfillmentSet.service_zones.find((z) => z.name === "Vietnam")
+  if (!(location.sales_channels || []).some((sc) => sc.id === salesChannel.id)) {
+    await adminFetch(token, `/admin/stock-locations/${location.id}/sales-channels`, {
+      method: "POST",
+      body: JSON.stringify({ add: [salesChannel.id] }),
+    })
+    log("Linked stock location to the default sales channel.")
+  }
+
+  let fulfillmentSet = location.fulfillment_sets?.[0]
+  if (!fulfillmentSet) {
+    await adminFetch(token, `/admin/stock-locations/${location.id}/fulfillment-sets`, {
+      method: "POST",
+      body: JSON.stringify({ name: "Giao hàng Việt Nam", type: "shipping" }),
+    })
+    // Refetch — the create response doesn't reliably include the nested zones.
+    const refreshed = await adminFetch(
+      token,
+      `/admin/stock-locations/${location.id}?${LOCATION_FIELDS}`,
+    )
+    fulfillmentSet = refreshed.stock_location.fulfillment_sets?.[0]
+    if (!fulfillmentSet) throw new Error("Fulfillment set creation did not stick.")
+    log(`Created fulfillment set (${fulfillmentSet.id}).`)
+  }
+
+  let serviceZone = (fulfillmentSet.service_zones || []).find((z) => z.name === "Vietnam")
   if (!serviceZone) {
     const created = await adminFetch(
       token,
@@ -140,10 +236,18 @@ async function ensureVietnamShipping(token) {
     return
   }
 
-  // Reuse whatever default shipping profile the seeded data created.
-  const { shipping_options: anyOptions } = await adminFetch(token, "/admin/shipping-options?limit=1")
-  const shippingProfileId = anyOptions[0]?.shipping_profile_id
-  if (!shippingProfileId) throw new Error("No shipping profile found to reuse.")
+  // Fetch the shipping profile directly (the old "reuse from any existing
+  // shipping option" trick has nothing to reuse on an empty DB).
+  const { shipping_profiles } = await adminFetch(token, "/admin/shipping-profiles?limit=1")
+  let shippingProfileId = shipping_profiles[0]?.id
+  if (!shippingProfileId) {
+    const created = await adminFetch(token, "/admin/shipping-profiles", {
+      method: "POST",
+      body: JSON.stringify({ name: "Default Shipping Profile", type: "default" }),
+    })
+    shippingProfileId = created.shipping_profile.id
+    log("Created default shipping profile.")
+  }
 
   await adminFetch(token, "/admin/shipping-options", {
     method: "POST",
@@ -190,10 +294,31 @@ async function backfillVndPrices(token) {
   log(updated ? `Added VND price to ${updated} variant(s).` : "All variants already have VND prices.")
 }
 
-async function getPublishableKey(token) {
+async function ensurePublishableKey(token, salesChannel) {
   const { api_keys } = await adminFetch(token, "/admin/api-keys?type=publishable&limit=1")
-  if (!api_keys.length) throw new Error("No publishable API key found — expected the seeded default key.")
-  return api_keys[0].token
+  let key = api_keys[0]
+  if (!key) {
+    const created = await adminFetch(token, "/admin/api-keys", {
+      method: "POST",
+      body: JSON.stringify({ title: "Webshop", type: "publishable" }),
+    })
+    key = created.api_key
+    log(`Created publishable API key (${key.id}).`)
+  }
+  // The key only authorizes Store API calls for sales channels linked to it —
+  // an unlinked key is as useless as no key. The batch-add endpoint may error
+  // when the channel is already linked, so tolerate exactly that.
+  try {
+    await adminFetch(token, `/admin/api-keys/${key.id}/sales-channels`, {
+      method: "POST",
+      body: JSON.stringify({ add: [salesChannel.id] }),
+    })
+    log("Linked publishable key to the default sales channel.")
+  } catch (err) {
+    if (!/exist|already|duplicate/i.test(String(err.message))) throw err
+    log("Publishable key already linked to the sales channel.")
+  }
+  return key.token
 }
 
 function upsertEnvVars(filePath, vars) {
@@ -213,18 +338,21 @@ function upsertEnvVars(filePath, vars) {
 async function main() {
   await waitForHealth()
   const token = await adminLogin()
+  await ensureStoreDefaults(token)
+  const salesChannel = await ensureDefaultSalesChannel(token)
   const region = await ensureVietnamRegion(token)
-  await ensureVietnamShipping(token)
+  await ensureVietnamShipping(token, salesChannel)
   await backfillVndPrices(token)
-  const publishableKey = await getPublishableKey(token)
+  const publishableKey = await ensurePublishableKey(token, salesChannel)
 
-  upsertEnvVars(WEB_ENV_PATH, {
-    NUXT_PUBLIC_MEDUSA_BACKEND_URL: BACKEND_URL,
+  // NUXT_PUBLIC_MEDUSA_BACKEND_URL intentionally not written: compose derives
+  // it from DOMAIN + HTTP_PORT already.
+  upsertEnvVars(ENV_FILE_PATH, {
     NUXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: publishableKey,
     NUXT_PUBLIC_MEDUSA_REGION_ID: region.id,
   })
-  log(`Wrote Medusa env vars to ${WEB_ENV_PATH}`)
-  log("Done. Restart the Nuxt dev server to pick up the new env vars.")
+  log(`Wrote Medusa env vars to ${ENV_FILE_PATH}`)
+  log("Done. Re-run docker compose up -d (or the start script) so the web service picks them up.")
 }
 
 main().catch((err) => {

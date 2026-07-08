@@ -9,6 +9,10 @@ const CardMedia = model.define("card_media", {
   id: model.id({ prefix: "cdmed" }).primaryKey(),
   url: model.text(),
   filename: model.text().nullable(),
+  // Media-library folder (media_folder.id); null = library root. Kept as a
+  // plain text column (not a relationship) since folders are flat and
+  // deleting a folder just nulls this out.
+  folder_id: model.text().nullable(),
 })
 
 export default CardMedia

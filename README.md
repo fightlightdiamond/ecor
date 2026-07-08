@@ -79,9 +79,10 @@ pnpm install
 
 2. Set up environment variables for the backend:
 
-```bash
-cp apps/backend/.env.template apps/backend/.env
-```
+> This repo runs everything through docker compose instead — env lives in the
+> repo-root `.env.dev` / `.env.prod` (see `.env.example`), loaded by
+> `./start.dev.sh` and `./start.prod.sh`. The steps below only apply to a
+> native (non-docker) Medusa run, where you create `apps/backend/.env` yourself.
 
 3. Set the database URL in `apps/backend.env`:
 
@@ -113,11 +114,9 @@ pnpm dev
 
 7. Open the admin dashboard at `localhost:9000/app` and log in. Retrieve your publishable API key at Settings > Publishable API key.
 
-8. Set up environment variables for the storefront:
-
-```bash
-cp apps/storefront/.env.template apps/storefront/.env.local
-```
+8. Set up environment variables for the storefront (docker: already provided
+   by `infra/docker-compose.yml` from `.env.dev`; native runs create
+   `apps/storefront/.env.local` yourself):
 
 9. Update `apps/storefront/.env.local` with your Medusa publishable API key:
 

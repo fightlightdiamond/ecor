@@ -6,6 +6,7 @@ import {
 import type { Context } from "@medusajs/framework/types"
 import Card from "./models/card"
 import CardMedia from "./models/card-media"
+import MediaFolder from "./models/media-folder"
 
 type CardFilters = {
   id?: string | string[]
@@ -16,6 +17,7 @@ type CardFilters = {
 class CardModuleService extends MedusaService({
   Card,
   CardMedia,
+  MediaFolder,
 }) {
   @InjectManager()
   async listActiveCardsOrdered(

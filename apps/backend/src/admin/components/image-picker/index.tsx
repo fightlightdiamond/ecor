@@ -70,8 +70,13 @@ const ImagePicker = ({ value, onChange }: ImagePickerProps) => {
     <div className="flex items-center gap-x-4">
       <div className="h-16 w-24 flex-shrink-0 overflow-hidden rounded border border-ui-border-base bg-ui-bg-subtle flex items-center justify-center">
         {value ? (
+          // key={value} forces a fresh <img> mount on every URL change, so a
+          // previous load failure's inline `display: none` never carries over
+          // onto the next (valid) image — without it the broken-image state
+          // stuck around until a full page reload.
           // eslint-disable-next-line @next/next/no-img-element
           <img
+            key={value}
             src={value}
             alt=""
             className="h-full w-full object-cover"

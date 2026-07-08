@@ -15,7 +15,9 @@
 # CHOKIDAR_USEPOLLING settings it sets on the containers for the same reason).
 set -u
 
-COMPOSE="docker compose -f infra/docker-compose.yml --env-file .env"
+# Must match start.dev.sh's env file exactly — a different file here would
+# silently recreate containers with different env on every config change.
+COMPOSE="docker compose -f infra/docker-compose.yml --env-file .env.dev"
 COMPOSE_FILE="infra/docker-compose.yml"
 MEDUSA_CONFIG="apps/backend/medusa-config.ts"
 
