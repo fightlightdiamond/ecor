@@ -1,0 +1,180 @@
+{
+  "campaign-posts": {
+    "title": "Campaign Posts",
+    "create": "Create post",
+    "edit": "Edit post",
+    "backToList": "Back to list",
+    "scheduleHint": "Set publish and unpublish times to publish automatically",
+    "columns": {
+      "title": "Title",
+      "slug": "Slug",
+      "status": "Status",
+      "publishAt": "Publish at",
+      "unpublishAt": "Unpublish at"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "fields": {
+      "title": "Title",
+      "slug": "Slug",
+      "slugPlaceholder": "auto-generated from title",
+      "publishAt": "Publish at",
+      "unpublishAt": "Unpublish at",
+      "active": "Active",
+      "content": "Content"
+    },
+    "actions": {
+      "create": "Create post",
+      "save": "Save changes",
+      "delete": "Delete",
+      "backToList": "Back to list"
+    },
+    "messages": {
+      "created": "Post created successfully",
+      "updated": "Post updated successfully",
+      "deleted": "Post deleted successfully",
+      "createFailed": "Failed to create post",
+      "updateFailed": "Failed to update post",
+      "deleteFailed": "Failed to delete post",
+      "deleteConfirmTitle": "Delete post",
+      "deleteConfirmDesc": "Are you sure you want to delete \"{{title}}\"?",
+      "confirmDelete": "Delete",
+      "cancelDelete": "Cancel"
+    }
+  },
+  "cards": {
+    "title": "Homepage Cards",
+    "create": "Add card",
+    "edit": "Edit card",
+    "backToList": "Back to list",
+    "hint": "Cards shown on the homepage. Drag and drop to reorder — the 3 fixed cards (Promotions, Contact, Map) cannot be deleted or edited.",
+    "columns": {
+      "title": "Title",
+      "type": "Type",
+      "status": "Status",
+      "order": "Order"
+    },
+    "type": {
+      "link": "Link card",
+      "contact": "Contact info (fixed)",
+      "map": "Map (fixed)",
+      "promotions": "Monthly promotions (fixed)"
+    },
+    "status": {
+      "active": "Visible",
+      "inactive": "Hidden"
+    },
+    "fields": {
+      "titleVi": "Title (Vietnamese)",
+      "titleEn": "Title (English)",
+      "image": "Thumbnail image",
+      "path": "Link path",
+      "pathPlaceholder": "e.g. /san-pham-list",
+      "active": "Show on homepage"
+    },
+    "lockedNotice": "This is a fixed card — you can only reorder or hide/show it, not change its content or type.",
+    "media": {
+      "title": "Choose thumbnail image",
+      "library": "Image library",
+      "upload": "Upload new image",
+      "uploading": "Uploading...",
+      "empty": "No images in the library yet — upload a new one in the next tab.",
+      "select": "Select this image",
+      "close": "Close",
+      "uploadFailed": "Image upload failed",
+      "dropHint": "Drag and drop an image here or click to choose a file",
+      "orPasteUrl": "or paste an existing image URL",
+      "urlPlaceholder": "https://...",
+      "useUrl": "Use this URL"
+    },
+    "actions": {
+      "create": "Add card",
+      "save": "Save changes",
+      "delete": "Delete",
+      "backToList": "Back to list",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "drag": "Drag to reorder",
+      "chooseImage": "Choose image",
+      "changeImage": "Change image",
+      "removeImage": "Remove image"
+    },
+    "messages": {
+      "created": "Card added successfully",
+      "updated": "Card updated successfully",
+      "deleted": "Card deleted successfully",
+      "reordered": "New order saved",
+      "createFailed": "Failed to add card",
+      "updateFailed": "Failed to update card",
+      "deleteFailed": "Failed to delete card",
+      "reorderFailed": "Failed to save order",
+      "deleteConfirmTitle": "Delete card",
+      "deleteConfirmDesc": "Are you sure you want to delete \"{{title}}\"?",
+      "confirmDelete": "Delete",
+      "cancelDelete": "Cancel",
+      "cannotDeleteLocked": "Fixed cards cannot be deleted",
+      "importDone": "Import done: {{created}} created, {{updated}} updated, {{skipped}} skipped",
+      "importFailed": "Failed to import cards",
+      "importEmpty": "The file has no data to import",
+      "importParseFailed": "Could not read the file — check its format"
+    },
+    "io": {
+      "export": "Export",
+      "exportJson": "Export JSON",
+      "exportCsv": "Export CSV",
+      "exportTxt": "Export Text",
+      "import": "Import"
+    },
+    "bulk": {
+      "selectAll": "Select all",
+      "selectedCount": "{{count}} cards selected",
+      "deleteSelected": "Delete selected",
+      "deleteDone": "Deleted {{count}} cards",
+      "deleteSkipped": "Skipped {{count}} fixed cards that cannot be deleted",
+      "deleteFailed": "Failed to delete selected cards",
+      "confirmTitle": "Delete selected cards",
+      "confirmDesc": "Are you sure you want to delete {{count}} selected cards? This action cannot be undone.",
+      "lockedNotSelectable": "Fixed cards cannot be selected for bulk deletion"
+    }
+  },
+  "mediaLib": {
+    "title": "Image Library",
+    "hint": "Manage all uploaded images: organize them into folders, upload new ones or delete unused images. Before deleting, the system always checks whether the image is in use anywhere.",
+    "upload": "Upload images",
+    "allImages": "All",
+    "rootFolder": "Uncategorized",
+    "newFolderPlaceholder": "New folder name...",
+    "createFolder": "Create folder",
+    "deleteFolder": "Delete folder",
+    "folderDeleteConfirmTitle": "Delete folder",
+    "folderDeleteConfirmDesc": "Delete folder \"{{name}}\"? Images inside will be moved to \"Uncategorized\", not deleted.",
+    "moveTo": "Move to",
+    "empty": "No images in this section yet.",
+    "messages": {
+      "uploadDone": "Uploaded {{count}} images",
+      "uploadFailed": "Upload failed ({{done}}/{{total}} images uploaded)",
+      "folderCreateFailed": "Failed to create folder",
+      "folderDeleted": "Folder deleted, its images were moved to Uncategorized",
+      "folderDeleteFailed": "Failed to delete folder",
+      "moved": "Images moved",
+      "moveFailed": "Failed to move images"
+    },
+    "delete": {
+      "title": "Delete image",
+      "checking": "Checking whether the image is in use anywhere...",
+      "usedBy": "This image is used in {{count}} places:",
+      "usedWarning": "If deleted, the places above will show a broken image. Replace their image before deleting.",
+      "notUsed": "This image is not used anywhere — safe to delete.",
+      "kind": {
+        "card": "Card",
+        "campaign_post": "Post"
+      },
+      "confirm": "Delete",
+      "cancel": "Cancel",
+      "done": "Image deleted",
+      "failed": "Failed to delete image"
+    }
+  }
+}

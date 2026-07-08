@@ -1,6 +1,5 @@
 import {
   Button,
-  Container,
   Heading,
   Text,
   toast,
@@ -19,6 +18,7 @@ import {
 } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import CampaignPostForm from "../../../components/campaign-post-form"
+import PageLayout from "../../../components/page-layout"
 import { toDatetimeLocal, toIsoDateTime } from "../../../lib/campaign-post"
 import { sdk } from "../../../lib/sdk"
 import type {
@@ -131,7 +131,7 @@ const EditCampaignPostPage = () => {
   }
 
   return (
-    <Container className="divide-y p-0">
+    <PageLayout>
       <div className="flex items-center justify-between px-6 py-4">
         <div>
           <Heading level="h1">{t("campaign-posts.edit")}</Heading>
@@ -167,7 +167,7 @@ const EditCampaignPostPage = () => {
         onSubmit={handleSubmit}
         editorKey={id}
       />
-    </Container>
+    </PageLayout>
   )
 }
 

@@ -3,7 +3,6 @@ import { ArrowUpTray, ExclamationCircle, Folder, FolderOpen, Photo, Trash } from
 import {
   Badge,
   Button,
-  Container,
   DropdownMenu,
   Heading,
   IconButton,
@@ -16,6 +15,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
+import PageLayout from "../../components/page-layout"
 import { sdk } from "../../lib/sdk"
 import type { MediaFolderItem, MediaItem, UsageEntry } from "../../types/media"
 
@@ -158,7 +158,7 @@ const MediaPage = () => {
     id ? folders.find((f) => f.id === id)?.name ?? "?" : t("mediaLib.rootFolder")
 
   return (
-    <Container className="divide-y p-0">
+    <PageLayout>
       <div className="flex flex-col gap-y-1 px-6 py-4">
         <div className="flex items-center justify-between">
           <Heading>{t("mediaLib.title")}</Heading>
@@ -391,7 +391,7 @@ const MediaPage = () => {
           </Prompt.Footer>
         </Prompt.Content>
       </Prompt>
-    </Container>
+    </PageLayout>
   )
 }
 

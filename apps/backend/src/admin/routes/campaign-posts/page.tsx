@@ -3,7 +3,6 @@ import { DocumentText } from "@medusajs/icons"
 import {
   Badge,
   Button,
-  Container,
   DataTable,
   Heading,
   createDataTableColumnHelper,
@@ -14,6 +13,7 @@ import { useQuery } from "@tanstack/react-query"
 import { useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
+import PageLayout from "../../components/page-layout"
 import { sdk } from "../../lib/sdk"
 import type { CampaignPost, CampaignPostsResponse } from "../../types/campaign-post"
 
@@ -91,7 +91,7 @@ const CampaignPostsPage = () => {
   })
 
   return (
-    <Container className="divide-y p-0">
+    <PageLayout>
       <DataTable instance={table}>
         <DataTable.Toolbar className="flex flex-col items-start justify-between gap-2 md:flex-row md:items-center">
           <Heading>{t("campaign-posts.title")}</Heading>
@@ -102,7 +102,7 @@ const CampaignPostsPage = () => {
         <DataTable.Table />
         <DataTable.Pagination />
       </DataTable>
-    </Container>
+    </PageLayout>
   )
 }
 

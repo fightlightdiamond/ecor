@@ -1,4 +1,4 @@
-import { Button, Container, Heading, Text, toast, usePrompt } from "@medusajs/ui"
+import { Button, Heading, Text, toast, usePrompt } from "@medusajs/ui"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
 import {
@@ -10,6 +10,7 @@ import {
 } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import CardForm from "../../../components/card-form"
+import PageLayout from "../../../components/page-layout"
 import { cardTitle } from "../../../lib/card"
 import { sdk } from "../../../lib/sdk"
 import type { Card, CardResponse } from "../../../types/card"
@@ -91,7 +92,7 @@ const EditCardPage = () => {
   }
 
   return (
-    <Container className="divide-y p-0">
+    <PageLayout>
       <div className="flex items-center justify-between px-6 py-4">
         <div>
           <Heading level="h1">{t("cards.edit")}</Heading>
@@ -127,7 +128,7 @@ const EditCardPage = () => {
         onIsActiveChange={setIsActive}
         onSubmit={handleSubmit}
       />
-    </Container>
+    </PageLayout>
   )
 }
 

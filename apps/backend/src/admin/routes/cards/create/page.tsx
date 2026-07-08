@@ -1,9 +1,10 @@
-import { Button, Container, Heading, toast } from "@medusajs/ui"
+import { Button, Heading, toast } from "@medusajs/ui"
 import { useMutation } from "@tanstack/react-query"
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import CardForm from "../../../components/card-form"
+import PageLayout from "../../../components/page-layout"
 import { sdk } from "../../../lib/sdk"
 import type { CardResponse } from "../../../types/card"
 
@@ -43,7 +44,7 @@ const CreateCardPage = () => {
   }
 
   return (
-    <Container className="divide-y p-0">
+    <PageLayout>
       <div className="flex items-center justify-between px-6 py-4">
         <Heading level="h1">{t("cards.create")}</Heading>
         <Button variant="secondary" onClick={() => navigate("..")}>
@@ -66,7 +67,7 @@ const CreateCardPage = () => {
         onIsActiveChange={setIsActive}
         onSubmit={handleSubmit}
       />
-    </Container>
+    </PageLayout>
   )
 }
 

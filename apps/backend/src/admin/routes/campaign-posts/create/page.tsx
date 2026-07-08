@@ -1,6 +1,5 @@
 import {
   Button,
-  Container,
   Heading,
   Text,
   toast,
@@ -12,6 +11,7 @@ import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import CampaignPostForm from "../../../components/campaign-post-form"
+import PageLayout from "../../../components/page-layout"
 import { slugify, toIsoDateTime } from "../../../lib/campaign-post"
 import { sdk } from "../../../lib/sdk"
 import type { CampaignPostResponse } from "../../../types/campaign-post"
@@ -57,7 +57,7 @@ const CreateCampaignPostPage = () => {
   }
 
   return (
-    <Container className="divide-y p-0">
+    <PageLayout>
       <div className="flex items-center justify-between px-6 py-4">
         <div>
           <Heading level="h1">{t("campaign-posts.create")}</Heading>
@@ -88,7 +88,7 @@ const CreateCampaignPostPage = () => {
         onSubmit={handleSubmit}
         editorKey="create"
       />
-    </Container>
+    </PageLayout>
   )
 }
 

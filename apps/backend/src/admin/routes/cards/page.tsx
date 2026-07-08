@@ -1,6 +1,6 @@
 import { defineRouteConfig } from "@medusajs/admin-sdk"
 import { ArrowDownTray, ArrowUpTray, DotsSix, GridLayout } from "@medusajs/icons"
-import { Badge, Button, Checkbox, Container, DropdownMenu, Heading, Switch, Text, Tooltip, toast, usePrompt } from "@medusajs/ui"
+import { Badge, Button, Checkbox, DropdownMenu, Heading, Switch, Text, Tooltip, toast, usePrompt } from "@medusajs/ui"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
@@ -22,6 +22,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
+import PageLayout from "../../components/page-layout"
 import { cardTitle } from "../../lib/card"
 import { cardsToDelimited, cardsToJson, downloadFile, parseImportFile, type ImportRow } from "../../lib/card-io"
 import { sdk } from "../../lib/sdk"
@@ -310,7 +311,7 @@ const CardsPage = () => {
   }
 
   return (
-    <Container className="divide-y p-0">
+    <PageLayout>
       <div className="flex flex-col gap-y-1 px-6 py-4">
         <div className="flex items-center justify-between">
           <Heading>{t("cards.title")}</Heading>
@@ -410,7 +411,7 @@ const CardsPage = () => {
           </SortableContext>
         </DndContext>
       </div>
-    </Container>
+    </PageLayout>
   )
 }
 
