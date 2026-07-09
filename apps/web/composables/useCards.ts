@@ -18,6 +18,7 @@ export interface CardItem {
  */
 export function useCards() {
   const { fetchMedusa } = useMedusaApi()
+  const { resolveMediaUrl } = useMediaUrl()
 
   const { data, pending } = useAsyncData(
     'storefront-cards',
@@ -25,7 +26,14 @@ export function useCards() {
     { default: () => ({ cards: [] as CardItem[] }) },
   )
 
-  const cards = computed<CardItem[]>(() => data.value?.cards ?? [])
+  const cards = computed<CardItem[]>(() =>
+    (data.value?.cards ?? []).map(card => ({
+      ...card,
+      // Backend-hosted uploads are relative ("/static/..."); bundled seed
+      // filenames and pasted external URLs pass through resolveMediaUrl unchanged.
+      image: card.image ? resolveMediaUrl(card.image) : card.image,
+    })),
+  )
 
   return { cards, pending }
 }

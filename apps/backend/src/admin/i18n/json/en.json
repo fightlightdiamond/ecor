@@ -1,4 +1,10 @@
 {
+  "menu": {
+    "cards": "Homepage Cards",
+    "campaignPosts": "Campaign Posts",
+    "campaignTopics": "Post Topics",
+    "media": "Media Library"
+  },
   "campaign-posts": {
     "title": "Campaign Posts",
     "create": "Create post",
@@ -8,6 +14,7 @@
     "columns": {
       "title": "Title",
       "slug": "Slug",
+      "topic": "Topic",
       "status": "Status",
       "publishAt": "Publish at",
       "unpublishAt": "Unpublish at"
@@ -20,6 +27,11 @@
       "title": "Title",
       "slug": "Slug",
       "slugPlaceholder": "auto-generated from title",
+      "topic": "Topic",
+      "topicPlaceholder": "Select a topic",
+      "noTopic": "No topic",
+      "thumbnail": "Thumbnail",
+      "thumbnailHint": "Shown on post cards in listing pages — falls back to the first image in the content when empty.",
       "publishAt": "Publish at",
       "unpublishAt": "Unpublish at",
       "active": "Active",
@@ -40,6 +52,53 @@
       "deleteFailed": "Failed to delete post",
       "deleteConfirmTitle": "Delete post",
       "deleteConfirmDesc": "Are you sure you want to delete \"{{title}}\"?",
+      "confirmDelete": "Delete",
+      "cancelDelete": "Cancel"
+    }
+  },
+  "campaign-topics": {
+    "title": "Post Topics",
+    "create": "Add topic",
+    "edit": "Edit topic",
+    "hint": "Topics group posts — each topic gets its own listing page on the website with a banner image.",
+    "columns": {
+      "image": "Image",
+      "name": "Name",
+      "slug": "Slug",
+      "link": "Link",
+      "rank": "Order",
+      "status": "Status"
+    },
+    "status": {
+      "active": "Visible",
+      "inactive": "Hidden"
+    },
+    "fields": {
+      "name": "Topic name",
+      "slug": "Slug",
+      "slugPlaceholder": "auto-generated from name",
+      "slugCopyHint": "Click the button next to the field to copy the full path (no domain) to this topic's page on the website.",
+      "description": "Short description",
+      "image": "Banner image",
+      "imageHint": "Large hero image shown at the top of this topic's listing page.",
+      "rank": "Display order",
+      "active": "Visible on website"
+    },
+    "actions": {
+      "create": "Add topic",
+      "save": "Save changes",
+      "delete": "Delete",
+      "backToList": "Back to list"
+    },
+    "messages": {
+      "created": "Topic created successfully",
+      "updated": "Topic updated successfully",
+      "deleted": "Topic deleted successfully",
+      "createFailed": "Failed to create topic",
+      "updateFailed": "Failed to update topic",
+      "deleteFailed": "Failed to delete topic",
+      "deleteConfirmTitle": "Delete topic",
+      "deleteConfirmDesc": "Are you sure you want to delete topic \"{{name}}\"? Its posts will simply become untagged, not deleted.",
       "confirmDelete": "Delete",
       "cancelDelete": "Cancel"
     }
@@ -147,7 +206,10 @@
     "rootFolder": "Uncategorized",
     "newFolderPlaceholder": "New folder name...",
     "createFolder": "Create folder",
+    "renameFolder": "Rename folder",
     "deleteFolder": "Delete folder",
+    "folderActions": "Folder actions",
+    "folderItemCount": "{{count}} images",
     "folderDeleteConfirmTitle": "Delete folder",
     "folderDeleteConfirmDesc": "Delete folder \"{{name}}\"? Images inside will be moved to \"Uncategorized\", not deleted.",
     "moveTo": "Move to",
@@ -156,6 +218,8 @@
       "uploadDone": "Uploaded {{count}} images",
       "uploadFailed": "Upload failed ({{done}}/{{total}} images uploaded)",
       "folderCreateFailed": "Failed to create folder",
+      "folderRenamed": "Folder renamed",
+      "folderRenameFailed": "Failed to rename folder",
       "folderDeleted": "Folder deleted, its images were moved to Uncategorized",
       "folderDeleteFailed": "Failed to delete folder",
       "moved": "Images moved",
@@ -169,7 +233,8 @@
       "notUsed": "This image is not used anywhere — safe to delete.",
       "kind": {
         "card": "Card",
-        "campaign_post": "Post"
+        "campaign_post": "Post",
+        "campaign_topic": "Post topic"
       },
       "confirm": "Delete",
       "cancel": "Cancel",

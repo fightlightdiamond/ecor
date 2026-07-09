@@ -8,7 +8,7 @@
 # remote server. The compose stack itself never compiles anything.
 #
 # TLS/domain is intentionally NOT handled here — front this stack (published
-# on HTTP_PORT, default 8080) with your existing nginx/reverse proxy for SSL.
+# on HTTP_PORT, default 8800) with your existing nginx/reverse proxy for SSL.
 #
 # Usage (on the host, from the repo root):
 #   cp .env.example .env.prod    # fill in DOMAIN, secrets/CORS, HTTP_PORT...

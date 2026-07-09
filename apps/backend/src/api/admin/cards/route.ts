@@ -2,6 +2,7 @@ import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { z } from "zod"
 import { CARD_MODULE } from "../../../modules/card"
 import type CardModuleService from "../../../modules/card/service"
+import { toRelativeMediaUrl } from "../../utils/media-url"
 
 const CreateCardSchema = z.object({
   title: z.record(z.string(), z.string()).default({}),
@@ -42,7 +43,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
   const card = await cardModuleService.createCards({
     type: "link",
     title: body.title,
-    image: body.image ?? null,
+    image: toRelativeMediaUrl(body.image),
     path: body.path ?? null,
     is_active: body.is_active,
     locked: false,

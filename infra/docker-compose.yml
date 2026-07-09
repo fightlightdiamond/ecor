@@ -105,13 +105,13 @@ services:
       DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-medusa}
       STORE_CORS: ${STORE_CORS:-http://localhost:8000}
       ADMIN_CORS: ${ADMIN_CORS:-http://localhost:9000,http://localhost:5173,http://localhost}
-      AUTH_CORS: ${AUTH_CORS:-http://localhost:9000,http://localhost:8080,http://localhost:5173,http://localhost}
+      AUTH_CORS: ${AUTH_CORS:-http://localhost:9000,http://localhost:8800,http://localhost:5173,http://localhost}
       JWT_SECRET: ${JWT_SECRET:-supersecret}
       COOKIE_SECRET: ${COOKIE_SECRET:-supersecret}
       # Public origin for uploaded-file URLs (file-local provider appends
       # /static). Must be the nginx entrypoint — the backend's own :9000 is no
       # longer published, so URLs built from it would be unreachable.
-      MEDUSA_BACKEND_URL: ${MEDUSA_BACKEND_URL:-http://${DOMAIN:-localhost}:${HTTP_PORT:-8080}}
+      MEDUSA_BACKEND_URL: ${MEDUSA_BACKEND_URL:-http://${DOMAIN:-localhost}:${HTTP_PORT:-8800}}
       # Lets medusa-config.ts whitelist the public domain in Vite's dev-server
       # host check (only matters when DOMAIN != localhost).
       DOMAIN: ${DOMAIN:-localhost}
@@ -191,10 +191,10 @@ services:
       NODE_ENV: development
       HOST: 0.0.0.0
       PORT: "3000"
-      NUXT_PUBLIC_SITE_URL: ${NUXT_PUBLIC_SITE_URL:-http://${DOMAIN:-localhost}:${HTTP_PORT:-8080}}
+      NUXT_PUBLIC_SITE_URL: ${NUXT_PUBLIC_SITE_URL:-http://${DOMAIN:-localhost}:${HTTP_PORT:-8800}}
       # Browser-side Medusa URL — the nginx entrypoint (single origin), since
       # the backend's :9000 is no longer published to the host.
-      NUXT_PUBLIC_MEDUSA_BACKEND_URL: ${NUXT_PUBLIC_MEDUSA_BACKEND_URL:-http://${DOMAIN:-localhost}:${HTTP_PORT:-8080}}
+      NUXT_PUBLIC_MEDUSA_BACKEND_URL: ${NUXT_PUBLIC_MEDUSA_BACKEND_URL:-http://${DOMAIN:-localhost}:${HTTP_PORT:-8800}}
       # SSR-side override: reach Medusa via compose DNS, no round-trip out
       # through nginx.
       NUXT_MEDUSA_BACKEND_URL_SERVER: http://backend:9000

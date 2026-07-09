@@ -5,15 +5,18 @@ import {
 } from "@medusajs/framework/utils"
 import type { Context } from "@medusajs/framework/types"
 import CampaignPost from "./models/campaign-post"
+import CampaignTopic from "./models/campaign-topic"
 
 type CampaignPostFilters = {
   id?: string | string[]
   slug?: string | string[]
+  topic_id?: string | string[]
   is_active?: boolean
 }
 
 class CampaignModuleService extends MedusaService({
   CampaignPost,
+  CampaignTopic,
 }) {
   /**
    * Returns posts that are currently visible on the storefront:

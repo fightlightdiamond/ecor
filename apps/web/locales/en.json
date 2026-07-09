@@ -276,7 +276,20 @@
     "featured": "Featured",
     "subtitle": "Beauty tips, trends and news from Thăng Long Chè Việt",
     "viewAll": "View All Articles",
-    "comingSoon": "Full article content is being updated."
+    "comingSoon": "Full article content is being updated.",
+    "readMore": "Read more",
+    "readingTime": "{minutes} min read",
+    "related": "Related articles",
+    "backToTopic": "Back to {topic}",
+    "topics": {
+      "eyebrow": "Topics",
+      "title": "Explore by topic",
+      "subtitle": "Pick a topic to browse articles curated around each theme",
+      "browse": "Topics:",
+      "postCount": "{count} articles",
+      "emptyTitle": "No articles in this topic yet",
+      "emptyDesc": "Content is being prepared — please check back soon or browse other articles."
+    }
   },
   "home": {
     "pillars": {

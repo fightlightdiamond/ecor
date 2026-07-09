@@ -1,4 +1,10 @@
 {
+  "menu": {
+    "cards": "Card trang chủ",
+    "campaignPosts": "Bài viết Campaign",
+    "campaignTopics": "Chủ đề bài viết",
+    "media": "Thư viện ảnh"
+  },
   "campaign-posts": {
     "title": "Bài viết Campaign",
     "create": "Tạo bài viết",
@@ -8,6 +14,7 @@
     "columns": {
       "title": "Tiêu đề",
       "slug": "Đường dẫn",
+      "topic": "Chủ đề",
       "status": "Trạng thái",
       "publishAt": "Thời gian đăng",
       "unpublishAt": "Thời gian gỡ"
@@ -20,6 +27,11 @@
       "title": "Tiêu đề",
       "slug": "Đường dẫn (slug)",
       "slugPlaceholder": "tự động tạo từ tiêu đề",
+      "topic": "Chủ đề",
+      "topicPlaceholder": "Chọn chủ đề",
+      "noTopic": "Không thuộc chủ đề nào",
+      "thumbnail": "Ảnh đại diện",
+      "thumbnailHint": "Hiển thị trên thẻ bài viết ở trang danh sách — nếu bỏ trống sẽ dùng ảnh đầu tiên trong nội dung.",
       "publishAt": "Thời gian đăng",
       "unpublishAt": "Thời gian gỡ",
       "active": "Kích hoạt",
@@ -40,6 +52,53 @@
       "deleteFailed": "Xóa bài viết thất bại",
       "deleteConfirmTitle": "Xóa bài viết",
       "deleteConfirmDesc": "Bạn có chắc muốn xóa \"{{title}}\" không?",
+      "confirmDelete": "Xóa",
+      "cancelDelete": "Hủy"
+    }
+  },
+  "campaign-topics": {
+    "title": "Chủ đề bài viết",
+    "create": "Thêm chủ đề",
+    "edit": "Chỉnh sửa chủ đề",
+    "hint": "Chủ đề dùng để nhóm bài viết — mỗi chủ đề có trang danh sách riêng trên website với ảnh banner.",
+    "columns": {
+      "image": "Ảnh",
+      "name": "Tên chủ đề",
+      "slug": "Đường dẫn",
+      "link": "Liên kết",
+      "rank": "Thứ tự",
+      "status": "Trạng thái"
+    },
+    "status": {
+      "active": "Đang hiển thị",
+      "inactive": "Đã ẩn"
+    },
+    "fields": {
+      "name": "Tên chủ đề",
+      "slug": "Đường dẫn (slug)",
+      "slugPlaceholder": "tự động tạo từ tên chủ đề",
+      "slugCopyHint": "Bấm nút bên cạnh để sao chép đường dẫn đầy đủ (không kèm domain) tới trang chủ đề trên website.",
+      "description": "Mô tả ngắn",
+      "image": "Ảnh banner",
+      "imageHint": "Ảnh nền lớn hiển thị đầu trang danh sách bài viết của chủ đề này.",
+      "rank": "Thứ tự hiển thị",
+      "active": "Hiển thị trên website"
+    },
+    "actions": {
+      "create": "Thêm chủ đề",
+      "save": "Lưu thay đổi",
+      "delete": "Xóa",
+      "backToList": "Quay lại danh sách"
+    },
+    "messages": {
+      "created": "Thêm chủ đề thành công",
+      "updated": "Cập nhật chủ đề thành công",
+      "deleted": "Xóa chủ đề thành công",
+      "createFailed": "Thêm chủ đề thất bại",
+      "updateFailed": "Cập nhật chủ đề thất bại",
+      "deleteFailed": "Xóa chủ đề thất bại",
+      "deleteConfirmTitle": "Xóa chủ đề",
+      "deleteConfirmDesc": "Bạn có chắc muốn xóa chủ đề \"{{name}}\"? Các bài viết thuộc chủ đề này sẽ chuyển về trạng thái không có chủ đề, không bị xóa.",
       "confirmDelete": "Xóa",
       "cancelDelete": "Hủy"
     }
@@ -147,7 +206,10 @@
     "rootFolder": "Chưa phân loại",
     "newFolderPlaceholder": "Tên thư mục mới...",
     "createFolder": "Tạo thư mục",
+    "renameFolder": "Đổi tên thư mục",
     "deleteFolder": "Xóa thư mục",
+    "folderActions": "Tùy chọn thư mục",
+    "folderItemCount": "{{count}} ảnh",
     "folderDeleteConfirmTitle": "Xóa thư mục",
     "folderDeleteConfirmDesc": "Xóa thư mục \"{{name}}\"? Ảnh bên trong sẽ được chuyển về \"Chưa phân loại\", không bị xóa.",
     "moveTo": "Di chuyển tới",
@@ -156,6 +218,8 @@
       "uploadDone": "Đã tải lên {{count}} ảnh",
       "uploadFailed": "Tải ảnh thất bại ({{done}}/{{total}} ảnh đã tải xong)",
       "folderCreateFailed": "Tạo thư mục thất bại",
+      "folderRenamed": "Đã đổi tên thư mục",
+      "folderRenameFailed": "Đổi tên thư mục thất bại",
       "folderDeleted": "Đã xóa thư mục, ảnh bên trong được chuyển về Chưa phân loại",
       "folderDeleteFailed": "Xóa thư mục thất bại",
       "moved": "Đã di chuyển ảnh",
@@ -169,7 +233,8 @@
       "notUsed": "Ảnh chưa được sử dụng ở đâu — có thể xóa an toàn.",
       "kind": {
         "card": "Card",
-        "campaign_post": "Bài viết"
+        "campaign_post": "Bài viết",
+        "campaign_topic": "Chủ đề bài viết"
       },
       "confirm": "Xóa",
       "cancel": "Hủy",

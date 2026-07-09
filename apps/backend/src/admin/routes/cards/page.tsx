@@ -416,7 +416,8 @@ const CardsPage = () => {
 }
 
 export const config = defineRouteConfig({
-  label: "Cards",
+  label: "menu.cards",
+  translationNs: "translation",
   icon: GridLayout,
 })
 

@@ -41,7 +41,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 // Default to the nginx entrypoint — the backend's own :9000 is not published.
 const BACKEND_URL =
   process.env.MEDUSA_BACKEND_URL ||
-  `http://${process.env.DOMAIN || "localhost"}:${process.env.HTTP_PORT || "8080"}`
+  `http://${process.env.DOMAIN || "localhost"}:${process.env.HTTP_PORT || "8800"}`
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@medusa.local"
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "supersecret123"
 // Repo-root compose env file — the single source of truth the start scripts

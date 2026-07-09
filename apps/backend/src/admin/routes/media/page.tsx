@@ -1,5 +1,14 @@
 import { defineRouteConfig } from "@medusajs/admin-sdk"
-import { ArrowUpTray, ExclamationCircle, Folder, FolderOpen, Photo, Trash } from "@medusajs/icons"
+import {
+  ArrowLeft,
+  ArrowUpTray,
+  EllipsisHorizontal,
+  ExclamationCircle,
+  Folder,
+  Pencil,
+  Photo,
+  Trash,
+} from "@medusajs/icons"
 import {
   Badge,
   Button,
@@ -13,7 +22,7 @@ import {
   usePrompt,
 } from "@medusajs/ui"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { useRef, useState } from "react"
+import { useMemo, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import PageLayout from "../../components/page-layout"
 import { sdk } from "../../lib/sdk"
@@ -24,7 +33,7 @@ const MediaPage = () => {
   const queryClient = useQueryClient()
   const confirmPrompt = usePrompt()
 
-  // "all" | "root" | <folder id>
+  // "all" = library root (folders + unfiled images shown together); otherwise a folder id.
   const [folder, setFolder] = useState<string>("all")
 
   const { data: foldersData } = useQuery<{ folders: MediaFolderItem[] }>({
@@ -32,6 +41,7 @@ const MediaPage = () => {
     queryKey: ["media-folders"],
   })
   const folders = foldersData?.folders ?? []
+  const currentFolder = folder === "all" ? null : folders.find((f) => f.id === folder) ?? null
 
   const { data: mediaData, isLoading } = useQuery<{ media: MediaItem[], count: number }>({
     queryFn: () =>
@@ -39,6 +49,20 @@ const MediaPage = () => {
     queryKey: ["media-lib", folder],
   })
   const media = mediaData?.media ?? []
+
+  // At the library root, only unfiled images sit alongside the folder tiles —
+  // a folder's own contents only show once you open that folder (flat, non-nested).
+  const visibleMedia = folder === "all" ? media.filter((m) => m.folder_id === null) : media
+
+  const folderCounts = useMemo(() => {
+    const counts = new Map<string, number>()
+    if (folder === "all") {
+      for (const m of media) {
+        if (m.folder_id) counts.set(m.folder_id, (counts.get(m.folder_id) ?? 0) + 1)
+      }
+    }
+    return counts
+  }, [media, folder])
 
   const refreshLibrary = () => {
     queryClient.invalidateQueries({ queryKey: ["media-lib"] })
@@ -67,7 +91,7 @@ const MediaPage = () => {
             url: uploaded.url,
             filename: file.name,
             // Uploads land in the folder currently being viewed.
-            folder_id: folder !== "all" && folder !== "root" ? folder : null,
+            folder_id: folder !== "all" ? folder : null,
           },
         })
         done++
@@ -118,6 +142,36 @@ const MediaPage = () => {
       cancelText: t("mediaLib.delete.cancel"),
     })
     if (confirmed) deleteFolder(f.id)
+  }
+
+  // --- rename folder (inline edit on the tile) --------------------------------
+  const [editingFolderId, setEditingFolderId] = useState<string | null>(null)
+  const [editingName, setEditingName] = useState("")
+
+  const { mutate: renameFolder } = useMutation({
+    mutationFn: ({ id, name }: { id: string, name: string }) =>
+      sdk.client.fetch(`/admin/media/folders/${id}`, {
+        method: "PATCH",
+        body: { name },
+      }),
+    onSuccess: () => {
+      setEditingFolderId(null)
+      queryClient.invalidateQueries({ queryKey: ["media-folders"] })
+      toast.success(t("mediaLib.messages.folderRenamed"))
+    },
+    onError: () => toast.error(t("mediaLib.messages.folderRenameFailed")),
+  })
+
+  const startRenameFolder = (f: MediaFolderItem) => {
+    setEditingFolderId(f.id)
+    setEditingName(f.name)
+  }
+
+  const commitRenameFolder = (f: MediaFolderItem) => {
+    const trimmed = editingName.trim()
+    setEditingFolderId(null)
+    if (!trimmed || trimmed === f.name) return
+    renameFolder({ id: f.id, name: trimmed })
   }
 
   // --- move -------------------------------------------------------------------
@@ -187,47 +241,41 @@ const MediaPage = () => {
         </Text>
       </div>
 
-      {/* folder bar */}
-      <div className="flex flex-wrap items-center gap-2 px-6 py-3 bg-ui-bg-subtle">
-        <Button
-          size="small"
-          variant={folder === "all" ? "primary" : "secondary"}
-          onClick={() => setFolder("all")}
-        >
-          {t("mediaLib.allImages")}
-        </Button>
-        <Button
-          size="small"
-          variant={folder === "root" ? "primary" : "secondary"}
-          onClick={() => setFolder("root")}
-        >
-          {t("mediaLib.rootFolder")}
-        </Button>
-        {folders.map((f) => (
-          <div key={f.id} className="flex items-center">
-            <Button
-              size="small"
-              variant={folder === f.id ? "primary" : "secondary"}
-              onClick={() => setFolder(f.id)}
-            >
-              {folder === f.id ? <FolderOpen /> : <Folder />}
-              {f.name}
-            </Button>
-            {folder === f.id && (
+      {/* breadcrumb + create folder */}
+      <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-3 bg-ui-bg-subtle">
+        <div className="flex items-center gap-x-2 min-w-0">
+          {currentFolder ? (
+            <>
+              <Button size="small" variant="transparent" onClick={() => setFolder("all")}>
+                <ArrowLeft />
+                {t("mediaLib.allImages")}
+              </Button>
+              <Text className="text-ui-fg-muted">/</Text>
+              <Text weight="plus" className="truncate">{currentFolder.name}</Text>
               <IconButton
                 size="small"
                 variant="transparent"
-                className="ml-1 text-ui-fg-muted"
+                aria-label={t("mediaLib.renameFolder")}
+                onClick={() => startRenameFolder(currentFolder)}
+              >
+                <Pencil />
+              </IconButton>
+              <IconButton
+                size="small"
+                variant="transparent"
+                className="text-ui-fg-muted"
                 aria-label={t("mediaLib.deleteFolder")}
-                onClick={() => handleDeleteFolder(f)}
+                onClick={() => handleDeleteFolder(currentFolder)}
               >
                 <Trash />
               </IconButton>
-            )}
-          </div>
-        ))}
+            </>
+          ) : (
+            <Text weight="plus">{t("mediaLib.allImages")}</Text>
+          )}
+        </div>
 
-        <div className="ml-auto flex items-center gap-x-2">
+        <div className="flex items-center gap-x-2">
           <Input
             size="small"
             className="w-44"
@@ -253,17 +301,87 @@ const MediaPage = () => {
         </div>
       </div>
 
-      {/* image grid */}
+      {/* folders + image grid */}
       <div className="px-6 py-4">
         {isLoading && <Text size="small">…</Text>}
-        {!isLoading && !media.length && (
+        {!isLoading && !folders.length && !visibleMedia.length && (
           <Text size="small" className="text-ui-fg-subtle">
             {t("mediaLib.empty")}
           </Text>
         )}
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-          {media.map((m) => (
+          {!currentFolder && folders.map((f) => {
+            const isEditing = editingFolderId === f.id
+            return (
+              <div
+                key={f.id}
+                className="group relative flex aspect-square flex-col overflow-hidden rounded-lg border border-ui-border-base bg-ui-bg-base"
+              >
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => !isEditing && setFolder(f.id)}
+                  onKeyDown={(e) => {
+                    if (!isEditing && (e.key === "Enter" || e.key === " ")) setFolder(f.id)
+                  }}
+                  className="flex flex-1 cursor-pointer flex-col items-center justify-center gap-2 px-3 text-center"
+                >
+                  <Folder className="text-ui-fg-muted h-8 w-8" />
+                  {isEditing ? (
+                    <Input
+                      size="small"
+                      autoFocus
+                      value={editingName}
+                      onClick={(e) => e.stopPropagation()}
+                      onChange={(e) => setEditingName(e.target.value)}
+                      onBlur={() => commitRenameFolder(f)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault()
+                          commitRenameFolder(f)
+                        } else if (e.key === "Escape") {
+                          setEditingFolderId(null)
+                        }
+                      }}
+                    />
+                  ) : (
+                    <Text size="small" weight="plus" className="w-full truncate">
+                      {f.name}
+                    </Text>
+                  )}
+                  <Text size="xsmall" className="text-ui-fg-muted">
+                    {t("mediaLib.folderItemCount", { count: folderCounts.get(f.id) ?? 0 })}
+                  </Text>
+                </div>
+
+                <div className="absolute top-1 right-1 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
+                  <DropdownMenu>
+                    <DropdownMenu.Trigger asChild onClick={(e) => e.stopPropagation()}>
+                      <IconButton size="small" variant="transparent" aria-label={t("mediaLib.folderActions")}>
+                        <EllipsisHorizontal />
+                      </IconButton>
+                    </DropdownMenu.Trigger>
+                    <DropdownMenu.Content align="end">
+                      <DropdownMenu.Item onClick={() => startRenameFolder(f)}>
+                        <Pencil className="mr-1" />
+                        {/* {t("mediaLib.renameFolder")} */}
+                      </DropdownMenu.Item>
+                      <DropdownMenu.Item
+                        className="text-ui-fg-error"
+                        onClick={() => handleDeleteFolder(f)}
+                      >
+                        <Trash className="mr-1" />
+                        {/* {t("mediaLib.deleteFolder")} */}
+                      </DropdownMenu.Item>
+                    </DropdownMenu.Content>
+                  </DropdownMenu>
+                </div>
+              </div>
+            )
+          })}
+
+          {visibleMedia.map((m) => (
             <div
               key={m.id}
               className="group flex flex-col overflow-hidden rounded-lg border border-ui-border-base bg-ui-bg-base"
@@ -396,7 +514,8 @@ const MediaPage = () => {
 }
 
 export const config = defineRouteConfig({
-  label: "Media",
+  label: "menu.media",
+  translationNs: "translation",
   icon: Photo,
 })
 

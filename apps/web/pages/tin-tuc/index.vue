@@ -17,6 +17,7 @@ useSeoMeta({
       :title="t('blog.title')"
       :subtitle="t('blog.subtitle')"
     />
+    <SectionsBlogTopics />
     <SectionsBlogList />
   </div>
 </template>

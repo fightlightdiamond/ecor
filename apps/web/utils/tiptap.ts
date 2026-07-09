@@ -30,6 +30,10 @@ function isSafeUrl(url: unknown): boolean {
   return /^(https?:\/\/|\/|mailto:|tel:)/i.test(s)
 }
 
+type UrlResolver = (url: string) => string
+
+const identity: UrlResolver = url => url
+
 function renderMarks(text: string, marks: TiptapNode['marks'] = []): string {
   let html = text
   for (const mark of marks ?? []) {
@@ -66,8 +70,8 @@ function renderMarks(text: string, marks: TiptapNode['marks'] = []): string {
   return html
 }
 
-function renderNode(node: TiptapNode): string {
-  const children = (node.content ?? []).map(renderNode).join('')
+function renderNode(node: TiptapNode, resolveUrl: UrlResolver): string {
+  const children = (node.content ?? []).map(n => renderNode(n, resolveUrl)).join('')
 
   switch (node.type) {
     case 'doc':
@@ -100,7 +104,7 @@ function renderNode(node: TiptapNode): string {
       const src = node.attrs?.src
       if (!isSafeUrl(src)) return ''
       const alt = escapeAttr(node.attrs?.alt ?? '')
-      return `<img src="${escapeAttr(src)}" alt="${alt}" loading="lazy">`
+      return `<img src="${escapeAttr(resolveUrl(String(src)))}" alt="${alt}" loading="lazy">`
     }
     case 'youtube': {
       const src = node.attrs?.src
@@ -122,9 +126,9 @@ function renderNode(node: TiptapNode): string {
   }
 }
 
-export function tiptapToHtml(doc: unknown): string {
+export function tiptapToHtml(doc: unknown, resolveUrl: UrlResolver = identity): string {
   if (!doc || typeof doc !== 'object') return ''
-  return renderNode(doc as TiptapNode)
+  return renderNode(doc as TiptapNode, resolveUrl)
 }
 
 /** Plain text of a TipTap document (for excerpts/SEO descriptions). */
@@ -138,11 +142,11 @@ export function tiptapToText(doc: unknown): string {
 }
 
 /** First image URL inside a TipTap document, if any. */
-export function tiptapFirstImage(doc: unknown): string | null {
+export function tiptapFirstImage(doc: unknown, resolveUrl: UrlResolver = identity): string | null {
   if (!doc || typeof doc !== 'object') return null
   const walk = (node: TiptapNode): string | null => {
     if (node.type === 'image' && isSafeUrl(node.attrs?.src)) {
-      return String(node.attrs!.src)
+      return resolveUrl(String(node.attrs!.src))
     }
     for (const child of node.content ?? []) {
       const found = walk(child)

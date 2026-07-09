@@ -21,6 +21,8 @@ const CreateCampaignPostPage = () => {
   const { t } = useTranslation()
   const [title, setTitle] = useState("")
   const [slug, setSlug] = useState("")
+  const [thumbnail, setThumbnail] = useState("")
+  const [topicId, setTopicId] = useState("")
   const [isActive, setIsActive] = useState(true)
   const [publishAt, setPublishAt] = useState("")
   const [unpublishAt, setUnpublishAt] = useState("")
@@ -42,6 +44,8 @@ const CreateCampaignPostPage = () => {
         title,
         slug: slug || slugify(title),
         content: content || EMPTY_TIPTAP_DOC,
+        thumbnail: thumbnail || null,
+        topic_id: topicId || null,
         is_active: isActive,
         publish_at: toIsoDateTime(publishAt),
         unpublish_at: toIsoDateTime(unpublishAt),
@@ -73,6 +77,8 @@ const CreateCampaignPostPage = () => {
       <CampaignPostForm
         title={title}
         slug={slug}
+        thumbnail={thumbnail}
+        topicId={topicId}
         isActive={isActive}
         publishAt={publishAt}
         unpublishAt={unpublishAt}
@@ -81,6 +87,8 @@ const CreateCampaignPostPage = () => {
         submitLabel={t("campaign-posts.actions.create")}
         onTitleChange={setTitle}
         onSlugChange={setSlug}
+        onThumbnailChange={setThumbnail}
+        onTopicIdChange={setTopicId}
         onIsActiveChange={setIsActive}
         onPublishAtChange={setPublishAt}
         onUnpublishAtChange={setUnpublishAt}

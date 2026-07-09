@@ -26,7 +26,7 @@ module.exports = defineConfig({
     // Medusa forces a `Secure` session cookie whenever NODE_ENV=production,
     // so the admin dashboard only authenticates over HTTPS. Behind a real
     // TLS-terminating proxy that's exactly right — leave it. But when testing
-    // the PROD stack locally over plain http://localhost:8080 the browser
+    // the PROD stack locally over plain http://localhost:8800 the browser
     // silently drops the Secure cookie and every /admin call comes back 401.
     // Set COOKIE_SECURE=false in that case (LOCAL/HTTP ONLY — never on a real
     // internet-facing deployment).

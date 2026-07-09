@@ -3,6 +3,7 @@ import { MedusaError } from "@medusajs/framework/utils"
 import { z } from "zod"
 import { CARD_MODULE } from "../../../../modules/card"
 import type CardModuleService from "../../../../modules/card/service"
+import { toRelativeMediaUrl } from "../../../utils/media-url"
 
 const UpdateCardSchema = z.object({
   title: z.record(z.string(), z.string()).optional(),
@@ -46,6 +47,9 @@ export async function PATCH(req: MedusaRequest, res: MedusaResponse) {
   const patch: Record<string, unknown> = {}
   for (const key of allowedKeys) {
     if (body[key] !== undefined) patch[key] = body[key]
+  }
+  if (patch.image !== undefined) {
+    patch.image = toRelativeMediaUrl(patch.image as string | null)
   }
 
   const card = await cardModuleService.updateCards({ id, ...patch })

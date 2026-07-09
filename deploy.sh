@@ -194,7 +194,7 @@ echo "==> Starting the stack on the server (prebuilt output — no build there).
 
 # --- verify from this machine ------------------------------------------------------
 HTTP_PORT="$("${SSH[@]}" "grep '^HTTP_PORT=' '$REMOTE_DIR/.env.prod' | cut -d= -f2" )"
-HTTP_PORT="${HTTP_PORT:-8080}"
+HTTP_PORT="${HTTP_PORT:-8800}"
 echo "==> Verifying http://$HOST_IP:$HTTP_PORT/health ..."
 for _ in $(seq 1 10); do
   if curl -fsS -m 5 "http://$HOST_IP:$HTTP_PORT/health" >/dev/null 2>&1; then

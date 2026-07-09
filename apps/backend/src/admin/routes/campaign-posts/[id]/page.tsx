@@ -54,6 +54,8 @@ const EditCampaignPostPage = () => {
 
   const [title, setTitle] = useState(campaign_post.title)
   const [slug, setSlug] = useState(campaign_post.slug)
+  const [thumbnail, setThumbnail] = useState(campaign_post.thumbnail ?? "")
+  const [topicId, setTopicId] = useState(campaign_post.topic_id ?? "")
   const [isActive, setIsActive] = useState(campaign_post.is_active)
   const [publishAt, setPublishAt] = useState(
     toDatetimeLocal(campaign_post.publish_at)
@@ -96,6 +98,8 @@ const EditCampaignPostPage = () => {
         title,
         slug,
         content: content || EMPTY_TIPTAP_DOC,
+        thumbnail: thumbnail || null,
+        topic_id: topicId || null,
         is_active: isActive,
         publish_at: toIsoDateTime(publishAt),
         unpublish_at: toIsoDateTime(unpublishAt),
@@ -152,6 +156,8 @@ const EditCampaignPostPage = () => {
       <CampaignPostForm
         title={title}
         slug={slug}
+        thumbnail={thumbnail}
+        topicId={topicId}
         isActive={isActive}
         publishAt={publishAt}
         unpublishAt={unpublishAt}
@@ -160,6 +166,8 @@ const EditCampaignPostPage = () => {
         submitLabel={t("campaign-posts.actions.save")}
         onTitleChange={setTitle}
         onSlugChange={setSlug}
+        onThumbnailChange={setThumbnail}
+        onTopicIdChange={setTopicId}
         onIsActiveChange={setIsActive}
         onPublishAtChange={setPublishAt}
         onUnpublishAtChange={setUnpublishAt}

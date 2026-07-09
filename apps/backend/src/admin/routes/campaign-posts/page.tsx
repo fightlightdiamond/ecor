@@ -16,6 +16,7 @@ import { useTranslation } from "react-i18next"
 import PageLayout from "../../components/page-layout"
 import { sdk } from "../../lib/sdk"
 import type { CampaignPost, CampaignPostsResponse } from "../../types/campaign-post"
+import type { CampaignTopicsResponse } from "../../types/campaign-topic"
 
 const CampaignPostsPage = () => {
   const navigate = useNavigate()
@@ -41,6 +42,22 @@ const CampaignPostsPage = () => {
     queryKey: [["campaign-posts", limit, offset]],
   })
 
+  const { data: topicsData } = useQuery<CampaignTopicsResponse>({
+    queryFn: () =>
+      sdk.client.fetch(`/admin/campaign-topics`, {
+        query: { limit: 100 },
+      }),
+    queryKey: [["campaign-topics", "post-list"]],
+  })
+
+  const topicNameById = useMemo(() => {
+    const map = new Map<string, string>()
+    for (const topic of topicsData?.campaign_topics ?? []) {
+      map.set(topic.id, topic.name)
+    }
+    return map
+  }, [topicsData])
+
   const columnHelper = createDataTableColumnHelper<CampaignPost>()
 
   const columns = [
@@ -52,6 +69,17 @@ const CampaignPostsPage = () => {
     }),
     columnHelper.accessor("slug", {
       header: t("campaign-posts.columns.slug"),
+    }),
+    columnHelper.accessor("topic_id", {
+      header: t("campaign-posts.columns.topic"),
+      cell: ({ getValue }) => {
+        const topicId = getValue()
+        return topicId ? (
+          topicNameById.get(topicId) ?? "—"
+        ) : (
+          <span className="text-ui-fg-muted">—</span>
+        )
+      },
     }),
     columnHelper.accessor("is_active", {
       header: t("campaign-posts.columns.status"),
@@ -107,7 +135,8 @@ const CampaignPostsPage = () => {
 }
 
 export const config = defineRouteConfig({
-  label: "Campaign Posts",
+  label: "menu.campaignPosts",
+  translationNs: "translation",
   icon: DocumentText,
 })
 

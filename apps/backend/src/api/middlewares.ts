@@ -22,6 +22,8 @@ export default defineMiddlewares({
             "id",
             "title",
             "slug",
+            "thumbnail",
+            "topic_id",
             "is_active",
             "publish_at",
             "unpublish_at",

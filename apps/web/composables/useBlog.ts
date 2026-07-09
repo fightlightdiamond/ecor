@@ -1,30 +1,53 @@
-import type { BlogPost } from '~/utils/storefront'
+import type { BlogPost, BlogTopic } from '~/utils/storefront'
 import { FALLBACK_POST_IMAGE } from '~/utils/storefront'
 import { tiptapFirstImage, tiptapToHtml, tiptapToText } from '~/utils/tiptap'
 import fallbackPosts from '~/content/blog.json'
 
-export type { BlogPost } from '~/utils/storefront'
+export type { BlogPost, BlogTopic } from '~/utils/storefront'
 
 interface CampaignPost {
   id: string
   title: string
   slug: string
   content: unknown
+  thumbnail?: string | null
+  topic?: { id: string, name: string, slug: string } | null
   publish_at: string | null
   created_at?: string
 }
 
-function transformCampaignPost(p: CampaignPost): BlogPost {
-  const content = tiptapToHtml(p.content)
+interface CampaignTopic {
+  id: string
+  name: string
+  slug: string
+  description: string | null
+  image: string | null
+  post_count?: number
+}
+
+function transformCampaignPost(p: CampaignPost, resolveUrl: (url: string | null | undefined) => string): BlogPost {
+  const content = tiptapToHtml(p.content, resolveUrl)
   const plain = tiptapToText(p.content)
   return {
     slug: p.slug,
     title: p.title,
     excerpt: plain.slice(0, 200) + (plain.length > 200 ? '…' : ''),
     content,
-    image: tiptapFirstImage(p.content) || FALLBACK_POST_IMAGE,
+    image: resolveUrl(p.thumbnail) || tiptapFirstImage(p.content, resolveUrl) || FALLBACK_POST_IMAGE,
     date: p.publish_at || p.created_at || '',
     author: 'Thăng Long Chè Việt',
+    topic: p.topic ? { name: p.topic.name, slug: p.topic.slug } : null,
+  }
+}
+
+function transformCampaignTopic(t: CampaignTopic, resolveUrl: (url: string | null | undefined) => string): BlogTopic {
+  return {
+    id: t.id,
+    name: t.name,
+    slug: t.slug,
+    description: t.description,
+    image: resolveUrl(t.image) || null,
+    post_count: t.post_count ?? 0,
   }
 }
 
@@ -37,6 +60,7 @@ function transformCampaignPost(p: CampaignPost): BlogPost {
 export function useBlog() {
   const { fetchMedusa } = useMedusaApi()
   const { locale } = useI18n()
+  const { resolveMediaUrl } = useMediaUrl()
 
   const localFallback = computed<BlogPost[]>(() =>
     (fallbackPosts as any[]).map(p => ({
@@ -47,6 +71,7 @@ export function useBlog() {
       image: FALLBACK_POST_IMAGE,
       date: p.date ?? '',
       author: 'Thăng Long Chè Việt',
+      topic: null,
     })),
   )
 
@@ -67,26 +92,82 @@ export function useBlog() {
   )
 
   const posts = computed<BlogPost[]>(() => {
-    const fromApi = (postsData.value ?? []).map(transformCampaignPost)
+    const fromApi = (postsData.value ?? []).map(p => transformCampaignPost(p, resolveMediaUrl))
     return fromApi.length ? fromApi : localFallback.value
   })
 
   const latestPosts = computed<BlogPost[]>(() => posts.value.slice(0, 4))
 
   const getBySlug = async (slug: string): Promise<BlogPost | null> => {
-    const found = posts.value.find(p => p.slug === slug)
-    if (found) return found
-
     try {
       const res = await fetchMedusa<{ campaign_post: CampaignPost }>(
         `/store/campaign-posts/${encodeURIComponent(slug)}`,
       )
-      if (res.campaign_post) return transformCampaignPost(res.campaign_post)
+      if (res.campaign_post) return transformCampaignPost(res.campaign_post, resolveMediaUrl)
+    } catch (e) {
+      console.error(e)
+    }
+    // Fallback: the already-listed posts (covers the local JSON fallback too)
+    return posts.value.find(p => p.slug === slug) ?? null
+  }
+
+  return { posts, latestPosts, pending, getBySlug }
+}
+
+/**
+ * Topics for grouping blog posts (GET /store/campaign-topics), each with a
+ * banner image and a count of currently visible posts.
+ */
+export function useBlogTopics() {
+  const { fetchMedusa } = useMedusaApi()
+  const { resolveMediaUrl } = useMediaUrl()
+
+  const { data, pending } = useAsyncData(
+    'campaign-topics',
+    async () => {
+      try {
+        const res = await fetchMedusa<{ campaign_topics: CampaignTopic[] }>(
+          '/store/campaign-topics',
+        )
+        return res.campaign_topics ?? []
+      } catch (e) {
+        console.warn('Campaign topics API unavailable', e)
+        return [] as CampaignTopic[]
+      }
+    },
+    { default: () => [] as CampaignTopic[] },
+  )
+
+  const topics = computed<BlogTopic[]>(() =>
+    (data.value ?? []).map(t => transformCampaignTopic(t, resolveMediaUrl)),
+  )
+
+  const getTopicBySlug = async (slug: string): Promise<BlogTopic | null> => {
+    const found = topics.value.find(t => t.slug === slug)
+    if (found) return found
+
+    try {
+      const res = await fetchMedusa<{ campaign_topic: CampaignTopic }>(
+        `/store/campaign-topics/${encodeURIComponent(slug)}`,
+      )
+      if (res.campaign_topic) return transformCampaignTopic(res.campaign_topic, resolveMediaUrl)
     } catch (e) {
       console.error(e)
     }
     return null
   }
 
-  return { posts, latestPosts, pending, getBySlug }
+  const getPostsByTopicSlug = async (slug: string): Promise<BlogPost[]> => {
+    try {
+      const res = await fetchMedusa<{ campaign_posts: CampaignPost[] }>(
+        `/store/campaign-posts?limit=100&topic_slug=${encodeURIComponent(slug)}`,
+      )
+      return (res.campaign_posts ?? []).map(p => transformCampaignPost(p, resolveMediaUrl))
+    } catch (e) {
+      console.warn('Campaign posts by topic unavailable', e)
+      return []
+    }
+  }
+
+  return { topics, pending, getTopicBySlug, getPostsByTopicSlug }
 }

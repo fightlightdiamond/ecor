@@ -61,5 +61,5 @@ sleep 1m
 bash ./provisioning.sh
 
 "${COMPOSE[@]}" ps
-echo "==> Done. Stack is live on port ${HTTP_PORT:-8080}."
+echo "==> Done. Stack is live on port ${HTTP_PORT:-8800}."
 echo "    First deploy only: ./create-admin.sh --prod to (re)create the Medusa admin user."

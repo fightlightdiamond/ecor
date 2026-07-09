@@ -75,6 +75,15 @@ export interface RawPost {
   created_at?: string
 }
 
+export interface BlogTopic {
+  id: string
+  name: string
+  slug: string
+  description: string | null
+  image: string | null
+  post_count?: number
+}
+
 export interface BlogPost {
   slug: string
   title: string
@@ -83,6 +92,7 @@ export interface BlogPost {
   image: string
   date: string
   author: string
+  topic: { name: string, slug: string } | null
 }
 
 export interface ProductCategory {
@@ -138,6 +148,7 @@ export function transformPost(p: RawPost, locale = 'vi'): BlogPost {
     image: p.image || FALLBACK_POST_IMAGE,
     date: p.published_at || p.created_at || '',
     author: 'Admin',
+    topic: null,
   }
 }
 

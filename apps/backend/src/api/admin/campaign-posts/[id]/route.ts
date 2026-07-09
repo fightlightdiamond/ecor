@@ -2,11 +2,14 @@ import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { z } from "zod"
 import { CAMPAIGN_MODULE } from "../../../../modules/campaign"
 import type CampaignModuleService from "../../../../modules/campaign/service"
+import { normalizeTiptapImageUrls, toRelativeMediaUrl } from "../../../utils/media-url"
 
 const UpdateCampaignPostSchema = z.object({
   title: z.string().min(1).optional(),
   slug: z.string().min(1).optional(),
   content: z.record(z.string(), z.unknown()).optional(),
+  thumbnail: z.string().nullable().optional(),
+  topic_id: z.string().nullable().optional(),
   is_active: z.boolean().optional(),
   publish_at: z.string().datetime().nullable().optional(),
   unpublish_at: z.string().datetime().nullable().optional(),
@@ -34,6 +37,8 @@ export async function PATCH(req: MedusaRequest, res: MedusaResponse) {
   const post = await campaignModuleService.updateCampaignPosts({
     id,
     ...body,
+    content: body.content === undefined ? undefined : normalizeTiptapImageUrls(body.content),
+    thumbnail: body.thumbnail === undefined ? undefined : toRelativeMediaUrl(body.thumbnail),
     publish_at:
       body.publish_at === undefined
         ? undefined

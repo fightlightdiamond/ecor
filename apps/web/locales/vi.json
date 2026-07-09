@@ -276,7 +276,20 @@
     "featured": "Tin nổi bật",
     "subtitle": "Mẹo làm đẹp, xu hướng và tin tức từ Thăng Long Chè Việt",
     "viewAll": "Xem tất cả bài viết",
-    "comingSoon": "Nội dung đang được cập nhật."
+    "comingSoon": "Nội dung đang được cập nhật.",
+    "readMore": "Đọc tiếp",
+    "readingTime": "{minutes} phút đọc",
+    "related": "Bài viết liên quan",
+    "backToTopic": "Quay lại chủ đề {topic}",
+    "topics": {
+      "eyebrow": "Chủ đề",
+      "title": "Khám phá theo chủ đề",
+      "subtitle": "Chọn một chủ đề để xem các bài viết được tuyển chọn theo từng mạch nội dung",
+      "browse": "Chủ đề:",
+      "postCount": "{count} bài viết",
+      "emptyTitle": "Chưa có bài viết trong chủ đề này",
+      "emptyDesc": "Nội dung đang được biên soạn — mời bạn quay lại sau hoặc xem các bài viết khác."
+    }
   },
   "home": {
     "pillars": {

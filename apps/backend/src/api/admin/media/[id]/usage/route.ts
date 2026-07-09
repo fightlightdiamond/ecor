@@ -5,7 +5,7 @@ import { CAMPAIGN_MODULE } from "../../../../../modules/campaign"
 import type CampaignModuleService from "../../../../../modules/campaign/service"
 
 type UsageEntry = {
-  kind: "card" | "campaign_post"
+  kind: "card" | "campaign_post" | "campaign_topic"
   id: string
   label: string
 }
@@ -49,8 +49,19 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
   const posts = await campaignModuleService.listCampaignPosts({})
   for (const post of posts) {
     const contentStr = post.content ? JSON.stringify(post.content) : ""
-    if (contentStr.includes(url) || (basename && contentStr.includes(basename))) {
+    if (
+      matches(post.thumbnail) ||
+      contentStr.includes(url) ||
+      (basename && contentStr.includes(basename))
+    ) {
       usage.push({ kind: "campaign_post", id: post.id, label: post.title })
+    }
+  }
+
+  const topics = await campaignModuleService.listCampaignTopics({})
+  for (const topic of topics) {
+    if (matches(topic.image)) {
+      usage.push({ kind: "campaign_topic", id: topic.id, label: topic.name })
     }
   }
 

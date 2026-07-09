@@ -7,6 +7,8 @@ export type CampaignPost = {
   title: string
   slug: string
   content: CampaignPostContent
+  thumbnail: string | null
+  topic_id: string | null
   is_active: boolean
   publish_at: string | null
   unpublish_at: string | null
@@ -27,6 +29,8 @@ export type CampaignPostResponse = {
 export type CampaignPostFormValues = {
   title: string
   slug: string
+  thumbnail: string | null
+  topic_id: string | null
   is_active: boolean
   publish_at: string | null
   unpublish_at: string | null

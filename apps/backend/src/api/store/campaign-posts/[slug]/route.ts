@@ -6,7 +6,8 @@ import type CampaignModuleService from "../../../../modules/campaign/service"
 /**
  * GET /store/campaign-posts/:slug
  *
- * Returns a single active campaign post by slug.
+ * Returns a single active campaign post by slug, with its topic attached
+ * ({id, name, slug} or null).
  */
 export async function GET(req: MedusaRequest, res: MedusaResponse) {
   const { slug } = req.params
@@ -26,5 +27,18 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
     )
   }
 
-  res.json({ campaign_post: posts[0] })
+  const post = posts[0]
+  let topic: { id: string, name: string, slug: string } | null = null
+
+  if (post.topic_id) {
+    const topics = await campaignModuleService.listCampaignTopics(
+      { id: post.topic_id },
+      { take: 1 }
+    )
+    if (topics.length) {
+      topic = { id: topics[0].id, name: topics[0].name, slug: topics[0].slug }
+    }
+  }
+
+  res.json({ campaign_post: { ...post, topic } })
 }

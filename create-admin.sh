@@ -61,6 +61,6 @@ echo "Creating admin user: $EMAIL"
 if [ "$prod" -eq 1 ]; then
   echo "Done. Login at https://${DOMAIN:-your-domain}/app with:"
 else
-  echo "Done. Login at http://${DOMAIN:-localhost}:${HTTP_PORT:-8080}/app with:"
+  echo "Done. Login at http://${DOMAIN:-localhost}:${HTTP_PORT:-8800}/app with:"
 fi
 echo "  $EMAIL / $PASSWORD"

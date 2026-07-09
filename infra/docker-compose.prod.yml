@@ -16,7 +16,7 @@
 # binary can't run here). No TypeScript, no vite, no bundling on this host.
 #
 # Routing is identical to dev: everything reachable on one port (HTTP_PORT,
-# default 8080) via nginx, which routes /app,/admin,/store,/auth,/static,
+# default 8800) via nginx, which routes /app,/admin,/store,/auth,/static,
 # /health -> backend:9000 and everything else -> web:3000. Neither app runs a
 # Vite dev server (built admin assets + built Nitro server), so the dev-only
 # HMR/shared-port issues don't exist here.
@@ -90,12 +90,12 @@ services:
       DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-medusa}
       # All public-facing origins derive from DOMAIN + HTTP_PORT (.env.prod) —
       # localhost only ever appears as the fallback when DOMAIN is unset.
-      STORE_CORS: ${STORE_CORS:-http://${DOMAIN:-localhost}:${HTTP_PORT:-8080}}
-      ADMIN_CORS: ${ADMIN_CORS:-http://${DOMAIN:-localhost}:${HTTP_PORT:-8080}}
-      AUTH_CORS: ${AUTH_CORS:-http://${DOMAIN:-localhost}:${HTTP_PORT:-8080}}
+      STORE_CORS: ${STORE_CORS:-http://${DOMAIN:-localhost}:${HTTP_PORT:-8800}}
+      ADMIN_CORS: ${ADMIN_CORS:-http://${DOMAIN:-localhost}:${HTTP_PORT:-8800}}
+      AUTH_CORS: ${AUTH_CORS:-http://${DOMAIN:-localhost}:${HTTP_PORT:-8800}}
       # Public origin for uploaded-file URLs (file-local provider appends
       # /static; nginx proxies /static/ back to this backend).
-      MEDUSA_BACKEND_URL: ${MEDUSA_BACKEND_URL:-http://${DOMAIN:-localhost}:${HTTP_PORT:-8080}}
+      MEDUSA_BACKEND_URL: ${MEDUSA_BACKEND_URL:-http://${DOMAIN:-localhost}:${HTTP_PORT:-8800}}
       JWT_SECRET: ${JWT_SECRET:-supersecret}
       COOKIE_SECRET: ${COOKIE_SECRET:-supersecret}
       # LOCAL/HTTP ONLY: let the admin session cookie work over plain http
@@ -143,10 +143,10 @@ services:
       NODE_ENV: production
       HOST: 0.0.0.0
       PORT: "3000"
-      NUXT_PUBLIC_SITE_URL: ${NUXT_PUBLIC_SITE_URL:-http://${DOMAIN:-localhost}:${HTTP_PORT:-8080}}
+      NUXT_PUBLIC_SITE_URL: ${NUXT_PUBLIC_SITE_URL:-http://${DOMAIN:-localhost}:${HTTP_PORT:-8800}}
       # Browser-side Medusa URL — the public origin (nginx). The backend's
       # :9000 is internal-only in prod.
-      NUXT_PUBLIC_MEDUSA_BACKEND_URL: ${NUXT_PUBLIC_MEDUSA_BACKEND_URL:-http://${DOMAIN:-localhost}:${HTTP_PORT:-8080}}
+      NUXT_PUBLIC_MEDUSA_BACKEND_URL: ${NUXT_PUBLIC_MEDUSA_BACKEND_URL:-http://${DOMAIN:-localhost}:${HTTP_PORT:-8800}}
       # SSR-side override: compose DNS, no round-trip out through nginx.
       NUXT_MEDUSA_BACKEND_URL_SERVER: http://backend:9000
       # Store API credentials for the PROD database (.env.prod).
