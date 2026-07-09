@@ -12,6 +12,12 @@ const CampaignPost = model.define("campaign_post", {
   is_active: model.boolean().default(true),
   publish_at: model.dateTime().nullable(),
   unpublish_at: model.dateTime().nullable(),
+  // Original source/attribution of the article, e.g. "Theo VnExpress" — shown on the storefront post
+  source: model.text().nullable(),
+  // SEO overrides for the storefront <title>/<meta description> — fall back to title/excerpt when empty
+  seo_title: model.text().nullable(),
+  seo_description: model.text().nullable(),
+  seo_keywords: model.text().nullable(),
 })
 
 export default CampaignPost

@@ -300,7 +300,8 @@
       "postCount": "{count} bài viết",
       "emptyTitle": "Chưa có bài viết trong chủ đề này",
       "emptyDesc": "Nội dung đang được biên soạn — mời bạn quay lại sau hoặc xem các bài viết khác."
-    }
+    },
+    "source": "Nguồn: {source}"
   },
   "home": {
     "pillars": {

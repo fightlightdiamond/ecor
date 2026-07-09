@@ -26,6 +26,10 @@ const CreateCampaignPostPage = () => {
   const [isActive, setIsActive] = useState(true)
   const [publishAt, setPublishAt] = useState("")
   const [unpublishAt, setUnpublishAt] = useState("")
+  const [source, setSource] = useState("")
+  const [seoTitle, setSeoTitle] = useState("")
+  const [seoDescription, setSeoDescription] = useState("")
+  const [seoKeywords, setSeoKeywords] = useState("")
   const [content, setContent] = useState<JSONContent | null>(null)
 
   const { mutateAsync, isPending } = useMutation({
@@ -49,6 +53,10 @@ const CreateCampaignPostPage = () => {
         is_active: isActive,
         publish_at: toIsoDateTime(publishAt),
         unpublish_at: toIsoDateTime(unpublishAt),
+        source: source || null,
+        seo_title: seoTitle || null,
+        seo_description: seoDescription || null,
+        seo_keywords: seoKeywords || null,
       }) as CampaignPostResponse
 
       toast.success(t("campaign-posts.messages.created"))
@@ -82,6 +90,10 @@ const CreateCampaignPostPage = () => {
         isActive={isActive}
         publishAt={publishAt}
         unpublishAt={unpublishAt}
+        source={source}
+        seoTitle={seoTitle}
+        seoDescription={seoDescription}
+        seoKeywords={seoKeywords}
         content={content}
         isSubmitting={isPending}
         submitLabel={t("campaign-posts.actions.create")}
@@ -92,6 +104,10 @@ const CreateCampaignPostPage = () => {
         onIsActiveChange={setIsActive}
         onPublishAtChange={setPublishAt}
         onUnpublishAtChange={setUnpublishAt}
+        onSourceChange={setSource}
+        onSeoTitleChange={setSeoTitle}
+        onSeoDescriptionChange={setSeoDescription}
+        onSeoKeywordsChange={setSeoKeywords}
         onContentChange={setContent}
         onSubmit={handleSubmit}
         editorKey="create"

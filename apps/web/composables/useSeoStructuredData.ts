@@ -52,8 +52,8 @@ export function useArticleStructuredData(post: Ref<BlogPost | null | undefined>)
         innerHTML: JSON.stringify({
           '@context': 'https://schema.org',
           '@type': 'Article',
-          headline: post.value.title,
-          description: post.value.excerpt,
+          headline: post.value.seoTitle || post.value.title,
+          description: post.value.seoDescription || post.value.excerpt,
           image: post.value.image || undefined,
           datePublished: post.value.date,
           author: {

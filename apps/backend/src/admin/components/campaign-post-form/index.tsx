@@ -1,9 +1,12 @@
 import {
   Button,
+  Heading,
   Input,
   Label,
   Select,
   Switch,
+  Text,
+  Textarea,
 } from "@medusajs/ui"
 import type { JSONContent } from "@tiptap/core"
 import { useQuery } from "@tanstack/react-query"
@@ -24,6 +27,10 @@ type CampaignPostFormProps = {
   isActive: boolean
   publishAt: string
   unpublishAt: string
+  source: string
+  seoTitle: string
+  seoDescription: string
+  seoKeywords: string
   content: JSONContent | null
   editorKey?: string
   isSubmitting?: boolean
@@ -35,6 +42,10 @@ type CampaignPostFormProps = {
   onIsActiveChange: (value: boolean) => void
   onPublishAtChange: (value: string) => void
   onUnpublishAtChange: (value: string) => void
+  onSourceChange: (value: string) => void
+  onSeoTitleChange: (value: string) => void
+  onSeoDescriptionChange: (value: string) => void
+  onSeoKeywordsChange: (value: string) => void
   onContentChange: (value: JSONContent) => void
   onSubmit: (event: React.FormEvent) => void
 }
@@ -47,6 +58,10 @@ const CampaignPostForm = ({
   isActive,
   publishAt,
   unpublishAt,
+  source,
+  seoTitle,
+  seoDescription,
+  seoKeywords,
   content,
   editorKey,
   isSubmitting = false,
@@ -58,6 +73,10 @@ const CampaignPostForm = ({
   onIsActiveChange,
   onPublishAtChange,
   onUnpublishAtChange,
+  onSourceChange,
+  onSeoTitleChange,
+  onSeoDescriptionChange,
+  onSeoKeywordsChange,
   onContentChange,
   onSubmit,
 }: CampaignPostFormProps) => {
@@ -152,6 +171,58 @@ const CampaignPostForm = ({
       <div className="flex items-center gap-x-3">
         <Switch checked={isActive} onCheckedChange={onIsActiveChange} />
         <Label>{t("campaign-posts.fields.active")}</Label>
+      </div>
+
+      <div className="flex flex-col gap-y-2">
+        <Label htmlFor="source">{t("campaign-posts.fields.source")}</Label>
+        <Input
+          id="source"
+          value={source}
+          onChange={(e) => onSourceChange(e.target.value)}
+        />
+        <span className="text-ui-fg-subtle text-xs">
+          {t("campaign-posts.fields.sourceHint")}
+        </span>
+      </div>
+
+      <div className="flex flex-col gap-y-4 rounded-lg border p-4">
+        <div>
+          <Heading level="h3">{t("campaign-posts.fields.seoSectionTitle")}</Heading>
+          <Text size="small" className="text-ui-fg-subtle">
+            {t("campaign-posts.fields.seoSectionHint")}
+          </Text>
+        </div>
+
+        <div className="flex flex-col gap-y-2">
+          <Label htmlFor="seo_title">{t("campaign-posts.fields.seoTitle")}</Label>
+          <Input
+            id="seo_title"
+            placeholder={t("campaign-posts.fields.seoTitlePlaceholder")}
+            value={seoTitle}
+            onChange={(e) => onSeoTitleChange(e.target.value)}
+          />
+        </div>
+
+        <div className="flex flex-col gap-y-2">
+          <Label htmlFor="seo_description">{t("campaign-posts.fields.seoDescription")}</Label>
+          <Textarea
+            id="seo_description"
+            rows={3}
+            placeholder={t("campaign-posts.fields.seoDescriptionPlaceholder")}
+            value={seoDescription}
+            onChange={(e) => onSeoDescriptionChange(e.target.value)}
+          />
+        </div>
+
+        <div className="flex flex-col gap-y-2">
+          <Label htmlFor="seo_keywords">{t("campaign-posts.fields.seoKeywords")}</Label>
+          <Input
+            id="seo_keywords"
+            placeholder={t("campaign-posts.fields.seoKeywordsPlaceholder")}
+            value={seoKeywords}
+            onChange={(e) => onSeoKeywordsChange(e.target.value)}
+          />
+        </div>
       </div>
 
       <div className="flex flex-col gap-y-2 overflow-visible">

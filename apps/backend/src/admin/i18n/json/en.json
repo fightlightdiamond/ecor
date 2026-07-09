@@ -35,7 +35,17 @@
       "publishAt": "Publish at",
       "unpublishAt": "Unpublish at",
       "active": "Active",
-      "content": "Content"
+      "content": "Content",
+      "source": "Source",
+      "sourceHint": "Credit the original source when this post is adapted from elsewhere, e.g. \"Via VnExpress\".",
+      "seoSectionTitle": "SEO",
+      "seoSectionHint": "Optional — leave blank to fall back to the post title and auto-generated excerpt.",
+      "seoTitle": "SEO title",
+      "seoTitlePlaceholder": "defaults to the post title",
+      "seoDescription": "SEO description",
+      "seoDescriptionPlaceholder": "defaults to an auto-generated excerpt from the content",
+      "seoKeywords": "SEO keywords",
+      "seoKeywordsPlaceholder": "comma-separated, e.g. lotus tea, vietnamese tea"
     },
     "actions": {
       "create": "Create post",
@@ -240,6 +250,35 @@
       "cancel": "Cancel",
       "done": "Image deleted",
       "failed": "Failed to delete image"
+    }
+  },
+  "storefrontLink": {
+    "noHandle": "No handle set yet — set a handle before copying the link.",
+    "category": {
+      "title": "Storefront link",
+      "hint": "Domain-relative path to the product listing page for this category.",
+      "mediaTitle": "Thumbnail",
+      "mediaHint": "Cover image shown on product listing pages/cards for this category — pick from the media library."
+    },
+    "collection": {
+      "title": "Storefront link",
+      "hint": "Domain-relative path to the product listing page for this collection.",
+      "mediaTitle": "Thumbnail",
+      "mediaHint": "Cover image shown on product listing pages/cards for this collection — pick from the media library."
+    },
+    "mediaSaved": "Thumbnail saved",
+    "mediaSaveFailed": "Failed to save thumbnail",
+    "list": {
+      "categoryTitle": "Category storefront links",
+      "collectionTitle": "Collection storefront links",
+      "hint": "Quickly copy the domain-relative path to the product listing page — handy for sharing or embedding elsewhere.",
+      "thumbnail": "Image",
+      "name": "Name",
+      "path": "Path",
+      "actions": "Actions",
+      "copyLink": "Copy link",
+      "copied": "Link copied",
+      "copyFailed": "Failed to copy link"
     }
   }
 }

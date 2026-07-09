@@ -300,7 +300,8 @@
       "postCount": "{count} articles",
       "emptyTitle": "No articles in this topic yet",
       "emptyDesc": "Content is being prepared — please check back soon or browse other articles."
-    }
+    },
+    "source": "Source: {source}"
   },
   "home": {
     "pillars": {

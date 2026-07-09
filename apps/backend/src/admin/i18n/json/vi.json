@@ -35,7 +35,17 @@
       "publishAt": "Thời gian đăng",
       "unpublishAt": "Thời gian gỡ",
       "active": "Kích hoạt",
-      "content": "Nội dung"
+      "content": "Nội dung",
+      "source": "Nguồn bài viết",
+      "sourceHint": "Ghi rõ xuất xứ nếu bài viết được biên tập lại từ nơi khác, ví dụ \"Theo VnExpress\".",
+      "seoSectionTitle": "Thông tin SEO",
+      "seoSectionHint": "Tùy chọn — nếu bỏ trống, website sẽ tự dùng tiêu đề và đoạn trích của bài viết.",
+      "seoTitle": "Tiêu đề SEO",
+      "seoTitlePlaceholder": "mặc định dùng tiêu đề bài viết",
+      "seoDescription": "Mô tả SEO",
+      "seoDescriptionPlaceholder": "mặc định dùng đoạn trích tự động từ nội dung",
+      "seoKeywords": "Từ khóa SEO",
+      "seoKeywordsPlaceholder": "phân tách bằng dấu phẩy, ví dụ: trà sen, trà việt"
     },
     "actions": {
       "create": "Tạo bài viết",
@@ -240,6 +250,35 @@
       "cancel": "Hủy",
       "done": "Đã xóa ảnh",
       "failed": "Xóa ảnh thất bại"
+    }
+  },
+  "storefrontLink": {
+    "noHandle": "Chưa có đường dẫn (handle) — hãy đặt handle trước khi lấy liên kết.",
+    "category": {
+      "title": "Liên kết trên website",
+      "hint": "Đường dẫn (không kèm domain) tới trang hiển thị sản phẩm theo danh mục này.",
+      "mediaTitle": "Ảnh thumbnail",
+      "mediaHint": "Ảnh đại diện hiển thị trên các trang/thẻ sản phẩm theo danh mục này — chọn từ thư viện media."
+    },
+    "collection": {
+      "title": "Liên kết trên website",
+      "hint": "Đường dẫn (không kèm domain) tới trang hiển thị sản phẩm theo bộ sưu tập này.",
+      "mediaTitle": "Ảnh thumbnail",
+      "mediaHint": "Ảnh đại diện hiển thị trên các trang/thẻ sản phẩm theo bộ sưu tập này — chọn từ thư viện media."
+    },
+    "mediaSaved": "Đã lưu ảnh thumbnail",
+    "mediaSaveFailed": "Lưu ảnh thumbnail thất bại",
+    "list": {
+      "categoryTitle": "Liên kết trang danh mục trên website",
+      "collectionTitle": "Liên kết trang bộ sưu tập trên website",
+      "hint": "Sao chép nhanh đường dẫn (không kèm domain) tới trang hiển thị sản phẩm — dùng để chia sẻ hoặc chèn vào nội dung khác.",
+      "thumbnail": "Ảnh",
+      "name": "Tên",
+      "path": "Đường dẫn",
+      "actions": "Thao tác",
+      "copyLink": "Copy liên kết",
+      "copied": "Đã sao chép liên kết",
+      "copyFailed": "Sao chép liên kết thất bại"
     }
   }
 }

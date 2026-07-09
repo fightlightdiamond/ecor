@@ -13,6 +13,10 @@ const UpdateCampaignPostSchema = z.object({
   is_active: z.boolean().optional(),
   publish_at: z.string().datetime().nullable().optional(),
   unpublish_at: z.string().datetime().nullable().optional(),
+  source: z.string().nullable().optional(),
+  seo_title: z.string().nullable().optional(),
+  seo_description: z.string().nullable().optional(),
+  seo_keywords: z.string().nullable().optional(),
 })
 
 export async function GET(req: MedusaRequest, res: MedusaResponse) {

@@ -12,6 +12,10 @@ export type CampaignPost = {
   is_active: boolean
   publish_at: string | null
   unpublish_at: string | null
+  source: string | null
+  seo_title: string | null
+  seo_description: string | null
+  seo_keywords: string | null
   created_at?: string
 }
 
@@ -34,5 +38,9 @@ export type CampaignPostFormValues = {
   is_active: boolean
   publish_at: string | null
   unpublish_at: string | null
+  source: string | null
+  seo_title: string | null
+  seo_description: string | null
+  seo_keywords: string | null
   content: CampaignPostContent
 }

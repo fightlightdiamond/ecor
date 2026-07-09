@@ -13,6 +13,10 @@ const CreateCampaignPostSchema = z.object({
   is_active: z.boolean().default(true),
   publish_at: z.string().datetime().nullable().optional(),
   unpublish_at: z.string().datetime().nullable().optional(),
+  source: z.string().nullable().optional(),
+  seo_title: z.string().nullable().optional(),
+  seo_description: z.string().nullable().optional(),
+  seo_keywords: z.string().nullable().optional(),
 })
 
 const slugify = (value: string) =>
@@ -62,6 +66,10 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
     is_active: body.is_active,
     publish_at: body.publish_at ? new Date(body.publish_at) : null,
     unpublish_at: body.unpublish_at ? new Date(body.unpublish_at) : null,
+    source: body.source ?? null,
+    seo_title: body.seo_title ?? null,
+    seo_description: body.seo_description ?? null,
+    seo_keywords: body.seo_keywords ?? null,
   })
 
   res.status(201).json({ campaign_post: post })

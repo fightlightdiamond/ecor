@@ -14,6 +14,10 @@ interface CampaignPost {
   topic?: { id: string, name: string, slug: string } | null
   publish_at: string | null
   created_at?: string
+  source?: string | null
+  seo_title?: string | null
+  seo_description?: string | null
+  seo_keywords?: string | null
 }
 
 interface CampaignTopic {
@@ -37,6 +41,10 @@ function transformCampaignPost(p: CampaignPost, resolveUrl: (url: string | null 
     date: p.publish_at || p.created_at || '',
     author: 'Thăng Long Chè Việt',
     topic: p.topic ? { name: p.topic.name, slug: p.topic.slug } : null,
+    source: p.source || null,
+    seoTitle: p.seo_title || null,
+    seoDescription: p.seo_description || null,
+    seoKeywords: p.seo_keywords || null,
   }
 }
 

@@ -95,6 +95,12 @@ export interface BlogPost {
   date: string
   author: string
   topic: { name: string, slug: string } | null
+  /** Original source/attribution when the post is adapted from elsewhere, e.g. "Theo VnExpress". */
+  source?: string | null
+  /** SEO overrides — fall back to title/excerpt/image on the storefront when empty. */
+  seoTitle?: string | null
+  seoDescription?: string | null
+  seoKeywords?: string | null
 }
 
 export interface ProductCategory {

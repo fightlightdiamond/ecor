@@ -62,10 +62,20 @@ const relatedPosts = computed(() => {
   })
 })
 
+const seoTitle = computed(() => post.value?.seoTitle || title.value)
+const seoDescription = computed(() => post.value?.seoDescription || excerpt.value)
+
 useSeoMeta({
-  title: () => `${title.value} | ${t('nav.blog')}`,
-  description: () => excerpt.value,
+  title: () => `${seoTitle.value} | ${t('nav.blog')}`,
+  description: () => seoDescription.value,
+  keywords: () => post.value?.seoKeywords || undefined,
+  ogTitle: () => seoTitle.value,
+  ogDescription: () => seoDescription.value,
   ogImage: () => post.value?.image,
+  twitterCard: 'summary_large_image',
+  twitterTitle: () => seoTitle.value,
+  twitterDescription: () => seoDescription.value,
+  twitterImage: () => post.value?.image,
 })
 
 useArticleStructuredData(post)
@@ -133,6 +143,13 @@ useArticleStructuredData(post)
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
             </svg>
             {{ post.author }}
+          </span>
+          <span v-if="post.source" class="inline-flex items-center gap-2">
+            <svg class="w-4 h-4 text-primary-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10 13a5 5 0 0 0 7.07 0l1.93-1.93a5 5 0 0 0-7.07-7.07L10.5 5.5" />
+              <path d="M14 11a5 5 0 0 0-7.07 0l-1.93 1.93a5 5 0 0 0 7.07 7.07l1.41-1.41" />
+            </svg>
+            {{ t('blog.source', { source: post.source }) }}
           </span>
         </div>
       </header>
