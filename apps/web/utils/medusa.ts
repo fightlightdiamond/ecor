@@ -29,6 +29,12 @@ export interface MedusaCategory {
   handle: string
 }
 
+export interface MedusaCollection {
+  id: string
+  title: string
+  handle: string
+}
+
 export interface MedusaProduct {
   id: string
   title: string
@@ -39,6 +45,7 @@ export interface MedusaProduct {
   weight?: number | null
   images?: { url: string }[]
   categories?: MedusaCategory[]
+  collection?: MedusaCollection | null
   options?: MedusaOption[]
   variants?: MedusaVariant[]
 }
@@ -86,6 +93,8 @@ export function transformMedusaProduct(p: MedusaProduct): Product {
     description,
     categoryId: p.categories?.[0]?.id ?? null,
     categoryName: p.categories?.[0]?.name ?? '',
+    collectionId: p.collection?.id ?? null,
+    collectionName: p.collection?.title ?? '',
     inStock: true,
     variants,
     options,

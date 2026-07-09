@@ -65,9 +65,9 @@
       "image": "Image",
       "name": "Name",
       "slug": "Slug",
-      "link": "Link",
       "rank": "Order",
-      "status": "Status"
+      "status": "Status",
+      "actions": "Actions"
     },
     "status": {
       "active": "Visible",

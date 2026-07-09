@@ -166,7 +166,18 @@
       "category": "Danh mục",
       "material": "Chất liệu",
       "weight": "Khối lượng"
-    }
+    },
+    "byCategoryLabel": "Danh mục",
+    "byCollectionLabel": "Bộ sưu tập",
+    "browseCategories": "Danh mục",
+    "browseCollections": "Bộ sưu tập",
+    "productCount": "{count} sản phẩm",
+    "emptyCollection": "Chưa có sản phẩm trong bộ sưu tập này.",
+    "viewAllProducts": "Xem tất cả sản phẩm",
+    "collectionsEyebrow": "Bộ sưu tập",
+    "collectionsTitle": "Khám phá theo bộ sưu tập",
+    "collectionsSubtitle": "Mỗi bộ sưu tập là một câu chuyện hương vị riêng của trà Việt",
+    "groupNotFound": "Không tìm thấy trang này"
   },
   "cart": {
     "title": "Giỏ hàng",

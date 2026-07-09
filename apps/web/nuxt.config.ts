@@ -41,6 +41,8 @@ export default defineNuxtConfig({
     pages: {
       'san-pham-list': { en: '/products', vi: '/san-pham-list' },
       'san-pham-slug': { en: '/products/[slug]', vi: '/san-pham/[slug]' },
+      'san-pham-danh-muc-slug': { en: '/products/category/[slug]', vi: '/san-pham/danh-muc/[slug]' },
+      'san-pham-bo-suu-tap-slug': { en: '/products/collection/[slug]', vi: '/san-pham/bo-suu-tap/[slug]' },
       'dich-vu': { en: '/services', vi: '/dich-vu' },
       'doi-ngu': { en: '/team', vi: '/doi-ngu' },
       'lang-nghe': { en: '/craft-village', vi: '/lang-nghe' },

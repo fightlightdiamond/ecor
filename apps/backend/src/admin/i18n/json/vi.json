@@ -65,9 +65,9 @@
       "image": "Ảnh",
       "name": "Tên chủ đề",
       "slug": "Đường dẫn",
-      "link": "Liên kết",
       "rank": "Thứ tự",
-      "status": "Trạng thái"
+      "status": "Trạng thái",
+      "actions": "Thao tác"
     },
     "status": {
       "active": "Đang hiển thị",

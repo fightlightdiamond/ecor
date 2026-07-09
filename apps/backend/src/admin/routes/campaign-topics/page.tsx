@@ -72,13 +72,6 @@ const CampaignTopicsPage = () => {
     columnHelper.accessor("slug", {
       header: t("campaign-topics.columns.slug"),
     }),
-    columnHelper.display({
-      id: "link",
-      header: t("campaign-topics.columns.link"),
-      cell: ({ row }) => (
-        <Copy content={`/tin-tuc/chu-de/${row.original.slug}`} />
-      ),
-    }),
     columnHelper.accessor("rank", {
       header: t("campaign-topics.columns.rank"),
     }),
@@ -90,6 +83,18 @@ const CampaignTopicsPage = () => {
             ? t("campaign-topics.status.active")
             : t("campaign-topics.status.inactive")}
         </Badge>
+      ),
+    }),
+    columnHelper.display({
+      id: "actions",
+      header: t("campaign-topics.columns.actions"),
+      cell: ({ row }) => (
+        <div
+          className="flex justify-end"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <Copy content={`/tin-tuc/chu-de/${row.original.slug}`} />
+        </div>
       ),
     }),
   ]

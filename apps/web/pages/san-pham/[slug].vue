@@ -2,7 +2,7 @@
 import { formatMoney } from '~/utils/storefront'
 
 const { t, locale } = useI18n()
-const { getBySlug } = useProducts()
+const { getBySlug, categories } = useProducts()
 const { addToCart, loading: cartLoading } = useCart()
 const localePath = useLocalePath()
 const route = useRoute()
@@ -30,6 +30,9 @@ const { data: productData, pending } = useAsyncData(
 
 const product = computed(() => productData.value?.product ?? null)
 const relatedItems = computed(() => productData.value?.relatedFromApi ?? [])
+const category = computed(() =>
+  categories.value.find(c => c.id === product.value?.categoryId) ?? null,
+)
 
 watchEffect(() => {
   if (!pending.value && !product.value) {
@@ -191,7 +194,16 @@ useProductStructuredData(product)
 
           <!-- Info -->
           <div class="animate-on-scroll">
-            <p class="modis-eyebrow mb-3">{{ product.categoryName || t('products.label') }}</p>
+            <p class="modis-eyebrow mb-3">
+              <NuxtLink
+                v-if="category"
+                :to="localePath(`/san-pham/danh-muc/${category.slug}`)"
+                class="hover:text-primary-300 transition-colors"
+              >
+                {{ category.label }}
+              </NuxtLink>
+              <template v-else>{{ product.categoryName || t('products.label') }}</template>
+            </p>
             <h1 class="font-heading text-3xl md:text-4xl font-bold mb-3 leading-tight">{{ product.title }}</h1>
             <p class="text-2xl font-semibold text-primary-400 mb-5">{{ priceText }}</p>
             <p class="text-white/70 leading-relaxed mb-6">{{ product.shortDesc }}</p>

@@ -20,6 +20,8 @@ useSeoMeta({
 
     <SectionsProductCatalog />
 
+    <SectionsCollectionShowcase />
+
     <SectionsBlogList
       :eyebrow="t('products.storyEyebrow')"
       :title="t('products.storyTitle')"

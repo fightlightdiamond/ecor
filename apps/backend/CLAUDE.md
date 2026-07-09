@@ -1,3 +1,24 @@
+# Medusa Admin extensions — table row-actions rule
+
+Every data table (or table-like row list) in a custom admin page keeps its
+per-row action controls in the **last column**, never mixed between data
+columns:
+
+- Header key: `<namespace>.columns.actions` (vi: "Thao tác", en: "Actions"),
+  added to both `src/admin/i18n/json/vi.json` and `en.json`.
+- **Exactly one action** → render it inline in that column (e.g. a `Copy` or
+  an `IconButton`).
+- **Two or more actions** → collapse them into a `DropdownMenu` triggered by
+  an `IconButton` with the `EllipsisHorizontal` icon (see the folder tiles in
+  `src/admin/routes/media/page.tsx` for the reference pattern; destructive
+  items get `className="text-ui-fg-error"`).
+- Tables use `onRowClick` to navigate, so the actions cell must wrap its
+  content in a container with `onClick={(e) => e.stopPropagation()}`
+  (see `src/admin/routes/campaign-topics/page.tsx`).
+
+This applies to every existing table and to **all new admin pages** — do not
+add per-row buttons anywhere except the trailing actions column.
+
 # Medusa Admin extensions — i18n rule
 
 The admin dashboard's language switcher (`src/admin/components/language-switcher`)

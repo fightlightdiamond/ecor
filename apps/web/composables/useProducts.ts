@@ -1,24 +1,31 @@
-import type { MedusaCategory, MedusaProduct } from '~/utils/medusa'
+import type { MedusaCategory, MedusaCollection, MedusaProduct } from '~/utils/medusa'
 import type { Product } from '~/utils/storefront'
 import { transformMedusaCategory, transformMedusaProduct } from '~/utils/medusa'
 import { categoryLabel } from '~/utils/storefront'
 
 export type { Product } from '~/utils/storefront'
 
+export interface ProductGroup {
+  id: string
+  slug: string
+  label: string
+}
+
 const PRODUCT_FIELDS = 'id,title,handle,description,thumbnail,material,weight,*images,*categories,'
-  + '*options,*options.values,*variants,*variants.options,*variants.calculated_price'
+  + '*collection,*options,*options.values,*variants,*variants.options,*variants.calculated_price'
 
 export function useProducts() {
   const { locale } = useI18n()
   const { fetchMedusa, regionId } = useMedusaApi()
 
-  const { data: productsData, pending } = useAsyncData(
+  const productsAsync = useAsyncData(
     'medusa-products',
     () => fetchMedusa<{ products: MedusaProduct[] }>(
       `/store/products?limit=100&region_id=${regionId}&fields=${PRODUCT_FIELDS}`,
     ),
     { default: () => ({ products: [] as MedusaProduct[] }) },
   )
+  const { data: productsData, pending } = productsAsync
 
   const products = computed<Product[]>(() =>
     (productsData.value?.products ?? []).map(transformMedusaProduct),
@@ -35,11 +42,25 @@ export function useProducts() {
     { default: () => ({ product_categories: [] as MedusaCategory[] }) },
   )
 
-  const categories = computed<{ id: string, slug: string, label: string }[]>(() =>
+  const categories = computed<ProductGroup[]>(() =>
     (categoriesData.value?.product_categories ?? []).map((c) => {
       const cat = transformMedusaCategory(c)
       return { id: cat.id, slug: cat.slug, label: categoryLabel(cat.name, locale.value) }
     }),
+  )
+
+  const { data: collectionsData } = useAsyncData(
+    'medusa-collections',
+    () => fetchMedusa<{ collections: MedusaCollection[] }>('/store/collections?limit=100'),
+    { default: () => ({ collections: [] as MedusaCollection[] }) },
+  )
+
+  const collections = computed<ProductGroup[]>(() =>
+    (collectionsData.value?.collections ?? []).map(c => ({
+      id: c.id,
+      slug: c.handle,
+      label: categoryLabel(c.title, locale.value),
+    })),
   )
 
   const getBySlug = async (slug: string) => {
@@ -50,7 +71,10 @@ export function useProducts() {
       const raw = res.products?.[0]
       if (raw) {
         const product = transformMedusaProduct(raw)
-        return { product, relatedFromApi: related(product.slug, product.categoryId, 3) }
+        // related() reads the full catalog fetched in parallel — wait for it
+        // so a direct hit on a product URL still gets related items.
+        await Promise.resolve(productsAsync).catch(() => null)
+        return { product, relatedFromApi: related(product) }
       }
     } catch (e) {
       console.error(e)
@@ -59,11 +83,21 @@ export function useProducts() {
     return { product: null, relatedFromApi: [] as Product[] }
   }
 
-  const related = (slug: string, categoryId: string | null, count = 3) => {
-    const pool = categoryId
-      ? products.value.filter(p => p.categoryId === categoryId && p.slug !== slug)
-      : products.value.filter(p => p.slug !== slug)
-    return pool.slice(0, count)
+  /**
+   * Products sharing the current product's category or collection. When
+   * neither yields a match, fall back to 5–10 random picks from the whole
+   * catalog so the section never renders empty on a lonely product.
+   */
+  const related = (product: Pick<Product, 'slug' | 'categoryId' | 'collectionId'>, count = 6) => {
+    const others = products.value.filter(p => p.slug !== product.slug)
+    const pool = others.filter(p =>
+      (product.categoryId && p.categoryId === product.categoryId)
+      || (product.collectionId && p.collectionId === product.collectionId),
+    )
+    if (pool.length) return pool.slice(0, count)
+
+    const shuffled = [...others].sort(() => Math.random() - 0.5)
+    return shuffled.slice(0, 8)
   }
 
   const byCategory = (categoryId: string | null) => {
@@ -71,13 +105,20 @@ export function useProducts() {
     return products.value.filter(p => p.categoryId === categoryId)
   }
 
+  const byCollection = (collectionId: string | null) => {
+    if (!collectionId) return products.value
+    return products.value.filter(p => p.collectionId === collectionId)
+  }
+
   return {
     products,
     featuredProducts,
     categories,
+    collections,
     pending,
     getBySlug,
     related,
     byCategory,
+    byCollection,
   }
 }

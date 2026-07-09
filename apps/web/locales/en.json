@@ -166,7 +166,18 @@
       "category": "Category",
       "material": "Material",
       "weight": "Weight"
-    }
+    },
+    "byCategoryLabel": "Category",
+    "byCollectionLabel": "Collection",
+    "browseCategories": "Categories",
+    "browseCollections": "Collections",
+    "productCount": "{count} products",
+    "emptyCollection": "No products in this collection yet.",
+    "viewAllProducts": "View all products",
+    "collectionsEyebrow": "Collections",
+    "collectionsTitle": "Explore by collection",
+    "collectionsSubtitle": "Each collection tells its own story of Vietnamese tea",
+    "groupNotFound": "Page not found"
   },
   "cart": {
     "title": "Cart",

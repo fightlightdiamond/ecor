@@ -39,6 +39,8 @@ export interface Product {
   description: string
   categoryId: string | null
   categoryName: string
+  collectionId: string | null
+  collectionName: string
   inStock: boolean
   variants: ProductVariant[]
   options: ProductOption[]
