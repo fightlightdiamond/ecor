@@ -40,7 +40,7 @@ const bannerImage = computed(() => props.image || props.products[0]?.image || nu
         <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/25" />
 
         <div class="relative h-full container-page flex flex-col justify-end pb-8 md:pb-12">
-          <nav class="mb-4 text-xs uppercase tracking-[0.2em] text-white/70" aria-label="breadcrumb">
+          <!-- <nav class="mb-4 text-xs uppercase tracking-[0.2em] text-white/70" aria-label="breadcrumb">
             <ol class="flex flex-wrap items-center gap-2">
               <li>
                 <NuxtLink :to="localePath('/')" class="hover:text-primary-300 transition-colors">
@@ -56,9 +56,9 @@ const bannerImage = computed(() => props.image || props.products[0]?.image || nu
               <li aria-hidden="true">/</li>
               <li class="text-primary-300">{{ heading }}</li>
             </ol>
-          </nav>
+          </nav> -->
 
-          <p class="modis-eyebrow mb-2">{{ groupLabel }}</p>
+          <!-- <p class="modis-eyebrow mb-2">{{ groupLabel }}</p> -->
           <h1 class="font-heading text-3xl sm:text-4xl md:text-5xl font-bold max-w-3xl">
             {{ heading }}
           </h1>

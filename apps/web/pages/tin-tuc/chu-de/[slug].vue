@@ -65,7 +65,7 @@ useSeoMeta({
 
         <div class="relative h-full container-page flex flex-col justify-end pb-8 md:pb-12">
           <!-- Breadcrumb -->
-          <nav class="mb-4 text-xs uppercase tracking-[0.2em] text-white/70" aria-label="breadcrumb">
+          <!-- <nav class="mb-4 text-xs uppercase tracking-[0.2em] text-white/70" aria-label="breadcrumb">
             <ol class="flex flex-wrap items-center gap-2">
               <li>
                 <NuxtLink :to="localePath('/')" class="hover:text-primary-300 transition-colors">
@@ -81,7 +81,7 @@ useSeoMeta({
               <li aria-hidden="true">/</li>
               <li class="text-primary-300">{{ topic?.name }}</li>
             </ol>
-          </nav>
+          </nav> -->
 
           <h1 class="font-heading text-3xl sm:text-4xl md:text-5xl font-bold max-w-3xl">
             {{ topic?.name }}

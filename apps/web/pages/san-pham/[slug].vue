@@ -160,13 +160,13 @@ useProductStructuredData(product)
 
     <section v-else class="section-py">
       <div class="container-page">
-        <nav class="mb-6 flex items-center gap-2 text-xs uppercase tracking-[0.1em] text-white/45" aria-label="Breadcrumb">
+        <!-- <nav class="mb-6 flex items-center gap-2 text-xs uppercase tracking-[0.1em] text-white/45" aria-label="Breadcrumb">
           <NuxtLink :to="localePath('/')" class="hover:text-primary-400 transition-colors">{{ t('nav.home') }}</NuxtLink>
           <span aria-hidden="true">/</span>
           <NuxtLink :to="listUrl" class="hover:text-primary-400 transition-colors">{{ t('products.label') }}</NuxtLink>
           <span aria-hidden="true">/</span>
           <span class="text-white/75 truncate">{{ product.title }}</span>
-        </nav>
+        </nav> -->
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
           <!-- Gallery -->

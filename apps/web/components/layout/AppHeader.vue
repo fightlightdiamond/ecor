@@ -25,7 +25,7 @@ interface NavLink {
 }
 
 const navLinks = computed<NavLink[]>(() => [
-  { key: 'nav.home', path: '/' },
+  // { key: 'nav.home', path: '/' },
   {
     key: 'nav.products',
     path: '/san-pham-list',
