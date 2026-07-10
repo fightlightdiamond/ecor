@@ -3,7 +3,134 @@
     "cards": "Card trang chủ",
     "campaignPosts": "Bài viết Campaign",
     "campaignTopics": "Chủ đề bài viết",
-    "media": "Thư viện ảnh"
+    "media": "Thư viện ảnh",
+    "events": "Sự kiện",
+    "eventRegistrations": "Đăng ký sự kiện"
+  },
+  "events": {
+    "title": "Sự kiện",
+    "create": "Tạo sự kiện",
+    "edit": "Chỉnh sửa sự kiện",
+    "hint": "Sự kiện hiển thị trên website — người dùng có thể đăng ký đặt chỗ tham gia.",
+    "registeredSeats": "Đã đăng ký {{count}} chỗ",
+    "columns": {
+      "title": "Tên sự kiện",
+      "startAt": "Thời gian tổ chức",
+      "location": "Địa điểm",
+      "registrations": "Đã đăng ký",
+      "registrationOpen": "Đăng ký",
+      "status": "Trạng thái"
+    },
+    "status": {
+      "active": "Đang hiển thị",
+      "inactive": "Đã ẩn"
+    },
+    "registration": {
+      "open": "Đang mở",
+      "closed": "Đã đóng"
+    },
+    "fields": {
+      "title": "Tên sự kiện",
+      "slug": "Đường dẫn (slug)",
+      "slugPlaceholder": "tự động tạo từ tên sự kiện",
+      "thumbnail": "Ảnh đại diện",
+      "thumbnailHint": "Hiển thị trên thẻ sự kiện ở trang danh sách và đầu trang chi tiết.",
+      "location": "Địa điểm tổ chức",
+      "locationPlaceholder": "vd: 123 Phố Huế, Hà Nội",
+      "startAt": "Thời gian bắt đầu",
+      "endAt": "Thời gian kết thúc",
+      "capacity": "Số chỗ tối đa",
+      "capacityPlaceholder": "bỏ trống nếu không giới hạn",
+      "capacityHint": "Khi đủ số chỗ, website tự ngừng nhận đăng ký mới.",
+      "registrationOpen": "Cho phép đăng ký",
+      "active": "Hiển thị trên website",
+      "content": "Nội dung",
+      "seoSectionTitle": "Thông tin SEO",
+      "seoSectionHint": "Tùy chọn — nếu bỏ trống, website sẽ tự dùng tên và mô tả của sự kiện.",
+      "seoTitle": "Tiêu đề SEO",
+      "seoTitlePlaceholder": "mặc định dùng tên sự kiện",
+      "seoDescription": "Mô tả SEO",
+      "seoDescriptionPlaceholder": "mặc định dùng đoạn trích tự động từ nội dung",
+      "seoKeywords": "Từ khóa SEO",
+      "seoKeywordsPlaceholder": "phân tách bằng dấu phẩy, ví dụ: trà sen, workshop trà"
+    },
+    "actions": {
+      "create": "Tạo sự kiện",
+      "save": "Lưu thay đổi",
+      "delete": "Xóa",
+      "backToList": "Quay lại danh sách",
+      "viewRegistrations": "Xem đăng ký"
+    },
+    "messages": {
+      "created": "Tạo sự kiện thành công",
+      "updated": "Cập nhật sự kiện thành công",
+      "deleted": "Xóa sự kiện thành công",
+      "createFailed": "Tạo sự kiện thất bại",
+      "updateFailed": "Cập nhật sự kiện thất bại",
+      "deleteFailed": "Xóa sự kiện thất bại",
+      "deleteConfirmTitle": "Xóa sự kiện",
+      "deleteConfirmDesc": "Bạn có chắc muốn xóa \"{{title}}\" không? Các phiếu đăng ký của sự kiện vẫn được giữ lại.",
+      "confirmDelete": "Xóa",
+      "cancelDelete": "Hủy"
+    }
+  },
+  "event-registrations": {
+    "title": "Đăng ký sự kiện",
+    "detail": "Phiếu đăng ký",
+    "columns": {
+      "name": "Người đăng ký",
+      "phone": "Số điện thoại",
+      "event": "Sự kiện",
+      "quantity": "Số chỗ",
+      "status": "Trạng thái",
+      "createdAt": "Thời gian đăng ký"
+    },
+    "filters": {
+      "event": "Lọc theo sự kiện",
+      "allEvents": "Tất cả sự kiện",
+      "status": "Lọc theo trạng thái",
+      "allStatuses": "Tất cả trạng thái"
+    },
+    "status": {
+      "new": "Mới",
+      "contacted": "Đã liên hệ",
+      "confirmed": "Đã xác nhận",
+      "cancelled": "Đã hủy"
+    },
+    "sections": {
+      "registrant": "Thông tin đăng ký",
+      "handling": "Xử lý phiếu đăng ký",
+      "handlingHint": "Liên hệ với người đăng ký, ghi chú lại kết quả và cập nhật trạng thái phiếu."
+    },
+    "fields": {
+      "name": "Họ tên",
+      "phone": "Số điện thoại",
+      "email": "Email",
+      "quantity": "Số chỗ đặt",
+      "message": "Lời nhắn của khách",
+      "event": "Sự kiện",
+      "source": "Nguồn",
+      "createdAt": "Thời gian đăng ký",
+      "currentStatus": "Trạng thái hiện tại",
+      "status": "Trạng thái",
+      "staffNote": "Ghi chú của nhân viên",
+      "staffNotePlaceholder": "vd: Đã gọi điện xác nhận lúc 10h, khách tham gia 2 người..."
+    },
+    "actions": {
+      "save": "Lưu thay đổi",
+      "delete": "Xóa",
+      "backToList": "Quay lại danh sách"
+    },
+    "messages": {
+      "updated": "Cập nhật phiếu đăng ký thành công",
+      "updateFailed": "Cập nhật phiếu đăng ký thất bại",
+      "deleted": "Xóa phiếu đăng ký thành công",
+      "deleteFailed": "Xóa phiếu đăng ký thất bại",
+      "deleteConfirmTitle": "Xóa phiếu đăng ký",
+      "deleteConfirmDesc": "Bạn có chắc muốn xóa phiếu đăng ký của \"{{name}}\" không?",
+      "confirmDelete": "Xóa",
+      "cancelDelete": "Hủy"
+    }
   },
   "campaign-posts": {
     "title": "Bài viết Campaign",

@@ -303,6 +303,44 @@
     },
     "source": "Source: {source}"
   },
+  "events": {
+    "eyebrow": "Experiences",
+    "title": "Workshops & Events",
+    "subtitle": "Tea workshops, tastings and cultural events hosted by Thang Long Che Viet — reserve your seat today",
+    "upcoming": "Upcoming events",
+    "past": "Past events",
+    "ended": "Ended",
+    "full": "Fully booked",
+    "viewDetail": "View details",
+    "registerCta": "Register now",
+    "comingSoon": "Content is being updated.",
+    "emptyTitle": "No events yet",
+    "emptyDesc": "New events are being prepared — please check back soon.",
+    "detail": {
+      "until": "Until {time}",
+      "seatsLeft": "{count} seats left"
+    },
+    "register": {
+      "eyebrow": "Reserve a seat",
+      "title": "Register for this event",
+      "name": "Full name",
+      "namePlaceholder": "John Doe",
+      "phone": "Phone number",
+      "phonePlaceholder": "09xx xxx xxx",
+      "email": "Email",
+      "quantity": "Number of attendees",
+      "message": "Message",
+      "messagePlaceholder": "Any note for the organizers...",
+      "submit": "Reserve my seat",
+      "submitting": "Sending...",
+      "success": "Registration received! We will contact you shortly to confirm.",
+      "successTitle": "Your registration has been received",
+      "error": "Failed to submit, please try again or contact our hotline.",
+      "endedNotice": "This event has ended — see you at the next one.",
+      "fullNotice": "This event is fully booked. Thank you for your interest!",
+      "closedNotice": "Registration is not open yet — please check back later."
+    }
+  },
   "home": {
     "pillars": {
       "aria": "Explore Thang Long Che Viet",

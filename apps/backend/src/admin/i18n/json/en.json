@@ -3,7 +3,134 @@
     "cards": "Homepage Cards",
     "campaignPosts": "Campaign Posts",
     "campaignTopics": "Post Topics",
-    "media": "Media Library"
+    "media": "Media Library",
+    "events": "Events",
+    "eventRegistrations": "Event Registrations"
+  },
+  "events": {
+    "title": "Events",
+    "create": "Create event",
+    "edit": "Edit event",
+    "hint": "Events shown on the website — visitors can register to reserve seats.",
+    "registeredSeats": "{{count}} seats registered",
+    "columns": {
+      "title": "Title",
+      "startAt": "Starts at",
+      "location": "Location",
+      "registrations": "Registered",
+      "registrationOpen": "Registration",
+      "status": "Status"
+    },
+    "status": {
+      "active": "Visible",
+      "inactive": "Hidden"
+    },
+    "registration": {
+      "open": "Open",
+      "closed": "Closed"
+    },
+    "fields": {
+      "title": "Title",
+      "slug": "Slug",
+      "slugPlaceholder": "auto-generated from title",
+      "thumbnail": "Thumbnail",
+      "thumbnailHint": "Shown on event cards in listing pages and at the top of the detail page.",
+      "location": "Location",
+      "locationPlaceholder": "e.g. 123 Pho Hue, Hanoi",
+      "startAt": "Starts at",
+      "endAt": "Ends at",
+      "capacity": "Max seats",
+      "capacityPlaceholder": "leave blank for unlimited",
+      "capacityHint": "When all seats are taken, the website stops accepting new registrations automatically.",
+      "registrationOpen": "Accept registrations",
+      "active": "Visible on website",
+      "content": "Content",
+      "seoSectionTitle": "SEO",
+      "seoSectionHint": "Optional — leave blank to fall back to the event title and description.",
+      "seoTitle": "SEO title",
+      "seoTitlePlaceholder": "defaults to the event title",
+      "seoDescription": "SEO description",
+      "seoDescriptionPlaceholder": "defaults to an auto-generated excerpt from the content",
+      "seoKeywords": "SEO keywords",
+      "seoKeywordsPlaceholder": "comma-separated, e.g. lotus tea, tea workshop"
+    },
+    "actions": {
+      "create": "Create event",
+      "save": "Save changes",
+      "delete": "Delete",
+      "backToList": "Back to list",
+      "viewRegistrations": "View registrations"
+    },
+    "messages": {
+      "created": "Event created successfully",
+      "updated": "Event updated successfully",
+      "deleted": "Event deleted successfully",
+      "createFailed": "Failed to create event",
+      "updateFailed": "Failed to update event",
+      "deleteFailed": "Failed to delete event",
+      "deleteConfirmTitle": "Delete event",
+      "deleteConfirmDesc": "Are you sure you want to delete \"{{title}}\"? Its registrations will be kept.",
+      "confirmDelete": "Delete",
+      "cancelDelete": "Cancel"
+    }
+  },
+  "event-registrations": {
+    "title": "Event Registrations",
+    "detail": "Registration",
+    "columns": {
+      "name": "Registrant",
+      "phone": "Phone",
+      "event": "Event",
+      "quantity": "Seats",
+      "status": "Status",
+      "createdAt": "Registered at"
+    },
+    "filters": {
+      "event": "Filter by event",
+      "allEvents": "All events",
+      "status": "Filter by status",
+      "allStatuses": "All statuses"
+    },
+    "status": {
+      "new": "New",
+      "contacted": "Contacted",
+      "confirmed": "Confirmed",
+      "cancelled": "Cancelled"
+    },
+    "sections": {
+      "registrant": "Registration info",
+      "handling": "Handle this registration",
+      "handlingHint": "Contact the registrant, note down the outcome and update the registration status."
+    },
+    "fields": {
+      "name": "Full name",
+      "phone": "Phone",
+      "email": "Email",
+      "quantity": "Seats reserved",
+      "message": "Visitor's message",
+      "event": "Event",
+      "source": "Source",
+      "createdAt": "Registered at",
+      "currentStatus": "Current status",
+      "status": "Status",
+      "staffNote": "Staff note",
+      "staffNotePlaceholder": "e.g. Called at 10am to confirm, 2 attendees..."
+    },
+    "actions": {
+      "save": "Save changes",
+      "delete": "Delete",
+      "backToList": "Back to list"
+    },
+    "messages": {
+      "updated": "Registration updated successfully",
+      "updateFailed": "Failed to update registration",
+      "deleted": "Registration deleted successfully",
+      "deleteFailed": "Failed to delete registration",
+      "deleteConfirmTitle": "Delete registration",
+      "deleteConfirmDesc": "Are you sure you want to delete \"{{name}}\"'s registration?",
+      "confirmDelete": "Delete",
+      "cancelDelete": "Cancel"
+    }
   },
   "campaign-posts": {
     "title": "Campaign Posts",

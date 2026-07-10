@@ -303,6 +303,44 @@
     },
     "source": "Nguồn: {source}"
   },
+  "events": {
+    "eyebrow": "Trải nghiệm",
+    "title": "Workshop & Sự kiện",
+    "subtitle": "Các buổi workshop, thưởng trà và sự kiện văn hóa do Thăng Long Chè Việt tổ chức — đăng ký giữ chỗ ngay hôm nay",
+    "upcoming": "Sự kiện sắp diễn ra",
+    "past": "Sự kiện đã diễn ra",
+    "ended": "Đã diễn ra",
+    "full": "Hết chỗ",
+    "viewDetail": "Xem chi tiết",
+    "registerCta": "Đăng ký tham gia",
+    "comingSoon": "Nội dung đang được cập nhật.",
+    "emptyTitle": "Chưa có sự kiện nào",
+    "emptyDesc": "Các sự kiện mới đang được chuẩn bị — mời bạn quay lại sau.",
+    "detail": {
+      "until": "Đến {time}",
+      "seatsLeft": "Còn {count} chỗ"
+    },
+    "register": {
+      "eyebrow": "Giữ chỗ",
+      "title": "Đăng ký tham gia sự kiện",
+      "name": "Họ và tên",
+      "namePlaceholder": "Nguyễn Văn A",
+      "phone": "Số điện thoại",
+      "phonePlaceholder": "09xx xxx xxx",
+      "email": "Email",
+      "quantity": "Số người tham gia",
+      "message": "Lời nhắn",
+      "messagePlaceholder": "Ghi chú thêm cho ban tổ chức (nếu có)...",
+      "submit": "Đăng ký giữ chỗ",
+      "submitting": "Đang gửi...",
+      "success": "Đăng ký thành công! Chúng tôi sẽ liên hệ xác nhận với bạn sớm nhất.",
+      "successTitle": "Đã nhận đăng ký của bạn",
+      "error": "Gửi đăng ký thất bại, vui lòng thử lại hoặc liên hệ hotline.",
+      "endedNotice": "Sự kiện đã kết thúc — hẹn gặp bạn ở các sự kiện tiếp theo.",
+      "fullNotice": "Sự kiện đã đủ số lượng đăng ký. Cảm ơn bạn đã quan tâm!",
+      "closedNotice": "Sự kiện hiện chưa mở đăng ký — mời bạn quay lại sau."
+    }
+  },
   "home": {
     "pillars": {
       "aria": "Khám phá Thăng Long Chè Việt",

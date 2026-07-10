@@ -80,6 +80,9 @@ module.exports = defineConfig({
       resolve: "./src/modules/inquiry",
     },
     {
+      resolve: "./src/modules/event",
+    },
+    {
       resolve: "./src/modules/card",
     },
     {

@@ -49,6 +49,8 @@ export default defineNuxtConfig({
       gallery: { en: '/gallery', vi: '/gallery' },
       'tin-tuc': { en: '/blog', vi: '/tin-tuc' },
       'tin-tuc-slug': { en: '/blog/[slug]', vi: '/tin-tuc/[slug]' },
+      'trai-nghiem': { en: '/events', vi: '/trai-nghiem' },
+      'trai-nghiem-slug': { en: '/events/[slug]', vi: '/trai-nghiem/[slug]' },
       'gio-hang': { en: '/cart', vi: '/gio-hang' },
       'lien-he': { en: '/contact', vi: '/lien-he' },
       'tai-khoan': { en: '/account', vi: '/tai-khoan' },

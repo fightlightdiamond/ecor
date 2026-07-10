@@ -6,9 +6,42 @@ import {
 import { createFindParams } from "@medusajs/medusa/api/utils/validators"
 
 export const GetCampaignPostsSchema = createFindParams()
+export const GetEventsSchema = createFindParams()
 
 export default defineMiddlewares({
   routes: [
+    {
+      matcher: "/admin/events",
+      method: "GET",
+      middlewares: [
+        validateAndTransformQuery(GetEventsSchema, {
+          defaults: [
+            "id",
+            "title",
+            "slug",
+            "thumbnail",
+            "location",
+            "start_at",
+            "end_at",
+            "capacity",
+            "registration_open",
+            "is_active",
+            "created_at",
+          ],
+          isList: true,
+        }),
+      ],
+    },
+    {
+      matcher: "/admin/events",
+      method: ["POST"],
+      bodyParser: { sizeLimit: "10mb" },
+    },
+    {
+      matcher: "/admin/events/*",
+      method: ["PATCH"],
+      bodyParser: { sizeLimit: "10mb" },
+    },
     {
       matcher: "/store/my-bookings*",
       middlewares: [authenticate("customer", ["bearer", "session"])],
