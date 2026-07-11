@@ -11,6 +11,15 @@ const dashboardReactRouterDom = path.dirname(
   })
 )
 
+const isDockerDev = process.env.CHOKIDAR_USEPOLLING === "true"
+// Docker + plain HTTP: production mode sets Secure cookies that browsers drop on http://localhost
+const localHttpCookies = process.env.MEDUSA_COOKIE_SECURE === "false"
+// In Docker, Vite file polling causes false-positive rebuilds on bind mounts → reload loop.
+// Default to no admin HMR/watch unless explicitly opted in.
+const disableAdminHmr =
+  process.env.DISABLE_ADMIN_HMR === "true" ||
+  (isDockerDev && process.env.ENABLE_ADMIN_HMR !== "true")
+
 module.exports = defineConfig({
   projectConfig: {
     databaseUrl: process.env.DATABASE_URL,
@@ -40,7 +49,15 @@ module.exports = defineConfig({
       authCors: process.env.AUTH_CORS!,
       jwtSecret: process.env.JWT_SECRET,
       cookieSecret: process.env.COOKIE_SECRET,
-    }
+    },
+    ...(localHttpCookies
+      ? {
+          cookieOptions: {
+            secure: false,
+            sameSite: "lax" as const,
+          },
+        }
+      : {}),
   },
   admin: {
     vite: () => ({
@@ -53,16 +70,22 @@ module.exports = defineConfig({
           process.env.DOMAIN && process.env.DOMAIN !== "localhost"
             ? [process.env.DOMAIN]
             : undefined,
-        // hmr: {
-        //   // Without this, the HMR websocket the browser injects picks an
-        //   // internal port Vite chose for itself inside the container, which
-        //   // isn't published through infra/docker-compose.yml's nginx —
-        //   // the browser then fails to connect to that random port. Forcing
-        //   // it onto the port nginx actually publishes makes it work whether
-        //   // the admin is loaded through nginx or directly at :9000.
-        //   clientPort: Number(process.env.HTTP_PORT) || 9000,
-        //   protocol: "ws",
-        // },
+        hmr: disableAdminHmr
+          ? false
+          : {
+              clientPort: Number(
+                process.env.VITE_HMR_CLIENT_PORT || process.env.HTTP_PORT
+              ) || 9000,
+              protocol: "ws",
+            },
+        watch: disableAdminHmr
+          ? null
+          : {
+              ignored: ["**/.medusa/**", "**/node_modules/**", "**/static/**"],
+            },
+      },
+      optimizeDeps: {
+        include: ["qs"],
       },
       resolve: {
         dedupe: ["react", "react-dom", "react-router-dom"],
@@ -72,6 +95,12 @@ module.exports = defineConfig({
       },
     }),
   },
+  plugins: [
+    {
+      resolve: "medusa-navigation-menu",
+      options: {},
+    },
+  ],
   modules: [
     {
       resolve: "./src/modules/campaign",

@@ -107,6 +107,7 @@ export default defineNuxtConfig({
       medusaBackendUrl: process.env.NUXT_PUBLIC_MEDUSA_BACKEND_URL || 'http://localhost:9000',
       medusaPublishableKey: process.env.NUXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY || '',
       medusaRegionId: process.env.NUXT_PUBLIC_MEDUSA_REGION_ID || '',
+      medusaNavigationId: process.env.NUXT_PUBLIC_MEDUSA_NAVIGATION_ID || '',
     },
   },
 

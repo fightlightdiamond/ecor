@@ -21,9 +21,11 @@ const { totalItems } = useCart()
 interface NavLink {
   key: string
   path: string
-  children?: { key: string, path: string }[]
+  label?: string
+  children?: { key: string, path: string, label?: string }[]
 }
 
+<<<<<<< Updated upstream
 const navLinks = computed<NavLink[]>(() => [
   // { key: 'nav.home', path: '/' },
   {
@@ -50,6 +52,56 @@ const navLinks = computed<NavLink[]>(() => [
   { key: 'nav.library', path: '/thu-vien-van-hoa' },
   { key: 'nav.contact', path: '/lien-he' },
 ])
+=======
+const { getStoreNavigation, mapNavigationToNavLinks, navigationId } = useNavigation()
+const dynamicLinks = ref<NavLink[]>([])
+
+if (navigationId) {
+  try {
+    const rawNav = await getStoreNavigation()
+    if (rawNav && rawNav.length > 0) {
+      dynamicLinks.value = mapNavigationToNavLinks(rawNav)
+    }
+  } catch (e) {
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('[AppHeader] Failed to load dynamic navigation, falling back to static:', e)
+    }
+  }
+}
+
+const navLinks = computed<NavLink[]>(() => {
+  if (dynamicLinks.value.length > 0) {
+    return dynamicLinks.value
+  }
+
+  return [
+    { key: 'nav.home', path: '/' },
+    {
+      key: 'nav.products',
+      path: '/san-pham-list',
+      children: [
+        { key: 'nav.productsMenu.teaViet', path: '/san-pham-list' },
+        { key: 'nav.productsMenu.anQuangCaffe', path: '/an-quang-caffe' },
+        { key: 'nav.productsMenu.corporateGifts', path: '/qua-tang-doanh-nghiep' },
+      ],
+    },
+    { key: 'nav.projectsPartners', path: '/du-an-doi-tac' },
+    { key: 'nav.events', path: '/trai-nghiem' },
+    {
+      key: 'nav.blog',
+      path: '/tin-tuc',
+      children: [
+        { key: 'nav.blogMenu.vietTea', path: '/nep-tra-viet' },
+        { key: 'nav.blogMenu.tradition', path: '/van-hoa-viet' },
+        { key: 'nav.blogMenu.teaHeritage', path: '/di-san-tra-cu' },
+        { key: 'nav.blogMenu.anQuangGarden', path: '/vuon-an-quang' },
+      ],
+    },
+    { key: 'nav.library', path: '/thu-vien-van-hoa' },
+    { key: 'nav.contact', path: '/lien-he' },
+  ]
+})
+>>>>>>> Stashed changes
 
 const toggleMobileGroup = (key: string) => {
   openMobileGroup.value = openMobileGroup.value === key ? null : key
@@ -82,14 +134,14 @@ onClickOutside(desktopNavEl, () => { openDropdown.value = null })
               class="site-nav-link"
               active-class="site-nav-active"
             >
-              {{ t(link.key) }}
+              {{ link.label || t(link.key) }}
             </NuxtLink>
             <button
               v-if="link.children"
               type="button"
               class="site-nav-caret"
               :aria-expanded="openDropdown === link.key"
-              :aria-label="`${t(link.key)} submenu`"
+              :aria-label="`${link.label || t(link.key)} submenu`"
               @click="openDropdown = link.key"
             >
               <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -111,7 +163,7 @@ onClickOutside(desktopNavEl, () => { openDropdown.value = null })
                 :to="localePath(child.path)"
                 class="site-dropdown-link"
               >
-                {{ t(child.key) }}
+                {{ child.label || t(child.key) }}
               </NuxtLink>
             </div>
           </Transition>
@@ -169,14 +221,14 @@ onClickOutside(desktopNavEl, () => { openDropdown.value = null })
                 active-class="text-[#e8d5a8]"
                 @click="isMenuOpen = false"
               >
-                {{ t(link.key) }}
+                {{ link.label || t(link.key) }}
               </NuxtLink>
               <button
                 v-if="link.children"
                 type="button"
                 class="site-mobile-caret"
                 :aria-expanded="openMobileGroup === link.key"
-                :aria-label="`${t(link.key)} submenu`"
+                :aria-label="`${link.label || t(link.key)} submenu`"
                 @click="toggleMobileGroup(link.key)"
               >
                 <svg
@@ -196,7 +248,7 @@ onClickOutside(desktopNavEl, () => { openDropdown.value = null })
                 class="site-mobile-sublink"
                 @click="isMenuOpen = false"
               >
-                {{ t(child.key) }}
+                {{ child.label || t(child.key) }}
               </NuxtLink>
             </div>
           </div>

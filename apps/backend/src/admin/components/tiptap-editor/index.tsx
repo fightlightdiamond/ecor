@@ -35,14 +35,8 @@ const TiptapEditor = ({
   }, [editorKey])
 
   const uploadImage = useCallback(async (file: File) => {
-    const formData = new FormData()
-    formData.append("files", file)
-
-    const result = await sdk.client.fetch<{
-      files?: Array<{ url: string }>
-    }>("/admin/uploads", {
-      method: "POST",
-      body: formData,
+    const result = await sdk.admin.upload.create({
+      files: [file],
     })
 
     const url = result.files?.[0]?.url

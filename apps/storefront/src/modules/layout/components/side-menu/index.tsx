@@ -16,20 +16,29 @@ type SideMenuProps = {
   regions: HttpTypes.StoreRegion[] | null
   locales: Locale[] | null
   currentLocale: string | null
+  menuItems?: { label: string; href: string }[]
 }
 
-const SideMenu = ({ regions, locales, currentLocale }: SideMenuProps) => {
+const SideMenu = ({
+  regions,
+  locales,
+  currentLocale,
+  menuItems = [],
+}: SideMenuProps) => {
   const countryToggleState = useToggleState()
   const languageToggleState = useToggleState()
   const t = useTranslations("nav")
 
-  const SideMenuItems = [
-    { label: t("home"), href: "/" },
-    { label: t("store"), href: "/store" },
-    { label: t("articles"), href: "/campaign-posts" },
-    { label: t("account"), href: "/account" },
-    { label: t("cart"), href: "/cart" },
-  ]
+  const SideMenuItems =
+    menuItems.length > 0
+      ? menuItems
+      : [
+          { label: t("home"), href: "/" },
+          { label: t("store"), href: "/store" },
+          { label: t("articles"), href: "/campaign-posts" },
+          { label: t("account"), href: "/account" },
+          { label: t("cart"), href: "/cart" },
+        ]
 
   return (
     <div className="h-full">

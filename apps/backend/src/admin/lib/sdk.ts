@@ -1,9 +1,14 @@
 import Medusa from "@medusajs/js-sdk"
 
+const authType = __AUTH_TYPE__ ?? "jwt"
+const jwtTokenStorageKey = __JWT_TOKEN_STORAGE_KEY__ || undefined
+const backendUrl = __BACKEND_URL__ ?? "/"
+
 export const sdk = new Medusa({
-  baseUrl: import.meta.env.VITE_BACKEND_URL || "/",
+  baseUrl: backendUrl,
   debug: import.meta.env.DEV,
   auth: {
-    type: "session",
+    type: authType,
+    jwtTokenStorageKey,
   },
 })
