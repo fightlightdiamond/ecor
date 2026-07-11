@@ -9,34 +9,35 @@
 ### 1.1 Mục đích
 Tài liệu này mô tả chi tiết các yêu cầu cho một nền tảng thương mại điện tử hiện đại, sử dụng kiến trúc **headless** với:
 
-- **Medusa**: Headless commerce engine xử lý toàn bộ logic bán hàng (giỏ hàng, thanh toán, đơn hàng, sản phẩm, inventory, khách hàng, auth).
-- **Strapi v5**: Headless CMS quản lý toàn bộ nội dung (landing page, blog, SEO, marketing content, media).
-- **Medusa Next.js Starter Storefront**: Frontend chính thức của Medusa, được xây dựng với Next.js, cung cấp sẵn các tính năng thương mại điện tử hiện đại.
+- **Medusa v2**: Headless commerce engine xử lý toàn bộ logic bán hàng, đơn hàng, sản phẩm, inventory, khách hàng, và các module custom như `campaign-posts`.
+- **Strapi v5**: Headless CMS quản lý nội dung linh hoạt (landing page, blog, bài viết, SEO, marketing content, media).
+- **Medusa Next.js Starter Storefront**: Frontend chính thức, được xây dựng với Next.js 15 App Router, cung cấp tính năng thương mại điện tử hiện đại và hiển thị dữ liệu từ cả Medusa & Strapi.
+- **Nginx API Gateway**: Điều hướng traffic tới các services nội bộ thông qua Docker network.
 
-**Lưu ý quan trọng**: Medusa và Strapi hoạt động **độc lập, không đồng bộ dữ liệu với nhau**. Storefront sẽ gọi API từ từng hệ thống riêng biệt.
+**Lưu ý quan trọng**: Medusa và Strapi hoạt động **độc lập, không đồng bộ dữ liệu với nhau**. Storefront gọi API từ từng hệ thống riêng biệt, đảm bảo Separation of Concerns (SoC).
 
 ### 1.2 Phạm vi
 Dự án bao gồm:
-- **Landing Page** với các section động (Hero, Feature, Testimonial, CTA) – dữ liệu từ Strapi.
-- **Blog** đa danh mục, hỗ trợ SEO – dữ liệu từ Strapi.
-- **Cửa hàng trực tuyến** đầy đủ tính năng thương mại điện tử (product listing, cart, checkout, account) – dữ liệu và logic từ Medusa.
-- **Admin Panel**: Strapi Admin cho content, Medusa Admin cho commerce.
+- **Landing Page & Cấu trúc tĩnh**: Với các section động (Hero, Feature, Testimonial, CTA) – dữ liệu từ Strapi.
+- **Blog (Strapi)**: Đa danh mục, hỗ trợ bài viết chuyên sâu về SEO – dữ liệu từ Strapi (`/vn/blog`).
+- **Campaign Posts (Medusa)**: Bài viết chiến dịch được quản lý bởi module custom trong Medusa (`/vn/campaign-posts`).
+- **Cửa hàng trực tuyến**: Đầy đủ tính năng E-commerce (product listing, cart, checkout, account) – dữ liệu và logic từ Medusa.
+- **Admin Panel**: Strapi Admin cho nội dung, Medusa Admin cho thương mại điện tử.
 
 ### 1.3 Đối tượng sử dụng
 | Vai trò | Mô tả |
 |---------|-------|
-| **Khách hàng (Guest)** | Xem sản phẩm, blog, landing page |
+| **Khách hàng (Guest)** | Xem sản phẩm, blog, landing page, chiến dịch |
 | **Khách hàng (Registered)** | Mua hàng, xem lịch sử đơn hàng, quản lý profile |
-| **Content Manager** | Quản lý bài blog, landing page, SEO, media trong Strapi |
-| **Product Manager** | Quản lý sản phẩm, inventory, giá, đơn hàng trong Medusa Admin |
-| **Admin** | Quản lý toàn bộ hệ thống (cả hai admin) |
+| **Content Manager** | Quản lý bài blog, landing page, SEO, media trong Strapi CMS |
+| **Store Manager** | Quản lý sản phẩm, tồn kho, đơn hàng, campaign posts trong Medusa Admin |
+| **System Admin** | Quản lý toàn bộ hệ thống hạ tầng (Docker, Nginx, Database, Services) |
 
 ---
 
 ## 2. YÊU CẦU CHỨC NĂNG
 
 ### 2.1 Landing Page
-
 | ID | Yêu cầu | Mô tả chi tiết |
 |----|---------|----------------|
 | LP-01 | Hero Section | Slider/banner với CTA, nội dung quản lý từ Strapi |
@@ -44,29 +45,18 @@ Dự án bao gồm:
 | LP-03 | Product Grid | Hiển thị sản phẩm nổi bật, lấy dữ liệu từ Medusa API |
 | LP-04 | Testimonial | Đánh giá khách hàng, quản lý từ Strapi |
 | LP-05 | Newsletter Signup | Form đăng ký nhận tin, tích hợp email service |
-| LP-06 | Trust Badges | Hiển thị chứng nhận, bảo mật, vận chuyển |
-| LP-07 | SEO Meta | Title, Description, Open Graph quản lý từ Strapi |
-| LP-08 | Responsive | Tương thích mobile, tablet, desktop (Mobile-first) |
+| LP-06 | SEO Meta | Title, Description, Open Graph quản lý từ Strapi |
+| LP-07 | Responsive | Tương thích mobile, tablet, desktop (Mobile-first) |
 
-### 2.2 Blog
-
+### 2.2 Quản trị Nội dung (Blog & Campaign Posts)
 | ID | Yêu cầu | Mô tả chi tiết |
 |----|---------|----------------|
-| BL-01 | Danh sách bài viết | Pagination, filter theo danh mục, tag |
-| BL-02 | Chi tiết bài viết | Rich content, hình ảnh, video embedded |
-| BL-03 | Danh mục | Quản lý category trong Strapi |
-| BL-04 | Tags | Hệ thống tag cho bài viết |
-| BL-05 | Tác giả | Hiển thị thông tin tác giả |
-| BL-06 | Bài viết liên quan | Gợi ý dựa trên category/tag |
-| BL-07 | Comment | Hệ thống bình luận (có moderate) |
-| BL-08 | Search | Tìm kiếm bài viết theo từ khóa |
-| BL-09 | SEO | Tự động generate meta từ nội dung Strapi |
-| BL-10 | Sitemap | Tự động tạo sitemap.xml cho blog |
+| BL-01 | Strapi Blog List | Lấy danh sách bài viết từ Strapi v5 API (cấu trúc JSON phẳng) |
+| BL-02 | Strapi Blog Detail| Chi tiết bài viết Blog (Rich text, hình ảnh) |
+| CP-01 | Campaign Posts | Quản trị các chiến dịch, bài viết đặc biệt thông qua Medusa Custom Module |
+| CP-02 | SEO & Sitemap | Tự động tạo SEO metadata, Sitemap.xml tích hợp nội dung từ 2 nguồn |
 
 ### 2.3 E-commerce (Medusa Core Features)
-
-Medusa Next.js Starter Storefront cung cấp sẵn các tính năng thương mại điện tử cốt lõi:
-
 | ID | Yêu cầu | Mô tả chi tiết |
 |----|---------|----------------|
 | EC-01 | Product Listing | Grid/List view, filter, sort, pagination |
@@ -76,363 +66,189 @@ Medusa Next.js Starter Storefront cung cấp sẵn các tính năng thương m�
 | EC-05 | Thanh toán | Tích hợp Stripe (payment provider) |
 | EC-06 | Order Management | Xem lịch sử, trạng thái, chi tiết đơn hàng |
 | EC-07 | Customer Account | Đăng ký, đăng nhập, quên mật khẩu, profile |
-| EC-08 | Wishlist | Danh sách yêu thích (có sẵn trong Starter) |
-| EC-09 | Product Reviews | Đánh giá sản phẩm (authenticated users) |
-| EC-10 | Search | Tìm kiếm sản phẩm (Medusa search plugin) |
-| EC-11 | Regions & Currencies | Hỗ trợ đa vùng, đa tiền tệ |
+| EC-08 | Regions | Hỗ trợ đa vùng (Region detection via Middleware Edge) |
 
-### 2.4 Tích hợp giữa Storefront với Strapi và Medusa
-
+### 2.4 Tích hợp Storefront (Strapi & Medusa)
 | ID | Yêu cầu | Mô tả chi tiết |
 |----|---------|----------------|
-| SI-01 | Kết nối đến Medusa | Storefront sử dụng Medusa JS Client hoặc fetch API với Publishable API Key |
-| SI-02 | Kết nối đến Strapi | Storefront gọi Strapi REST API (hoặc GraphQL) để lấy content |
-| SI-03 | Không đồng bộ | Strapi và Medusa **không trao đổi dữ liệu** với nhau |
-| SI-04 | Tách biệt dữ liệu | Dữ liệu sản phẩm (Medusa) và nội dung (Strapi) độc lập, không phụ thuộc nhau |
-| SI-05 | URL cấu hình | Biến môi trường cho MEDUSA_URL và STRAPI_URL riêng biệt |
-
-### 2.5 Admin
-
-| ID | Yêu cầu | Mô tả chi tiết |
-|----|---------|----------------|
-| AD-01 | Strapi Admin | Quản lý landing page, blog, media, SEO |
-| AD-02 | Medusa Admin | Quản lý sản phẩm, inventory, đơn hàng, khách hàng, discount |
-| AD-03 | User Management | Phân quyền riêng trong từng admin |
-| AD-04 | Dashboard | Thống kê đơn hàng, doanh thu trong Medusa Admin |
+| SI-01 | Giao tiếp Backend | Next.js Server / Middleware kết nối Medusa qua Internal Docker Network (`MEDUSA_BACKEND_URL`) |
+| SI-02 | Giao tiếp CMS | Kết nối Strapi v5 thông qua `STRAPI_API_URL` bằng Next.js ISR fetch wrapper |
+| SI-03 | Kiến trúc Độc lập | Không đồng bộ hóa database. Storefront làm nhiệm vụ "ghép nối" UI. |
+| SI-04 | Client & Server Env| Phân biệt môi trường Public URL (`NEXT_PUBLIC_*`) và Internal Docker URL. |
 
 ---
 
 ## 3. YÊU CẦU KỸ THUẬT – CHI TIẾT
 
 ### 3.1 Kiến trúc tổng thể
-┌─────────────────────────────────────────────────────────────────────────┐
-│ MEDUSA NEXT.JS STARTER STOREFRONT │
-│ ┌───────────────────┐ ┌───────────────┐ ┌──────────────────────┐ │
-│ │ Landing Page │ │ Blog │ │ E-commerce Pages │ │
-│ │ (gọi Strapi API) │ │ (Strapi API) │ │ (gọi Medusa API) │ │
-│ └───────────────────┘ └───────────────┘ └──────────────────────┘ │
-└────────────────────────────┬──────────────────────────────────────────┘
-│
-┌───────────────┴───────────────┐
-│ HTTP / REST / GraphQL │
-└───────────────┬───────────────┘
-┌───────────────┴───────────────┐
-│ │
-▼ ▼
-┌─────────────────────────┐ ┌───────────────────────────────────────┐
-│ STRAPI v5 (CMS) │ │ MEDUSA (Commerce Engine) │
-│ - Landing Page content │ │ - Products / Variants │
-│ - Blog posts │ │ - Cart / Checkout │
-│ - SEO metadata │ │ - Orders / Payments │
-│ - Media assets │ │ - Inventory / Pricing │
-│ - Categories/Tags │ │ - Customers / Auth │
-│ - Admin UI (Content) │ │ - Discounts / Gift Cards │
-└─────────────────────────┘ │ - Admin UI (Commerce) │
-└───────────────────────────────────────┘
-│ │
-└───────────────┬───────────────┘
-│
-▼
-┌─────────────────────────────┐
-│ DATABASE LAYER │
-│ PostgreSQL (riêng biệt) │
-│ Redis (cho Medusa) │
-└─────────────────────────────┘
 
+```text
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                       NGINX API GATEWAY (Reverse Proxy)                     │
+│                        Routes: / -> Storefront:8000                         │
+└──────┬───────────────────────────────┬──────────────────────────────┬───────┘
+       │                               │                              │
+       ▼                               ▼                              ▼
+┌───────────────┐               ┌──────────────┐               ┌──────────────┐
+│  STOREFRONT   │               │   BACKEND    │               │    STRAPI    │
+│  (Next.js 15) │ <===========> │ (Medusa v2)  │               │ (Strapi v5)  │
+│  Port: 8000   │ Internal Fetch│  Port: 9000  │               │  Port: 1337  │
+└──────┬────────┘               └──────┬───────┘               └──────┬───────┘
+       │                               │                              │
+       │                               ▼                              ▼
+       │                        ┌──────────────┐               ┌──────────────┐
+       └────────────────────────┤ REDIS CACHE  │               │ POSTGRESQL   │
+                                └──────┬───────┘               │ (medusa db)  │
+                                       │                       │ (strapi db)  │
+                                       └───────────────────────┴──────────────┘
+```
 
+### 3.2 Tech Stack
 
-### 3.2 Backend
+| Component | Technology | Version / Notes |
+|-----------|------------|-----------------|
+| E-commerce Engine | Medusa (Node.js) | v2.x |
+| Content Management| Strapi | v5.x (Có fix postinstall module `sharp` cho ARM64) |
+| Frontend Storefront| Next.js | v15.x App Router |
+| Database | PostgreSQL | ≥ 14 (Chung server, khác database/schema) |
+| Cache/Event | Redis | ≥ 7 |
+| API Gateway | Nginx | Điều phối traffic & host header |
 
-| Component | Technology | Version |
-|-----------|------------|---------|
-| Medusa | Node.js | ≥ 2.8.0 |
-| Strapi | Node.js | v5 (latest stable) |
-| Database (Medusa) | PostgreSQL | ≥ 14 |
-| Database (Strapi) | PostgreSQL | ≥ 14 (có thể cùng server nhưng khác DB) |
-| Cache/Event (Medusa) | Redis | ≥ 7 |
-| API | REST (Medusa) / REST + GraphQL (Strapi) | - |
+### 3.3 Frontend – Next.js Storefront
 
-### 3.3 Frontend – Medusa Next.js Starter Storefront
+| Yêu cầu | Mô tả chi tiết |
+|---------|----------------|
+| **Kiến trúc** | Cài đặt chung monorepo, giao tiếp Backend/CMS qua REST API |
+| **Styling** | Tailwind CSS + `@medusajs/ui-preset` |
+| **Routing & Middleware** | Route `/vn/blog`, `/vn/campaign-posts`. Middleware bắt Region dựa vào Header/Cookie (Xử lý `NEXT_PUBLIC_MEDUSA_BACKEND_URL` fallback sang internal URL). |
+| **Data Fetching** | Fetch API caching (ISR) cho Strapi (`fetchStrapi`), SDK cho Medusa. Xử lý chuẩn xác cấu trúc JSON phẳng (Flat structure) của Strapi v5. |
+| **Hydration Error Fix**| Xử lý Server Component ném lỗi 500 do sai Publishable Key bằng Error Boundaries (`global-error.tsx`). |
 
-| ID | Yêu cầu | Mô tả chi tiết |
-|----|---------|----------------|
-| FE-01 | **Kiến trúc** | Sử dụng **Medusa Next.js Starter Storefront** làm frontend chính thức, được cài đặt trong monorepo cùng Medusa backend qua `create-medusa-app` |
-| FE-02 | **Framework** | Next.js 15 với App Router |
-| FE-03 | **Ngôn ngữ** | TypeScript toàn bộ |
-| FE-04 | **Styling** | Sử dụng **Tailwind CSS** với **@medusajs/ui-preset** |
-| FE-05 | **UI Components** | Sử dụng **@medusajs/ui** |
-| FE-06 | **Icons** | Sử dụng **@medusajs/icons** |
-| FE-07 | **Theme** | Themeable thông qua CSS variables |
-| FE-08 | **Data Fetching** | TanStack Query + Server Components (Next.js) |
-| FE-09 | **State Management** | Zustand (có sẵn trong Starter) |
-| FE-10 | **Authentication** | JWT (Medusa Customer Auth) |
-| FE-11 | **Publishable API Key** | Sử dụng publishable API key cho tất cả Medusa store requests |
-| FE-12 | **Rendering Strategy** | Kết hợp SSG/ISR cho product pages, SSR cho cart/checkout |
-| FE-13 | **Gọi Strapi** | Sử dụng `fetch` hoặc Strapi SDK để lấy content (landing, blog) |
-| FE-14 | **Môi trường** | Có biến `NEXT_PUBLIC_MEDUSA_URL`, `NEXT_PUBLIC_STRAPI_URL`, `STRAPI_API_TOKEN` |
+### 3.4 DevOps & Triển khai
 
-### 3.4 Medusa UI – Chi tiết packages
-
-| Package | Mô tả | Cách dùng |
-|---------|-------|-----------|
-| `@medusajs/ui` | React components, hooks, utility functions | `import { Button, Badge, Table } from "@medusajs/ui"` |
-| `@medusajs/ui-preset` | Tailwind CSS preset với design tokens | `presets: [require("@medusajs/ui-preset")]` |
-| `@medusajs/icons` | Icon library | `import { MedusaLogo, Cart } from "@medusajs/icons"` |
-
-### 3.5 DevOps
-
-| Component | Technology |
-|-----------|------------|
-| Container | Docker + Docker Compose |
-| Deployment | Medusa Cloud (Storefront) hoặc VPS |
-| CI/CD | GitHub Actions |
-| Monitoring | Sentry + LogRocket |
-| Analytics | Google Analytics 4 |
+| Component | Technology / Config |
+|-----------|---------------------|
+| Môi trường Dev | `docker compose -f infra/docker-compose.yml --env-file .env.dev` |
+| Môi trường Prod | `docker compose -f infra/docker-compose.prod.yml` (Next.js Standalone build) |
+| Container Network | Bridge network chung cho Nginx, Storefront, Backend, Strapi, Postgres, Redis |
+| Quản lý Schema | Tạo schema `strapi` trong PostgreSQL tự động/thủ công tránh lỗi restart loop. |
 
 ---
 
 ## 4. CƠ SỞ DỮ LIỆU – SCHEMA CHÍNH
 
 ### 4.1 Strapi Content Types
+- **Article (Blog)**: `title` (string), `slug` (uid), `content` (richtext/blocks), `cover` (media), `seoDescription` (text). Phân quyền Public tự động khi bootstrap.
+- **Category**: Danh mục bài viết blog.
+- **Landing Page**: Các section linh hoạt lắp ghép trang chủ.
 
-**Blog Post**
-```json
-{
-  "title": "string",
-  "slug": "string (unique)",
-  "excerpt": "text",
-  "content": "richtext",
-  "featured_image": "media",
-  "categories": "relation[]",
-  "tags": "relation[]",
-  "author": "relation",
-  "published_at": "datetime",
-  "seo_title": "string",
-  "seo_description": "text"
-}
+### 4.2 Medusa Core & Custom Entities
+- **Core Commerce**: Product, ProductVariant, Order, Customer, Cart, Region, Currency.
+- **Custom Module**: `Campaign Posts` - Chuyên quản lý bài viết chiến dịch khuyến mãi hoặc sự kiện.
+
+---
+
+## 5. LUỒNG DỮ LIỆU CHÍNH
+
+### 5.1 Hiển thị Blog & Nội dung tĩnh (Strapi)
+1. Content Manager tạo bài viết trong Strapi Admin.
+2. Next.js Storefront Server Components gọi `fetchStrapi` truy xuất API port `1337` trong mạng Docker nội bộ.
+3. Dữ liệu (JSON phẳng v5) được parse và render thành HTML qua cơ chế ISR/SSG của Next.js. Trả về Client.
+
+### 5.2 Hiển thị Sản phẩm và Bán hàng (Medusa)
+1. Store Manager quản lý hàng hóa trong Medusa Admin.
+2. Khách hàng lướt web: Middleware Next.js kiểm tra Region cookie.
+3. Server Components / Client fetch SDK gọi API port `9000` (Medusa Backend) sử dụng `Publishable API Key`.
+4. Mọi logic giỏ hàng, thanh toán, auth đều do Medusa xử lý.
+
+---
+
+## 6. YÊU CẦU PHI CHỨC NĂNG
+
+### 6.1 Performance
+| Tiêu chí | Ngưỡng |
+|----------|--------|
+| First Contentful Paint (FCP) | < 1.5s |
+| Largest Contentful Paint (LCP) | < 2.5s |
+| Time to Interactive (TTI) | < 3.5s |
+| Internal Network Latency | < 5ms (Giữa các container Docker) |
+
+### 6.2 Security
+| Yêu cầu | Mô tả |
+|---------|-------|
+| Tách biệt môi trường | Cấu hình `.env` triệt để. Môi trường Server dùng Internal URL, Client dùng Public URL. |
+| API Gateway | Nginx cấu hình Host Headers chuẩn (`proxy_set_header Host $http_host;`) chống lỗi CSRF/Server Actions của Next.js. |
+| Access Control | Tách quyền quản trị viên Medusa và Strapi. |
+
+---
+
+## 7. YÊU CẦU VỀ UI/UX
+
+### 7.1 Medusa Starter Storefront – Design System
+- **Colors & Typography**: Sử dụng Design tokens từ `@medusajs/ui`.
+- **Components**: Chuẩn hóa Button, Input, Modal, Table, Skeleton loading, v.v.
+- **Responsive**: Mobile-first, hoạt động hoàn hảo trên mọi kích thước màn hình.
+
+### 7.2 Blog & Campaign Posts (Tích hợp thêm)
+- **Danh sách (List)**: Grid layout hiển thị thumbnail, title, excerpt.
+- **Chi tiết (Detail)**: Render Rich Text (Strapi Blocks) hoặc HTML an toàn, Responsive Images.
+
+---
+
+## 8. SEO & MARKETING
+| Yêu cầu | Mô tả |
+|---------|-------|
+| **Meta tags** | Tích hợp Title, description, keywords (Strapi SEO component). |
+| **Sitemap** | Hỗ trợ sitemap.xml động map các pages từ cả Medusa & Strapi. |
+| **URL Structure** | `/vn/products/[slug]`, `/vn/blog/[slug]`, `/vn/campaign-posts/[slug]`. |
+
+---
+
+## 9. LOCALIZATION (i18n) & REGIONS
+| Yêu cầu | Mô tả |
+|---------|-------|
+| **Regions (Quốc gia/Vùng)** | Next.js Middleware check `x-vercel-ip-country`, cookie hoặc tham số URL (`/vn/`, `/en/`) để định tuyến Region đúng với Medusa. |
+| **Đồng tiền (Currency)** | Auto-map với Region (VND, USD). |
+
+---
+
+## 10. KẾ HOẠCH TRIỂN KHAI THỰC TẾ
+
+### Phase 1: Foundation (Đã hoàn thành)
+- [x] Khởi tạo Medusa backend v2, Next.js Storefront.
+- [x] Cài đặt Strapi v5, cấu hình Postgres schema `strapi`. Fix lỗi kiến trúc `sharp` ARM64.
+- [x] Docker hóa toàn bộ hệ thống bằng `docker-compose.yml`. Định tuyến bằng Nginx.
+
+### Phase 2: Core Commerce & CMS Integration (Đã hoàn thành)
+- [x] Sửa lỗi Nginx Host Headers gây ra lỗi Next.js Server Actions (`Invalid Server Actions request`).
+- [x] Tích hợp Strapi SDK / Fetch (xử lý Strapi v5 flat format) vào Storefront. Render thành công UI bài viết.
+- [x] Fix cấu hình `NEXT_PUBLIC_MEDUSA_BACKEND_URL` và `MEDUSA_BACKEND_URL` trong Middleware tránh lỗi 500 khi server fetch SSR.
+- [x] Fix lỗi Publishable API Key gây crash React Hydration.
+
+### Phase 3: Hoàn thiện tính năng & Đưa vào sử dụng (Sắp tới)
+- [ ] Render chi tiết trang chủ (Landing page sections) từ Strapi.
+- [ ] Tích hợp hệ thống thanh toán (Payment Gateway).
+- [ ] CI/CD Deployment lên Production VPS với `docker-compose.prod.yml`.
+
+---
+
+## 11. RỦI RO & GIẢI PHÁP
+| Rủi ro | Giải pháp |
+|--------|-----------|
+| **SSR Fetch lỗi kết nối internal trong Docker** | Ưu tiên gọi API bằng `MEDUSA_BACKEND_URL` (IP nội bộ Docker) thay cho `NEXT_PUBLIC_...` khi chạy SSR/Middleware. |
+| **Lỗi module ảnh Strapi (`sharp`) khi build Docker** | Gắn script `"postinstall": "npm install --os=linux --cpu=arm64 sharp"` vào package.json để ép cài đúng binary. |
+| **Crash vòng lặp do thiếu Database Schema** | Tự động hoặc thủ công chạy script `CREATE SCHEMA IF NOT EXISTS strapi;` trên Postgres. |
+
+---
 
-Landing Page Section
+## 12. TÀI LIỆU THAM KHẢO
+| Tài liệu | Link |
+|----------|------|
+| Medusa Next.js Starter | [https://docs.medusajs.com/learn/storefront-development](https://docs.medusajs.com/learn/storefront-development) |
+| Strapi v5 Documentation | [https://docs.strapi.io/dev-docs/intro](https://docs.strapi.io/dev-docs/intro) |
 
-Media (quản lý ảnh, video)
+---
+**📄 Tài liệu này là SRS cập nhật của dự án, phản ánh đúng cấu trúc mã nguồn thực tế và kiến trúc Docker container.**
 
-4.2 Medusa Core Entities
-Product – thông tin cơ bản, variants, options
-
-ProductVariant – SKU, inventory, pricing
-
-Order – đơn hàng, shipping, payment
-
-Customer – thông tin khách hàng
-
-Cart – giỏ hàng
-
-Discount – mã giảm giá
-
-Collection – bộ sưu tập
-
-Category – danh mục sản phẩm
-
-5. LUỒNG DỮ LIỆU CHÍNH
-5.1 Hiển thị Landing Page và Blog
-Content Manager tạo/sửa nội dung trong Strapi Admin.
-
-Storefront gọi Strapi API để lấy dữ liệu landing page sections / blog posts.
-
-Dữ liệu được render trên FE với Next.js (SSG/ISR).
-
-(Không có sự tham gia của Medusa)
-
-5.2 Hiển thị sản phẩm và mua hàng
-Product Manager tạo/sửa sản phẩm trong Medusa Admin.
-
-Storefront gọi Medusa Store API (với Publishable Key) để lấy danh sách sản phẩm, chi tiết, giỏ hàng, thanh toán, đơn hàng.
-
-Tất cả logic thương mại do Medusa xử lý.
-
-(Không có sự tham gia của Strapi)
-
-5.3 Tương tác khách hàng
-Khách hàng đăng ký/đăng nhập qua Medusa Customer API.
-
-Xem lịch sử đơn hàng, quản lý profile qua Medusa API.
-
-6. YÊU CẦU PHI CHỨC NĂNG
-6.1 Performance
-Tiêu chí	Ngưỡng
-First Contentful Paint (FCP)	< 1.5s
-Largest Contentful Paint (LCP)	< 2.5s
-Time to Interactive (TTI)	< 3.5s
-API Response Time (Medusa)	< 200ms
-API Response Time (Strapi)	< 300ms
-Concurrent Users	Hỗ trợ ≥ 10,000
-6.2 Security
-Yêu cầu	Mô tả
-HTTPS	Toàn bộ hệ thống dùng TLS 1.3
-JWT Authentication	Medusa customer auth
-Publishable API Key	Cho tất cả Medusa store requests
-Strapi API Token	Sử dụng token cho các request từ FE đến Strapi (nếu cần)
-CORS	Cấu hình đúng domain cho phép
-Rate Limiting	Giới hạn request API
-Environment Variables	Tất cả secret lưu trong .env
-6.3 Scalability
-Medusa: Horizontal scaling với Redis, PostgreSQL.
-
-Strapi: Scale với database replication, có thể dùng CDN cho media.
-
-Storefront: Next.js với SSG/ISR + CDN caching.
-
-6.4 Availability
-Uptime: 99.9%
-
-Backup: Database backup tự động hàng ngày cho cả hai hệ thống.
-
-Disaster Recovery: RTO < 4 giờ.
-
-7. YÊU CẦU VỀ UI/UX
-7.1 Medusa Starter Storefront – Design System
-Medusa Next.js Starter Storefront tích hợp sẵn Medusa UI design system:
-
-Colors: Design tokens từ Medusa UI
-
-Typography: Hệ thống typography từ Medusa UI
-
-Components: Button, Input, Card, Modal, Toast, Skeleton, Table, Badge, Switch, Command
-
-Responsive: Mobile-first, breakpoints chuẩn
-
-7.2 Landing Page (tùy chỉnh trên Starter)
-Hero: Full-width banner, CTA button nổi bật
-
-Features: 3-4 feature cards với icon
-
-Products: Product grid (Medusa components)
-
-Testimonials: Carousel với avatar, tên, đánh giá
-
-Newsletter: Form với email validation
-
-Footer: Links, social icons, copyright
-
-7.3 Blog (tích hợp vào Starter)
-List: Grid layout, thumbnail, title, excerpt, date, author
-
-Detail: Breadcrumb, featured image, content, author box, related posts
-
-Sidebar: Search, categories, recent posts, tags
-
-7.4 E-commerce (có sẵn trong Starter)
-Product List: Grid/List toggle, filter sidebar, sort, pagination
-
-Product Detail: Gallery (zoom), variant selector, quantity, add to cart
-
-Cart: Mini cart (dropdown) + Cart page
-
-Checkout: Progress indicator, form validation, order summary
-
-Account: Dashboard, orders, wishlist, profile settings
-
-8. YÊU CẦU VỀ SEO & MARKETING
-Yêu cầu	Mô tả
-Meta tags	Title, description, keywords từ Strapi
-Open Graph	og:title, og:description, og:image
-Twitter Cards	Twitter card tags
-JSON-LD	Schema.org cho Product (từ Medusa), Article (từ Strapi), Breadcrumb
-Sitemap	Tự động generate sitemap.xml cho blog và sản phẩm
-Robots.txt	Cấu hình crawl
-URL Structure	SEO-friendly: /products/{slug}, /blog/{slug}
-Canonical	Thẻ canonical cho mỗi trang
-Alt Text	Hình ảnh có alt text
-Performance	Core Web Vitals đạt yêu cầu
-9. YÊU CẦU VỀ LOCALIZATION (i18n)
-Yêu cầu	Mô tả
-Ngôn ngữ	Tiếng Việt (mặc định), Tiếng Anh
-Content	Strapi hỗ trợ i18n
-Currency	VND, USD (Medusa Regions)
-Regions	Medusa Regions hỗ trợ đa quốc gia
-URL	/vi/... , /en/...
-
-10. KẾ HOẠCH TRIỂN KHAI
-Phase 1: Foundation
-Tạo Medusa project với create-medusa-app (bao gồm cả storefront)
-
-Cấu hình PostgreSQL + Redis cho Medusa
-
-Cài đặt Strapi v5 (cùng server hoặc riêng)
-
-Cấu hình Strapi database (PostgreSQL)
-
-Tạo Strapi content types: Blog Post, Landing Page Section, Media
-
-Cấu hình environment variables cho cả hai hệ thống
-
-Phase 2: Core Commerce
-Chạy Medusa Next.js Starter Storefront và kiểm tra kết nối Medusa API
-
-Cấu hình Publishable API Key
-
-Kiểm tra product listing, detail, cart, checkout
-
-Tích hợp thanh toán Stripe
-
-Kiểm tra authentication (customer register/login)
-
-Phase 3: Content Integration
-Tích hợp Strapi content vào Storefront (landing page sections)
-
-Tích hợp Blog (list, detail, categories, tags)
-
-Gọi Strapi API từ Storefront
-
-Strapi Admin training cho content team
-
-Phase 4: Customization & Polish
-Tùy chỉnh theme (CSS variables)
-
-SEO optimization (meta tags, JSON-LD, sitemap)
-
-Performance optimization (SSG/ISR strategy)
-
-Testing (Unit, Integration, E2E)
-
-Deployment (Medusa Cloud hoặc VPS)
-
-Monitoring setup (Sentry)
-
-11. RỦI RO & GIẢI PHÁP
-Rủi ro	Giải pháp
-Strapi API chậm	Cache response, sử dụng ISR
-Medusa performance	Scale horizontally, Redis cache
-FE gọi 2 API độc lập có thể gây chậm tải trang	Sử dụng parallel fetching, skeleton loading
-Dữ liệu không đồng bộ giữa Medusa và Strapi (ví dụ: sản phẩm không có mô tả)	Không yêu cầu đồng bộ; mô tả sản phẩm có thể được quản lý riêng trong Medusa hoặc Strapi tuỳ nhu cầu
-Security breach	Regular security audit, update dependencies
-12. TÀI LIỆU THAM KHẢO
-Tài liệu	Link
-Medusa Next.js Starter Storefront	https://docs.medusajs.com/learn/storefront-development
-Medusa UI Documentation	https://docs.medusajs.com/ui
-Strapi v5 Documentation	https://docs.strapi.io/dev-docs/intro
-Medusa Store API Reference	https://docs.medusajs.com/api/store
-Strapi REST API	https://docs.strapi.io/dev-docs/api/rest
-13. PHỤ LỤC: MEDUSA STARTER STOREFRONT – TÍNH NĂNG CÓ SẴN
-Tính năng	Trạng thái
-Product listing + pagination	✅ Có sẵn
-Product detail + variants	✅ Có sẵn
-Shopping cart	✅ Có sẵn
-Checkout (multi-step)	✅ Có sẵn
-Payment (Stripe)	✅ Có sẵn
-Customer authentication	✅ Có sẵn
-Order history	✅ Có sẵn
-Wishlist	✅ Có sẵn
-Regions & currencies	✅ Có sẵn
-Responsive design	✅ Có sẵn
-Tailwind CSS + Medusa UI	✅ Có sẵn
-TypeScript	✅ Có sẵn
-📌 TÓM TẮT QUYẾT ĐỊNH KỸ THUẬT QUAN TRỌNG
-Quyết định	Lý do
-Dùng Medusa Next.js Starter Storefront thay vì build FE từ scratch	Tiết kiệm 60-70% thời gian phát triển, có sẵn tất cả tính năng commerce core, được Medusa maintain và update thường xuyên
-Dùng @medusajs/ui + @medusajs/ui-preset	Design system chính thức, consistency với Medusa ecosystem, dễ dàng theme
-Tách biệt Strapi và Medusa, không sync	Đơn giản hóa kiến trúc, giảm dependency, dễ bảo trì, mỗi hệ thống chuyên biệt cho từng mục đích
-Deploy trên Medusa Cloud hoặc VPS	Linh hoạt, hỗ trợ storefront và backend cùng lúc
-📄 Tài liệu này là SRS chính thức của dự án, phản ánh đúng yêu cầu độc lập giữa Strapi và Medusa.
-
-Ngày tạo: 2026-07-11
-Phiên bản: 3.0 – Tách biệt hoàn toàn Strapi và Medusa, không đồng bộ
+- **Ngày tạo:** 2026-07-11
+- **Phiên bản:** 4.0 – Đồng bộ chặt chẽ với kiến trúc Nginx/Docker, Strapi v5, Next.js 15 và Medusa v2.
