@@ -8,8 +8,33 @@ import { createFindParams } from "@medusajs/medusa/api/utils/validators"
 export const GetCampaignPostsSchema = createFindParams()
 export const GetEventsSchema = createFindParams()
 
+/** Medusa file routes don't register `/` reliably on Windows — catch it here. */
+function redirectBareRootToAdmin(
+  req: { path?: string; originalUrl?: string; url?: string },
+  res: { headersSent?: boolean; redirect: (code: number, url: string) => void },
+  next: () => void
+) {
+  const path =
+    req.path ||
+    (req.originalUrl || req.url || "").split("?")[0] ||
+    ""
+
+  if (path === "/" || path === "") {
+    res.redirect(302, "/app")
+    return
+  }
+
+  next()
+}
+
 export default defineMiddlewares({
   routes: [
+    {
+      // Broad matcher so this middleware is installed; handler no-ops unless path is `/`
+      matcher: "/*",
+      method: "GET",
+      middlewares: [redirectBareRootToAdmin],
+    },
     {
       matcher: "/admin/events",
       method: "GET",

@@ -35,6 +35,18 @@
       "relation": "manyToOne",
       "target": "api::category.category",
       "inversedBy": "articles"
+    },
+    "blocks": {
+      "type": "dynamiczone",
+      "components": [
+        "page-blocks.hero",
+        "page-blocks.feature-list",
+        "page-blocks.product-grid",
+        "page-blocks.testimonials",
+        "page-blocks.cta-banner",
+        "page-blocks.faq",
+        "page-blocks.rich-text"
+      ]
     }
   }
 }

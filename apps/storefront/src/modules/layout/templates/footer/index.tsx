@@ -6,10 +6,16 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import MedusaCTA from "@modules/layout/components/medusa-cta";
 
 export default async function Footer() {
-  const { collections } = await listCollections({
-    fields: "*products",
-  });
-  const productCategories = await listCategories();
+  const [{ collections }, productCategories] = await Promise.all([
+    listCollections({
+      fields: "id,handle,title",
+      limit: "6",
+    }),
+    listCategories({
+      fields: "id,name,handle,parent_category,category_children",
+      limit: 6,
+    }),
+  ])
 
   return (
     <footer className="border-t border-ui-border-base w-full">

@@ -1,4 +1,5 @@
 import { getBaseURL } from "@lib/util/env"
+import { fontDisplay, fontSans } from "@lib/fonts"
 import { STOREFRONT_THEME } from "@lib/theme"
 import { Metadata } from "next"
 import { clx } from "@modules/common/components/ui"
@@ -21,9 +22,13 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
       lang={locale}
       data-mode={STOREFRONT_THEME.appearance}
       data-accent={STOREFRONT_THEME.accentScale}
-      className={clx(isDark && "dark")}
+      className={clx(
+        fontSans.variable,
+        fontDisplay.variable,
+        isDark && "dark"
+      )}
     >
-      <body>
+      <body className={clx(fontSans.className, "bg-store-atmosphere text-ui-fg-base antialiased")}>
         <NextIntlClientProvider messages={messages} locale={locale}>
           <main className="relative">{props.children}</main>
         </NextIntlClientProvider>

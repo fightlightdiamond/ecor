@@ -512,7 +512,7 @@ export interface ApiCategoryCategory extends Struct.CollectionTypeSchema {
 export interface ApiLandingPageLandingPage extends Struct.CollectionTypeSchema {
   collectionName: 'landing_pages';
   info: {
-    description: 'Pages for marketing and presentation';
+    description: 'Dynamic marketing pages built from reusable blocks';
     displayName: 'Landing Page';
     pluralName: 'landing-pages';
     singularName: 'landing-page';
@@ -521,6 +521,17 @@ export interface ApiLandingPageLandingPage extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
+    blocks: Schema.Attribute.DynamicZone<
+      [
+        'page-blocks.hero',
+        'page-blocks.feature-list',
+        'page-blocks.product-grid',
+        'page-blocks.testimonials',
+        'page-blocks.cta-banner',
+        'page-blocks.faq',
+        'page-blocks.rich-text',
+      ]
+    >;
     content: Schema.Attribute.RichText;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
@@ -532,6 +543,7 @@ export interface ApiLandingPageLandingPage extends Struct.CollectionTypeSchema {
     > &
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
+    seo: Schema.Attribute.Component<'shared.seo', false>;
     seoDescription: Schema.Attribute.Text;
     slug: Schema.Attribute.UID<'title'> & Schema.Attribute.Required;
     title: Schema.Attribute.String & Schema.Attribute.Required;

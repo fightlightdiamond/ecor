@@ -1,3 +1,5 @@
+import { withCountryPath } from "@lib/strapi-media"
+
 import type { LandingHeroCta, LandingHeroProps } from "./hero.types"
 
 /** Prefix internal CTA paths with the active storefront country code. */
@@ -9,11 +11,9 @@ export function withCountryCodeCta(
     return cta
   }
 
-  const path = cta.href.startsWith("/") ? cta.href : `/${cta.href}`
-
   return {
     ...cta,
-    href: `/${countryCode}${path}`,
+    href: withCountryPath(countryCode, cta.href),
   }
 }
 
@@ -23,7 +23,9 @@ export function buildLandingHeroProps(
 ): LandingHeroProps {
   return {
     ...content,
-    primaryCta: withCountryCodeCta(countryCode, content.primaryCta),
+    primaryCta: content.primaryCta
+      ? withCountryCodeCta(countryCode, content.primaryCta)
+      : undefined,
     secondaryCta: content.secondaryCta
       ? withCountryCodeCta(countryCode, content.secondaryCta)
       : undefined,

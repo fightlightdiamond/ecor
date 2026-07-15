@@ -57,6 +57,9 @@ export const listProducts = async ({
   }
 
   const next = {
+    // Keep product prices/media reasonably fresh — force-cache without a
+    // cache tag can keep stale prices after admin/seed updates.
+    revalidate: 30,
     ...(await getCacheOptions("products")),
   }
 
@@ -75,7 +78,6 @@ export const listProducts = async ({
         },
         headers,
         next,
-        cache: "force-cache",
       }
     )
     .then(({ products, count }) => {

@@ -1,0 +1,29 @@
+{
+  "collectionName": "components_page_blocks_cta_banners",
+  "info": {
+    "displayName": "CTA Banner",
+    "icon": "bell"
+  },
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "text"
+    },
+    "button_label": {
+      "type": "string",
+      "required": true
+    },
+    "button_link": {
+      "type": "string",
+      "required": true
+    },
+    "background_color": {
+      "type": "enumeration",
+      "enum": ["brand", "dark", "green", "amber"],
+      "default": "brand"
+    }
+  }
+}

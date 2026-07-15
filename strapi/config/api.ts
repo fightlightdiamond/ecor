@@ -4,7 +4,7 @@ const config: Core.Config.Api = {
   rest: {
     defaultLimit: 25,
     maxLimit: 100,
-    withCount: true,
+    withCount: false,
     strictParams: true,
   },
   documents: {

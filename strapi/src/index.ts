@@ -47,19 +47,95 @@ export default {
       });
     }
 
-    // Seeding logic cho Landing Page
-    const landingCount = await strapi.db.query('api::landing-page.landing-page').count();
-    if (landingCount === 0) {
-      console.log('Seeding landing pages...');
-      await strapi.db.query('api::landing-page.landing-page').create({
-        data: {
-          title: 'Về Thăng Long Chè Việt',
-          slug: 've-chung-toi',
-          seoDescription: 'Câu chuyện về hành trình mang hương vị trà truyền thống đến mọi nhà.',
-          content: 'Thăng Long Chè Việt được sinh ra với sứ mệnh bảo tồn và phát triển tinh hoa văn hoá trà Việt Nam...',
-          publishedAt: new Date()
-        }
-      });
+    // Seeding logic cho Landing Page (dynamic blocks)
+    const homeLanding = await strapi.db.query('api::landing-page.landing-page').findOne({
+      where: { slug: 'home' },
+    });
+
+    if (!homeLanding) {
+      console.log('Seeding homepage landing blocks...');
+      try {
+        await strapi.documents('api::landing-page.landing-page').create({
+          data: {
+            title: 'Trang chủ',
+            slug: 'home',
+            seoDescription: 'Thăng Long Chè Việt — tinh hoa trà Việt Nam.',
+            seo: {
+              metaTitle: 'Thăng Long Chè Việt',
+              metaDescription: 'Khám phá trà Việt Nam chất lượng cao — từ Thái Nguyên đến sen Tây Hồ.',
+            },
+            blocks: [
+              {
+                __component: 'page-blocks.hero',
+                heading: 'Tinh hoa trà Việt Nam',
+                subheading: 'Khám phá bộ sưu tập trà Thái Nguyên, trà sen và quà tặng cao cấp.',
+                alignment: 'Center',
+                cta_buttons: [
+                  { label: 'Mua sắm ngay', url: '/store', style: 'primary' },
+                  { label: 'Tìm hiểu thêm', url: '/blog', style: 'outline' },
+                ],
+              },
+              {
+                __component: 'page-blocks.feature-list',
+                section_title: 'Tại sao chọn chúng tôi?',
+                features: [
+                  {
+                    title: 'Nguồn gốc rõ ràng',
+                    description: 'Trà được thu hái và chế biến tại vùng nguyên liệu truyền thống.',
+                  },
+                  {
+                    title: 'Giao hàng nhanh',
+                    description: 'Đóng gói cẩn thận, giao toàn quốc trong 2–5 ngày.',
+                  },
+                  {
+                    title: 'Quà tặng doanh nghiệp',
+                    description: 'Thiết kế hộp quà theo yêu cầu cho sự kiện và đối tác.',
+                  },
+                ],
+              },
+              {
+                __component: 'page-blocks.cta-banner',
+                title: 'Trải nghiệm văn hóa trà Việt',
+                description: 'Đặt lịch tham quan vườn trà và workshop pha trà tại Hà Nội.',
+                button_label: 'Liên hệ ngay',
+                button_link: '/store',
+                background_color: 'brand',
+              },
+            ],
+            publishedAt: new Date(),
+          },
+        });
+      } catch (error) {
+        console.warn('Homepage landing seed skipped:', error);
+      }
+    }
+
+    const aboutLanding = await strapi.db.query('api::landing-page.landing-page').findOne({
+      where: { slug: 've-chung-toi' },
+    });
+
+    if (!aboutLanding) {
+      console.log('Seeding about landing page...');
+      try {
+        await strapi.documents('api::landing-page.landing-page').create({
+          data: {
+            title: 'Về Thăng Long Chè Việt',
+            slug: 've-chung-toi',
+            seoDescription: 'Câu chuyện về hành trình mang hương vị trà truyền thống đến mọi nhà.',
+            blocks: [
+              {
+                __component: 'page-blocks.rich-text',
+                container_width: 'Narrow',
+                content:
+                  '<p>Thăng Long Chè Việt được sinh ra với sứ mệnh bảo tồn và phát triển tinh hoa văn hoá trà Việt Nam.</p><p>Chúng tôi hợp tác trực tiếp với nông dân và nghệ nhân tại các vùng trà truyền thống.</p>',
+              },
+            ],
+            publishedAt: new Date(),
+          },
+        });
+      } catch (error) {
+        console.warn('About landing seed skipped:', error);
+      }
     }
     // Seeding logic cho Public Permissions
     const publicRole = await strapi.db.query('plugin::users-permissions.role').findOne({ where: { type: 'public' } });
@@ -80,5 +156,37 @@ export default {
       }
       console.log('Public permissions seeded successfully.');
     }
+
+    // Warm hot API paths so the first storefront SSR request is not ~2s cold.
+    warmStrapiApis(strapi);
   },
 };
+
+async function warmStrapiApis(strapi: Core.Strapi) {
+  const port = strapi.config.get<number>('server.port', 1337);
+  const host = strapi.config.get<string>('server.host', '0.0.0.0');
+  const base =
+    host === '0.0.0.0' || host === '::' ? `http://127.0.0.1:${port}` : `http://${host}:${port}`;
+
+  const paths = [
+    '/api/landing-pages?filters[slug][$eq]=home&status=published',
+    '/api/articles?pagination[limit]=1&status=published',
+  ];
+
+  const deadline = Date.now() + 60_000;
+  for (const path of paths) {
+    while (Date.now() < deadline) {
+      try {
+        const start = Date.now();
+        const res = await fetch(`${base}${path}`);
+        if (res.ok) {
+          console.log(`API warm-up ${path}: ${res.status} (${Date.now() - start}ms)`);
+          break;
+        }
+      } catch {
+        // Server not listening yet
+      }
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    }
+  }
+}

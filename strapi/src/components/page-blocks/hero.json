@@ -1,0 +1,32 @@
+{
+  "collectionName": "components_page_blocks_heroes",
+  "info": {
+    "displayName": "Hero Banner",
+    "icon": "picture",
+    "description": "Full-width hero with background image and CTAs"
+  },
+  "attributes": {
+    "heading": {
+      "type": "string",
+      "required": true
+    },
+    "subheading": {
+      "type": "text"
+    },
+    "background_image": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images", "videos"]
+    },
+    "cta_buttons": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.cta-button"
+    },
+    "alignment": {
+      "type": "enumeration",
+      "enum": ["Left", "Center", "Right"],
+      "default": "Center"
+    }
+  }
+}

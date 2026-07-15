@@ -9,11 +9,12 @@
     "deploy": "strapi deploy",
     "dev": "strapi develop",
     "develop": "strapi develop",
+    "start:api": "strapi build && strapi start",
     "start": "strapi start",
     "strapi": "strapi",
     "upgrade": "npx @strapi/upgrade latest",
     "upgrade:dry": "npx @strapi/upgrade latest --dry",
-    "postinstall": "npm install --os=linux --cpu=arm64 sharp"
+    "postinstall": "node ./scripts/postinstall-sharp.mjs"
   },
   "dependencies": {
     "@strapi/plugin-cloud": "5.50.1",

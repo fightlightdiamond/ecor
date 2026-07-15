@@ -15,9 +15,10 @@ const S3_PATHNAME = process.env.MEDUSA_CLOUD_S3_PATHNAME
  */
 const nextConfig = {
   reactStrictMode: true,
+  outputFileTracingRoot: require("path").join(__dirname, "../.."),
   logging: {
     fetches: {
-      fullUrl: true,
+      fullUrl: process.env.NODE_ENV === "development",
     },
   },
   eslint: {
@@ -27,11 +28,16 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    unoptimized: true,
+    // Optimize in production; skip optimizer overhead during local dev.
+    unoptimized: process.env.NODE_ENV === "development",
     remotePatterns: [
       {
         protocol: "http",
         hostname: "localhost",
+      },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
       },
       {
         protocol: "https",

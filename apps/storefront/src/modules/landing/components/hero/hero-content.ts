@@ -6,8 +6,7 @@ export const DEFAULT_LANDING_HERO_CONTENT: LandingHeroProps = {
   title: "Không gian thư giãn giữa lòng Hà Nội",
   subtitle:
     "Trải nghiệm salon & spa với liệu pháp chăm sóc tóc, da và cơ thể — phong cách Việt, tiêu chuẩn quốc tế.",
-  imageSrc:
-    "https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=1920&q=80",
+  imageSrc: "/images/hero-default.jpg",
   imageAlt: "Không gian salon Thăng Long Chè Việt",
   primaryCta: {
     label: "Đặt lịch ngay",

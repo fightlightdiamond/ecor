@@ -1,0 +1,17 @@
+{
+  "collectionName": "components_page_blocks_faqs",
+  "info": {
+    "displayName": "FAQ",
+    "icon": "question"
+  },
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "questions": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.faq-item"
+    }
+  }
+}

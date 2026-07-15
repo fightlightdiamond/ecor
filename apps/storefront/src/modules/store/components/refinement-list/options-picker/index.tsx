@@ -34,7 +34,21 @@ const OptionsPicker = ({
         })
 
         if (response?.product_options) {
-          setOptions(response.product_options)
+          // Apparel demo options are irrelevant for tea SKUs.
+          const apparelTitles = new Set(["size", "color", "colour"])
+          setOptions(
+            response.product_options.filter((option) => {
+              const title = (option.title || "").trim().toLowerCase()
+              if (apparelTitles.has(title)) {
+                return false
+              }
+              // Medusa default dummy option left over from incomplete seeds
+              if (title === "default option") {
+                return false
+              }
+              return true
+            })
+          )
         }
       } catch (error) {
         console.error("Failed to fetch product options", error)

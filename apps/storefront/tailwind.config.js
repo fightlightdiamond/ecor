@@ -80,20 +80,36 @@ module.exports = {
       },
       fontFamily: {
         sans: [
-          "Inter",
-          "-apple-system",
-          "BlinkMacSystemFont",
-          "Segoe UI",
-          "Roboto",
-          "Helvetica Neue",
-          "Ubuntu",
+          "var(--font-sans)",
+          "Be Vietnam Pro",
+          "system-ui",
           "sans-serif",
+        ],
+        display: [
+          "var(--font-display)",
+          "Literata",
+          "Georgia",
+          "serif",
         ],
       },
       keyframes: {
         ring: {
           "0%": { transform: "rotate(0deg)" },
           "100%": { transform: "rotate(360deg)" },
+        },
+        "rise-fade": {
+          "0%": {
+            opacity: "0",
+            transform: "translateY(18px)",
+          },
+          "100%": {
+            opacity: "1",
+            transform: "translateY(0)",
+          },
+        },
+        "soft-ken": {
+          "0%": { transform: "scale(1)" },
+          "100%": { transform: "scale(1.06)" },
         },
         "fade-in-right": {
           "0%": {
@@ -163,6 +179,8 @@ module.exports = {
       },
       animation: {
         ring: "ring 2.2s cubic-bezier(0.5, 0, 0.5, 1) infinite",
+        "rise-fade": "rise-fade 0.9s cubic-bezier(0.22, 1, 0.36, 1) both",
+        "soft-ken": "soft-ken 18s ease-out forwards",
         "fade-in-right":
           "fade-in-right 0.3s cubic-bezier(0.5, 0, 0.5, 1) forwards",
         "fade-in-top": "fade-in-top 0.2s cubic-bezier(0.5, 0, 0.5, 1) forwards",

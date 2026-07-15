@@ -5,7 +5,7 @@
     "singularName": "landing-page",
     "pluralName": "landing-pages",
     "displayName": "Landing Page",
-    "description": "Pages for marketing and presentation"
+    "description": "Dynamic marketing pages built from reusable blocks"
   },
   "options": {
     "draftAndPublish": true
@@ -21,8 +21,25 @@
       "targetField": "title",
       "required": true
     },
+    "seo": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.seo"
+    },
     "seoDescription": {
       "type": "text"
+    },
+    "blocks": {
+      "type": "dynamiczone",
+      "components": [
+        "page-blocks.hero",
+        "page-blocks.feature-list",
+        "page-blocks.product-grid",
+        "page-blocks.testimonials",
+        "page-blocks.cta-banner",
+        "page-blocks.faq",
+        "page-blocks.rich-text"
+      ]
     },
     "content": {
       "type": "richtext"

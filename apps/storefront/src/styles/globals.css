@@ -49,9 +49,23 @@
   }
 }
 
+@layer base {
+  .bg-store-atmosphere {
+    background-color: #eef1e8;
+    background-image:
+      radial-gradient(ellipse 120% 70% at 8% -12%, rgba(90, 110, 45, 0.14), transparent 55%),
+      radial-gradient(ellipse 90% 55% at 100% 5%, rgba(70, 90, 40, 0.08), transparent 50%),
+      linear-gradient(180deg, #f2f4ed 0%, #e8ebe2 45%, #e4e7dc 100%);
+  }
+}
+
 @layer components {
   .content-container {
     @apply max-w-[1440px] w-full mx-auto px-6;
+  }
+
+  .font-display {
+    font-family: var(--font-display), Literata, Georgia, serif;
   }
 
   .contrast-btn {
@@ -108,5 +122,42 @@
 
   .text-3xl-semi {
     @apply text-[32px] leading-[44px] font-semibold;
+  }
+
+  /* CMS rich text (replaces @tailwindcss/typography when plugin unavailable) */
+  .prose {
+    @apply text-ui-fg-base leading-relaxed;
+  }
+
+  .prose :where(p):not(:where([class~="not-prose"] *)) {
+    @apply mb-4;
+  }
+
+  .prose :where(h2):not(:where([class~="not-prose"] *)) {
+    @apply text-2xl font-semibold mt-8 mb-4;
+  }
+
+  .prose :where(h3):not(:where([class~="not-prose"] *)) {
+    @apply text-xl font-semibold mt-6 mb-3;
+  }
+
+  .prose :where(ul, ol):not(:where([class~="not-prose"] *)) {
+    @apply mb-4 pl-6;
+  }
+
+  .prose :where(ul):not(:where([class~="not-prose"] *)) {
+    @apply list-disc;
+  }
+
+  .prose :where(ol):not(:where([class~="not-prose"] *)) {
+    @apply list-decimal;
+  }
+
+  .prose :where(a):not(:where([class~="not-prose"] *)) {
+    @apply underline text-ui-fg-interactive;
+  }
+
+  .prose :where(strong):not(:where([class~="not-prose"] *)) {
+    @apply font-semibold;
   }
 }

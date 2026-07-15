@@ -13,8 +13,10 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       POSTGRES_DB: ${POSTGRES_DB:-medusa}
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./postgres/init-strapi-schema.sql:/docker-entrypoint-initdb.d/01-strapi-schema.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-medusa}"]
       interval: 5s
@@ -26,8 +28,10 @@ services:
     container_name: tlcv_install
     working_dir: /workspace
     command: >
-      sh -c "npm install --no-audit --no-fund ||
-             npm install --no-audit --no-fund --legacy-peer-deps"
+      sh -c "(npm install --no-audit --no-fund ||
+              npm install --no-audit --no-fund --legacy-peer-deps) &&
+             (cd /workspace/strapi && npm install --no-audit --no-fund ||
+              cd /workspace/strapi && npm install --no-audit --no-fund --legacy-peer-deps)"
     volumes:
       - ../:/workspace
       - root_node_modules:/workspace/node_modules
@@ -139,8 +143,9 @@ services:
       HTTP_PORT: ${HTTP_PORT:-80}
     volumes:
       - ../:/workspace
+      - root_node_modules:/workspace/node_modules
       - strapi_node_modules:/workspace/strapi/node_modules
-    command: sh -c "npm run develop"
+    command: sh -c "if [ ! -d dist ]; then npm run build; fi && npm run start"
 
   nginx:
     image: nginx:1.25-alpine

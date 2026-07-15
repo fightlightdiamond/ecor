@@ -5,7 +5,7 @@ import type { AccentScale, StorefrontThemeConfig } from "./types"
  * Supported values: jade | teal | sage | grass | olive | bronze
  */
 export const STOREFRONT_THEME: StorefrontThemeConfig = {
-  accentScale: "jade",
+  accentScale: "olive",
   appearance: "light",
 }
 

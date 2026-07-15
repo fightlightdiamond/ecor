@@ -1,0 +1,18 @@
+{
+  "collectionName": "components_page_blocks_rich_texts",
+  "info": {
+    "displayName": "Rich Text",
+    "icon": "file"
+  },
+  "attributes": {
+    "content": {
+      "type": "richtext",
+      "required": true
+    },
+    "container_width": {
+      "type": "enumeration",
+      "enum": ["Narrow", "Full"],
+      "default": "Narrow"
+    }
+  }
+}

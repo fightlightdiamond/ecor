@@ -1,10 +1,12 @@
 "use server"
 
+import { cache } from "react"
+
 import { sdk } from "@lib/config"
 import { HttpTypes } from "@medusajs/types"
 import { getCacheOptions } from "./cookies"
 
-export const listRegions = async () => {
+export const listRegions = cache(async () => {
   const next = {
     ...(await getCacheOptions("regions")),
   }
@@ -16,9 +18,9 @@ export const listRegions = async () => {
       cache: "force-cache",
     })
     .then(({ regions }) => regions)
-}
+})
 
-export const retrieveRegion = async (id: string) => {
+export const retrieveRegion = cache(async (id: string) => {
   const next = {
     ...(await getCacheOptions(["regions", id].join("-"))),
   }
@@ -30,20 +32,16 @@ export const retrieveRegion = async (id: string) => {
       cache: "force-cache",
     })
     .then(({ region }) => region)
-}
+})
 
-const regionMap = new Map<string, HttpTypes.StoreRegion>()
-
-export const getRegion = async (countryCode: string) => {
-  if (regionMap.has(countryCode)) {
-    return regionMap.get(countryCode)
-  }
-
+export const getRegion = cache(async (countryCode: string) => {
   const regions = await listRegions()
 
   if (!regions) {
     return null
   }
+
+  const regionMap = new Map<string, HttpTypes.StoreRegion>()
 
   regions.forEach((region) => {
     region.countries?.forEach((c) => {
@@ -51,9 +49,5 @@ export const getRegion = async (countryCode: string) => {
     })
   })
 
-  const region = countryCode
-    ? regionMap.get(countryCode)
-    : regionMap.get("us")
-
-  return region
-}
+  return countryCode ? regionMap.get(countryCode) : regionMap.get("us")
+})

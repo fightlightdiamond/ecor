@@ -14,13 +14,8 @@
     "backend:seed": "turbo seed --filter=@dtc/backend",
     "backend:dev": "turbo dev --filter=@dtc/backend",
     "storefront:dev": "turbo dev --filter=@dtc/storefront",
-    "storefront:storybook": "turbo storybook --filter=@dtc/storefront"
-  },
-  "pnpm": {
-    "overrides": {
-      "@types/react": "19.0.5",
-      "@types/react-dom": "19.0.5"
-    }
+    "storefront:storybook": "turbo storybook --filter=@dtc/storefront",
+    "warm:apis": "node scripts/warm-apis.mjs"
   },
   "devDependencies": {
     "@medusajs/eslint-plugin": "2.16.0",
@@ -36,6 +31,8 @@
   ],
   "overrides": {
     "ajv": "^8.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "react-router-dom": "6.30.4"
   }
 }

@@ -1,8 +1,9 @@
 import { sdk } from "@lib/config"
 import { HttpTypes } from "@medusajs/types"
+import { cache } from "react"
 import { getCacheOptions } from "./cookies"
 
-export const listCategories = async (query?: Record<string, unknown>) => {
+export const listCategories = cache(async (query?: Record<string, unknown>) => {
   const next = {
     ...(await getCacheOptions("categories")),
   }
@@ -15,7 +16,8 @@ export const listCategories = async (query?: Record<string, unknown>) => {
       {
         query: {
           fields:
-            "*category_children, *products, *parent_category, *parent_category.parent_category",
+            query?.fields ||
+            "*category_children, *parent_category, *parent_category.parent_category",
           limit,
           ...query,
         },
@@ -24,7 +26,7 @@ export const listCategories = async (query?: Record<string, unknown>) => {
       }
     )
     .then(({ product_categories }) => product_categories)
-}
+})
 
 export const getCategoryByHandle = async (categoryHandle: string[]) => {
   const handle = `${categoryHandle.join("/")}`
@@ -38,7 +40,7 @@ export const getCategoryByHandle = async (categoryHandle: string[]) => {
       `/store/product-categories`,
       {
         query: {
-          fields: "*category_children, *products",
+          fields: "*category_children, *parent_category",
           handle,
         },
         next,
